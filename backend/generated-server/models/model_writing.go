@@ -1,0 +1,36 @@
+package models
+
+import (
+	"time"
+)
+
+type Writing struct {
+
+	Id int64 `json:"id"`
+
+	UserId int64 `json:"userId"`
+
+	ThemeId int64 `json:"themeId"`
+
+	Content string `json:"content"`
+
+	DurationSeconds int32 `json:"durationSeconds"`
+
+	AiScore int32 `json:"aiScore,omitempty"`
+
+	AiFeedbackOverall string `json:"aiFeedbackOverall,omitempty"`
+
+	AiFeedbackClarity string `json:"aiFeedbackClarity,omitempty"`
+
+	AiFeedbackAccuracy string `json:"aiFeedbackAccuracy,omitempty"`
+
+	AiFeedbackCompleteness string `json:"aiFeedbackCompleteness,omitempty"`
+
+	AiFeedbackStructure string `json:"aiFeedbackStructure,omitempty"`
+
+	AiFeedbackConciseness string `json:"aiFeedbackConciseness,omitempty"`
+
+	CreatedAt time.Time `json:"createdAt"`
+
+	UpdatedAt time.Time `json:"updatedAt"`
+}

@@ -1,0 +1,441 @@
+openapi: 3.1.0
+info:
+  description: API for the Kotobalize technical interview preparation app.
+  title: Kotobalize API
+  version: 1.0.0
+servers:
+- description: Development server
+  url: http://localhost:8080/api/v1
+security:
+- bearerAuth: []
+paths:
+  /auth/register:
+    post:
+      operationId: registerUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+          description: User registered successfully
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "409":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: User with this email already exists
+      summary: Register a new user
+      tags:
+      - Auth
+  /auth/login:
+    post:
+      operationId: loginUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+          description: User logged in successfully
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+      summary: Authenticate user and get a token
+      tags:
+      - Auth
+  /auth/me:
+    get:
+      operationId: getCurrentUser
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: Current user information
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+      security:
+      - bearerAuth: []
+      summary: Get current authenticated user's information
+      tags:
+      - Auth
+  /themes:
+    get:
+      operationId: listThemes
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Theme'
+                type: array
+          description: A list of themes
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+      security:
+      - bearerAuth: []
+      summary: Get a list of all available themes
+      tags:
+      - Themes
+  /themes/{themeId}:
+    get:
+      operationId: getThemeById
+      parameters:
+      - explode: false
+        in: path
+        name: themeId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Theme'
+          description: Theme details
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+      security:
+      - bearerAuth: []
+      summary: Get details of a specific theme by ID
+      tags:
+      - Themes
+  /writings:
+    get:
+      operationId: listUserWritings
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Writing'
+                type: array
+          description: A list of user's writings
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+      security:
+      - bearerAuth: []
+      summary: Get a list of all writings for the authenticated user
+      tags:
+      - Writings
+    post:
+      operationId: createWriting
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewWritingRequest'
+        required: true
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Writing'
+          description: Writing record created successfully
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Theme not found
+      security:
+      - bearerAuth: []
+      summary: Create a new writing record and trigger AI review
+      tags:
+      - Writings
+  /writings/{writingId}:
+    get:
+      operationId: getWritingById
+      parameters:
+      - explode: false
+        in: path
+        name: writingId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Writing'
+          description: Writing record details
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Forbidden - User does not own this writing
+        "404":
+          $ref: '#/components/responses/NotFound'
+      security:
+      - bearerAuth: []
+      summary: Get details of a specific writing record by ID
+      tags:
+      - Writings
+components:
+  responses:
+    BadRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Bad Request - Invalid input
+    Unauthorized:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Unauthorized - Authentication required or invalid credentials
+    NotFound:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+      description: Not Found - Resource not found
+  schemas:
+    User:
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        id: 0
+        email: email
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        id:
+          format: int64
+          readOnly: true
+          type: integer
+        email:
+          format: email
+          readOnly: true
+          type: string
+        createdAt:
+          format: date-time
+          readOnly: true
+          type: string
+        updatedAt:
+          format: date-time
+          readOnly: true
+          type: string
+      required:
+      - createdAt
+      - email
+      - id
+      - updatedAt
+    Theme:
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        description: description
+        id: 0
+        title: title
+        category: category
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        id:
+          format: int64
+          readOnly: true
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        createdAt:
+          format: date-time
+          readOnly: true
+          type: string
+        updatedAt:
+          format: date-time
+          readOnly: true
+          type: string
+      required:
+      - category
+      - createdAt
+      - description
+      - id
+      - title
+      - updatedAt
+    Writing:
+      example:
+        aiScore: 5
+        aiFeedbackStructure: aiFeedbackStructure
+        durationSeconds: 5
+        aiFeedbackOverall: aiFeedbackOverall
+        themeId: 1
+        aiFeedbackCompleteness: aiFeedbackCompleteness
+        aiFeedbackAccuracy: aiFeedbackAccuracy
+        userId: 6
+        content: content
+        aiFeedbackConciseness: aiFeedbackConciseness
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        aiFeedbackClarity: aiFeedbackClarity
+        id: 0
+        updatedAt: 2000-01-23T04:56:07.000+00:00
+      properties:
+        id:
+          format: int64
+          readOnly: true
+          type: integer
+        userId:
+          format: int64
+          readOnly: true
+          type: integer
+        themeId:
+          format: int64
+          type: integer
+        content:
+          type: string
+        durationSeconds:
+          format: int32
+          type: integer
+        aiScore:
+          format: int32
+          type: integer
+          nullable: true
+        aiFeedbackOverall:
+          type: string
+          nullable: true
+        aiFeedbackClarity:
+          type: string
+          nullable: true
+        aiFeedbackAccuracy:
+          type: string
+          nullable: true
+        aiFeedbackCompleteness:
+          type: string
+          nullable: true
+        aiFeedbackStructure:
+          type: string
+          nullable: true
+        aiFeedbackConciseness:
+          type: string
+          nullable: true
+        createdAt:
+          format: date-time
+          readOnly: true
+          type: string
+        updatedAt:
+          format: date-time
+          readOnly: true
+          type: string
+      required:
+      - content
+      - createdAt
+      - durationSeconds
+      - id
+      - themeId
+      - updatedAt
+      - userId
+    NewWritingRequest:
+      example:
+        durationSeconds: 6
+        themeId: 0
+        content: content
+      properties:
+        themeId:
+          format: int64
+          type: integer
+        content:
+          type: string
+        durationSeconds:
+          format: int32
+          type: integer
+      required:
+      - content
+      - durationSeconds
+      - themeId
+    RegisterRequest:
+      example:
+        password: password
+        email: email
+      properties:
+        email:
+          format: email
+          type: string
+        password:
+          format: password
+          type: string
+      required:
+      - email
+      - password
+    LoginRequest:
+      example:
+        password: password
+        email: email
+      properties:
+        email:
+          format: email
+          type: string
+        password:
+          format: password
+          type: string
+      required:
+      - email
+      - password
+    AuthResponse:
+      example:
+        user:
+          createdAt: 2000-01-23T04:56:07.000+00:00
+          id: 0
+          email: email
+          updatedAt: 2000-01-23T04:56:07.000+00:00
+        token: token
+      properties:
+        token:
+          type: string
+        user:
+          $ref: '#/components/schemas/User'
+      required:
+      - token
+      - user
+    Error:
+      example:
+        code: code
+        message: message
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+      - code
+      - message
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
