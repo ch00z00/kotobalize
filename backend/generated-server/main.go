@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/GIT_USER_ID/GIT_REPO_ID/handlers"
+	"github.com/ch00z00/kotobalize/handlers"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -23,8 +23,8 @@ func main() {
 	// LoginUser - Authenticate user and get a token
 	e.POST("/api/v1/auth/login", c.LoginUser)
 
-	// RegisterUser - Register a new user
-	e.POST("/api/v1/auth/register", c.RegisterUser)
+	// SignupUser - Sign up a new user
+	e.POST("/api/v1/auth/signup", c.SignupUser)
 
 	// GetThemeById - Get details of a specific theme by ID
 	e.GET("/api/v1/themes/:themeId", c.GetThemeById)
@@ -40,6 +40,9 @@ func main() {
 
 	// ListUserWritings - Get a list of all writings for the authenticated user
 	e.GET("/api/v1/writings", c.ListUserWritings)
+
+	// ReviewWriting - Trigger AI review for a writing
+	e.POST("/api/v1/review", c.ReviewWriting)
 
 
 	// Start server

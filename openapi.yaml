@@ -11,10 +11,10 @@ security:
  - bearerAuth: []
 
 paths:
- /auth/register:
+ /auth/signup:
   post:
-   summary: Register a new user
-   operationId: registerUser
+   summary: Sign up a new user
+   operationId: signupUser
    tags:
     - Auth
    requestBody:
@@ -211,6 +211,40 @@ paths:
     "404":
      $ref: "#/components/responses/NotFound"
 
+ /review:
+  post:
+   summary: Trigger AI review for a writing
+   operationId: reviewWriting
+   tags:
+    - Writings
+   security:
+    - bearerAuth: []
+   requestBody:
+    required: true
+    content:
+     application/json:
+      schema:
+       $ref: "#/components/schemas/NewReviewRequest"
+   responses:
+    "200":
+     description: AI review completed successfully
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Writing"
+    "400":
+     $ref: "#/components/responses/BadRequest"
+    "401":
+     $ref: "#/components/responses/Unauthorized"
+    "403":
+     description: Forbidden - User does not own this writing
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Error"
+    "404":
+     $ref: "#/components/responses/NotFound"
+
 components:
  securitySchemes:
   bearerAuth:
@@ -346,6 +380,15 @@ components:
     - themeId
     - content
     - durationSeconds
+
+  NewReviewRequest:
+   type: object
+   properties:
+    writingId:
+     type: integer
+     format: int64
+   required:
+    - writingId
 
   RegisterRequest:
    type: object

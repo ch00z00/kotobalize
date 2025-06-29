@@ -1,8 +1,10 @@
 package handlers
+
 import (
-	"github.com/GIT_USER_ID/GIT_REPO_ID/models"
-	"github.com/labstack/echo/v4"
 	"net/http"
+
+	"github.com/ch00z00/kotobalize/models"
+	"github.com/labstack/echo/v4"
 )
 
 // GetThemeById - Get details of a specific theme by ID

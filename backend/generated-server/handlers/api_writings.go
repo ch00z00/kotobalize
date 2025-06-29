@@ -1,12 +1,22 @@
 package handlers
+
 import (
-	"github.com/GIT_USER_ID/GIT_REPO_ID/models"
-	"github.com/labstack/echo/v4"
 	"net/http"
+
+	"github.com/ch00z00/kotobalize/models"
+	"github.com/labstack/echo/v4"
 )
 
 // CreateWriting - Create a new writing record and trigger AI review
 func (c *Container) CreateWriting(ctx echo.Context) error {
+	return ctx.JSON(http.StatusOK, models.HelloWorld {
+		Message: "Hello World",
+	})
+}
+
+
+// ReviewWriting - Trigger AI review for a writing
+func (c *Container) ReviewWriting(ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, models.HelloWorld {
 		Message: "Hello World",
 	})
@@ -27,4 +37,3 @@ func (c *Container) ListUserWritings(ctx echo.Context) error {
 		Message: "Hello World",
 	})
 }
-
