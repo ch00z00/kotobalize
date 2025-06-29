@@ -17,7 +17,7 @@ type Container struct {
 
 // NewContainer returns an empty or an initialized container for your handlers.
 func NewContainer() (Container, error) {
-	// docker-compose.ymlから環境変数を読み込み
+	// Load environment variables from docker-compose.yml
 	user := os.Getenv("DB_USER")
 	password := os.Getenv("DB_PASSWORD")
 	host := os.Getenv("DB_HOST")
@@ -25,16 +25,16 @@ func NewContainer() (Container, error) {
 	dbname := os.Getenv("DB_NAME")
 	jwtSecret := os.Getenv("JWT_SECRET")
 
-	// DSN (Data Source Name) を構築
+	// Build DSN (Data Source Name)
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", user, password, host, port, dbname)
 
-	// GORMでMySQLに接続
+	// Connect to MySQL with GORM
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return Container{}, fmt.Errorf("failed to connect to database: %w", err)
 	}
 
-	// スキーマの自動マイグレーション
+	// Auto migrate the schema
 	db.AutoMigrate(&models.GormUser{}, &models.GormTheme{}, &models.GormWriting{})
 
 	c := Container{DB: db, JWTSecret: jwtSecret}
