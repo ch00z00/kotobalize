@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/ch00z00/kotobalize/handlers"
+	"github.com/ch00z00/kotobalize/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -26,35 +27,31 @@ func main() {
 	// Initialize Gin router
 	router := gin.Default()
 
+	// Create auth middleware instance
+	authMiddleware := middleware.AuthMiddleware(c.JWTSecret)
+
 	// API v1 group
 	v1 := router.Group("/api/v1")
 	{
-		// Auth routes
-		auth := v1.Group("/auth")
-		{
-			auth.POST("/signup", c.SignupUser)
-			auth.POST("/login", c.LoginUser)
-			// This route should be protected by auth middleware in a real app
-			auth.GET("/me", c.GetCurrentUser)
-		}
+		// Public routes (no authentication required)
+		v1.POST("/auth/signup", c.SignupUser)
+		v1.POST("/auth/login", c.LoginUser)
 
-		// Theme routes
-		themes := v1.Group("/themes")
+		// Protected routes (authentication required)
+		protected := v1.Group("/")
+		protected.Use(authMiddleware)
 		{
-			themes.GET("", c.ListThemes)
-			themes.GET("/:themeId", c.GetThemeByID)
-		}
+			protected.GET("/auth/me", c.GetCurrentUser)
 
-		// Writings routes
-		writings := v1.Group("/writings")
-		{
-			writings.GET("", c.ListUserWritings)
-			writings.POST("", c.CreateWriting)
-			writings.GET("/:writingId", c.GetWritingByID)
-		}
+			protected.GET("/themes", c.ListThemes)
+			protected.GET("/themes/:themeId", c.GetThemeByID)
 
-		// Review route
-		v1.POST("/review", c.ReviewWriting)
+			protected.GET("/writings", c.ListUserWritings)
+			protected.POST("/writings", c.CreateWriting)
+			protected.GET("/writings/:writingId", c.GetWritingByID)
+
+			protected.POST("/review", c.ReviewWriting)
+		}
 	}
 
 	// Start server

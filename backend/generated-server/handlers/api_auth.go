@@ -14,17 +14,74 @@ import (
 
 // GetCurrentUser - Get current authenticated user's information
 func (c *Container) GetCurrentUser(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, models.HelloWorld{
-		Message: "Hello World from GetCurrentUser",
-	})
+	// Get user ID from the context (set by the auth middleware)
+	userID, exists := ctx.Get("userId")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"code": "UNAUTHORIZED", "message": "User ID not found in token"})
+		return
+	}
+
+	// Find the user in the database
+	var user models.GormUser
+	if err := c.DB.First(&user, userID).Error; err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"code": "USER_NOT_FOUND", "message": "User not found"})
+		return
+	}
+
+	// Map GORM user to API user model
+	apiUser := models.User{
+		ID:        int64(user.ID),
+		Email:     user.Email,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+	}
+
+	ctx.JSON(http.StatusOK, apiUser)
 }
 
 // LoginUser - Authenticate user and get a token
 func (c *Container) LoginUser(ctx *gin.Context) {
-	// In a real implementation, you would validate credentials,
-	// generate a JWT, and return it.
-	ctx.JSON(http.StatusOK, models.HelloWorld{
-		Message: "Hello World from LoginUser",
+	var req models.LoginRequest
+	// Bind the incoming JSON to the LoginRequest struct
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"code": "INVALID_INPUT", "message": err.Error()})
+		return
+	}
+
+	// Find the user by email
+	var user models.GormUser
+	if err := c.DB.Model(&models.GormUser{}).Where("email = ?", req.Email).First(&user).Error; err != nil {
+		// To prevent email enumeration attacks, return a generic error for both "not found" and other DB errors.
+		ctx.JSON(http.StatusUnauthorized, gin.H{"code": "INVALID_CREDENTIALS", "message": "Invalid email or password"})
+		return
+	}
+
+	// Compare the provided password with the stored hash
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+		// If passwords don't match, return unauthorized
+		ctx.JSON(http.StatusUnauthorized, gin.H{"code": "INVALID_CREDENTIALS", "message": "Invalid email or password"})
+		return
+	}
+
+	// Generate JWT
+	token, err := generateJWT(user, c.JWTSecret)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"code": "INTERNAL_ERROR", "message": "Failed to generate token"})
+		return
+	}
+
+	// Map GORM user model to API user model for the response
+	apiUser := models.User{
+		ID:        int64(user.ID),
+		Email:     user.Email,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+	}
+
+	// Return the token and user info
+	ctx.JSON(http.StatusOK, models.AuthResponse{
+		Token: token,
+		User:  apiUser,
 	})
 }
 
