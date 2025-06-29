@@ -5,6 +5,7 @@ import (
 
 	"github.com/ch00z00/kotobalize/handlers"
 	"github.com/ch00z00/kotobalize/middleware"
+	"github.com/ch00z00/kotobalize/seeder"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,6 +24,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to create container: %v", err)
 	}
+
+	// Seed the database with initial data
+	seeder.SeedThemes(c.DB)
 
 	// Initialize Gin router
 	router := gin.Default()
