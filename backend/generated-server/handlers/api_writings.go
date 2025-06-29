@@ -65,9 +65,27 @@ func (c *Container) GetWritingByID(ctx *gin.Context) {
 
 // ListUserWritings - Get a list of all writings for the authenticated user
 func (c *Container) ListUserWritings(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, models.HelloWorld{
-		Message: "Hello World from ListUserWritings",
-	})
+	// Get user ID from the context (set by the auth middleware)
+	userID, exists := ctx.Get("userId")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"code": "UNAUTHORIZED", "message": "User ID not found in token"})
+		return
+	}
+
+	// Find all writings for the authenticated user, ordered by most recent
+	var gormWritings []models.GormWriting
+	if err := c.DB.Where("user_id = ?", userID).Order("created_at desc").Find(&gormWritings).Error; err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"code": "DATABASE_ERROR", "message": "Failed to fetch writings"})
+		return
+	}
+
+	// Map GORM writings to API writings
+	apiWritings := make([]models.Writing, len(gormWritings))
+	for i, w := range gormWritings {
+		apiWritings[i] = mapGormWritingToAPI(w)
+	}
+
+	ctx.JSON(http.StatusOK, apiWritings)
 }
 
 // mapGormWritingToAPI converts a GORM writing model to an API writing model.
