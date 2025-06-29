@@ -1,50 +1,64 @@
 package main
 
 import (
+	"log"
+
 	"github.com/ch00z00/kotobalize/handlers"
-	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	"github.com/gin-gonic/gin"
 )
 
+/**
+ * main is the entry point of the backend server.
+ *
+ * It creates a new Container with a DB connection, sets up a Gin router,
+ * and defines API v1 endpoints for auth, themes, writings, and review.
+ *
+ * Finally, it starts the server listening on port 8080.
+ */
+
 func main() {
-	e := echo.New()
+	// Initialize container with DB connection
+	c, err := handlers.NewContainer()
+	if err != nil {
+		log.Fatalf("failed to create container: %v", err)
+	}
 
-	//todo: handle the error!
-	c, _ := handlers.NewContainer()
+	// Initialize Gin router
+	router := gin.Default()
 
-	// Middleware
-	e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
+	// API v1 group
+	v1 := router.Group("/api/v1")
+	{
+		// Auth routes
+		auth := v1.Group("/auth")
+		{
+			auth.POST("/signup", c.SignupUser)
+			auth.POST("/login", c.LoginUser)
+			// This route should be protected by auth middleware in a real app
+			auth.GET("/me", c.GetCurrentUser)
+		}
 
+		// Theme routes
+		themes := v1.Group("/themes")
+		{
+			themes.GET("", c.ListThemes)
+			themes.GET("/:themeId", c.GetThemeByID)
+		}
 
-	// GetCurrentUser - Get current authenticated user's information
-	e.GET("/api/v1/auth/me", c.GetCurrentUser)
+		// Writings routes
+		writings := v1.Group("/writings")
+		{
+			writings.GET("", c.ListUserWritings)
+			writings.POST("", c.CreateWriting)
+			writings.GET("/:writingId", c.GetWritingByID)
+		}
 
-	// LoginUser - Authenticate user and get a token
-	e.POST("/api/v1/auth/login", c.LoginUser)
-
-	// SignupUser - Sign up a new user
-	e.POST("/api/v1/auth/signup", c.SignupUser)
-
-	// GetThemeById - Get details of a specific theme by ID
-	e.GET("/api/v1/themes/:themeId", c.GetThemeById)
-
-	// ListThemes - Get a list of all available themes
-	e.GET("/api/v1/themes", c.ListThemes)
-
-	// CreateWriting - Create a new writing record and trigger AI review
-	e.POST("/api/v1/writings", c.CreateWriting)
-
-	// GetWritingById - Get details of a specific writing record by ID
-	e.GET("/api/v1/writings/:writingId", c.GetWritingById)
-
-	// ListUserWritings - Get a list of all writings for the authenticated user
-	e.GET("/api/v1/writings", c.ListUserWritings)
-
-	// ReviewWriting - Trigger AI review for a writing
-	e.POST("/api/v1/review", c.ReviewWriting)
-
+		// Review route
+		v1.POST("/review", c.ReviewWriting)
+	}
 
 	// Start server
-	e.Logger.Fatal(e.Start(":8080"))
+	if err := router.Run(":8080"); err != nil {
+		log.Fatalf("failed to run server: %v", err)
+	}
 }

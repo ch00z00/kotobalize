@@ -19,8 +19,8 @@
 ## 技術スタック
 
 - フロントエンド: Next.js, TypeScript, Tailwind CSS
-- バックエンド: Golang（Echo または Gin）
-- スキーマ定義: OpenAPI 3.1.0
+- バックエンド: Golang, Gin
+- スキーマ定義: OpenAPI
 - DB: MySQL
 - インフラ: Docker（Docker Compose）, openapi-generator
 - AI レビュー: OpenAI API（GPT-4）

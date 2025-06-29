@@ -1,0 +1,58 @@
+version: "3.8"
+
+services:
+ backend:
+  build:
+   context: ./backend/generated-server
+  ports:
+   - "8080:8080"
+  depends_on:
+   - db
+  environment:
+   # バックエンドがDBコンテナと通信するための接続情報
+   - DB_USER=kotobalize_user
+   - DB_PASSWORD=kotobalize_password
+   - DB_HOST=db
+   - DB_PORT=3306
+   - DB_NAME=kotobalize_db
+  networks:
+   - kotobalize-net
+
+ frontend:
+  build:
+   context: ./frontend
+  ports:
+   - "3000:3000"
+  depends_on:
+   - backend
+  environment:
+   # フロントエンドがバックエンドAPIと通信するためのURL
+   - NEXT_PUBLIC_API_URL=http://backend:8080/api/v1
+  networks:
+   - kotobalize-net
+
+ db:
+  image: mysql:8.0
+  container_name: kotobalize-db
+  restart: always
+  environment:
+   MYSQL_ROOT_PASSWORD: rootpassword
+   MYSQL_DATABASE: kotobalize_db
+   MYSQL_USER: kotobalize_user
+   MYSQL_PASSWORD: kotobalize_password
+  ports:
+   # ホストの3306をコンテナの3306にマッピングします
+   - "3306:3306"
+  volumes:
+   # MySQLのデータをホストに永続化します
+   - mysql-data:/var/lib/mysql
+  networks:
+   - kotobalize-net
+
+networks:
+ kotobalize-net:
+  driver: bridge
+
+volumes:
+ mysql-data:
+  driver: local
