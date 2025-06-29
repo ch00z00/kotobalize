@@ -1,19 +1,38 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/ch00z00/kotobalize/models"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 // GetThemeByID - Get details of a specific theme by ID
 func (c *Container) GetThemeByID(ctx *gin.Context) {
-	// In a real implementation, you would get themeId from path params
-	// and fetch the theme from the database.
-	ctx.JSON(http.StatusOK, models.HelloWorld{
-		Message: "Hello World from GetThemeByID",
-	})
+	// Get themeId from path parameter
+	themeIDStr := ctx.Param("themeId")
+	themeID, err := strconv.ParseUint(themeIDStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"code": "INVALID_INPUT", "message": "Invalid theme ID format"})
+		return
+	}
+
+	// Find the theme in the database
+	var gormTheme models.GormTheme
+	if err := c.DB.First(&gormTheme, themeID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, gin.H{"code": "THEME_NOT_FOUND", "message": "Theme not found"})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"code": "DATABASE_ERROR", "message": "Failed to fetch theme"})
+		return
+	}
+
+	// Map GORM model to API model for the response and return it
+	ctx.JSON(http.StatusOK, mapGormThemeToAPI(gormTheme))
 }
 
 // ListThemes - Get a list of all available themes
