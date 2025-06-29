@@ -1,10 +1,13 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/ch00z00/kotobalize/models"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 )
 
 // CreateWriting - Create a new writing record and trigger AI review
@@ -58,9 +61,34 @@ func (c *Container) ReviewWriting(ctx *gin.Context) {
 
 // GetWritingByID - Get details of a specific writing record by ID
 func (c *Container) GetWritingByID(ctx *gin.Context) {
-	ctx.JSON(http.StatusOK, models.HelloWorld{
-		Message: "Hello World from GetWritingByID",
-	})
+	// Get writingId from path parameter
+	writingIDStr := ctx.Param("writingId")
+	writingID, err := strconv.ParseUint(writingIDStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"code": "INVALID_INPUT", "message": "Invalid writing ID format"})
+		return
+	}
+
+	// Get user ID from the context (set by the auth middleware)
+	userID, exists := ctx.Get("userId")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"code": "UNAUTHORIZED", "message": "User ID not found in token"})
+		return
+	}
+
+	// Find the writing record in the database, ensuring it belongs to the authenticated user.
+	var gormWriting models.GormWriting
+	if err := c.DB.Where("id = ? AND user_id = ?", writingID, userID).First(&gormWriting).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, gin.H{"code": "WRITING_NOT_FOUND", "message": "Writing not found or you don't have permission to view it"})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, gin.H{"code": "DATABASE_ERROR", "message": "Failed to fetch writing"})
+		return
+	}
+
+	// Map GORM model to API model for the response and return it
+	ctx.JSON(http.StatusOK, mapGormWritingToAPI(gormWriting))
 }
 
 // ListUserWritings - Get a list of all writings for the authenticated user
