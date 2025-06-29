@@ -15,6 +15,7 @@ services:
    - DB_HOST=db
    - DB_PORT=3306
    - DB_NAME=kotobalize_db
+   - JWT_SECRET=a_very_secret_key_that_should_be_changed
   networks:
    - kotobalize-net
 

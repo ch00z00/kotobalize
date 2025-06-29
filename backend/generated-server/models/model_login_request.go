@@ -1,5 +1,6 @@
 package models
 
+// LoginRequest model
 type LoginRequest struct {
 
 	Email string `json:"email"`

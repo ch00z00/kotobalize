@@ -11,7 +11,8 @@ import (
 
 // Container will hold all dependencies for your application.
 type Container struct {
-	DB *gorm.DB
+	DB        *gorm.DB
+	JWTSecret string
 }
 
 // NewContainer returns an empty or an initialized container for your handlers.
@@ -22,6 +23,7 @@ func NewContainer() (Container, error) {
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
 	dbname := os.Getenv("DB_NAME")
+	jwtSecret := os.Getenv("JWT_SECRET")
 
 	// DSN (Data Source Name) を構築
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", user, password, host, port, dbname)
@@ -33,8 +35,8 @@ func NewContainer() (Container, error) {
 	}
 
 	// スキーマの自動マイグレーション
-	db.AutoMigrate(&models.User{}, &models.Theme{}, &models.Writing{})
+	db.AutoMigrate(&models.GormUser{}, &models.GormTheme{}, &models.GormWriting{})
 
-	c := Container{DB: db}
+	c := Container{DB: db, JWTSecret: jwtSecret}
 	return c, nil
 }

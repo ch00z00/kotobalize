@@ -4,9 +4,10 @@ import (
 	"time"
 )
 
+// User model based on openapi.yml
 type User struct {
 
-	Id int64 `json:"id"`
+	ID int64 `json:"id"`
 
 	Email string `json:"email"`
 

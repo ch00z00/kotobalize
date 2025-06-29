@@ -4,13 +4,14 @@ import (
 	"time"
 )
 
+// Writing model based on openapi.yml
 type Writing struct {
 
-	Id int64 `json:"id"`
+	ID int64 `json:"id"`
 
-	UserId int64 `json:"userId"`
+	UserID int64 `json:"userId"`
 
-	ThemeId int64 `json:"themeId"`
+	ThemeID int64 `json:"themeId"`
 
 	Content string `json:"content"`
 

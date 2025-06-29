@@ -4,9 +4,10 @@ import (
 	"time"
 )
 
+// Theme model based on openapi.yml
 type Theme struct {
 
-	Id int64 `json:"id"`
+	ID int64 `json:"id"`
 
 	Title string `json:"title"`
 

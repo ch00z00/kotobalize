@@ -1,5 +1,6 @@
 package models
 
+// Error model
 type Error struct {
 
 	Code string `json:"code"`
