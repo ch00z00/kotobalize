@@ -72,29 +72,40 @@ func (c *Container) ListUserWritings(ctx *gin.Context) {
 
 // mapGormWritingToAPI converts a GORM writing model to an API writing model.
 func mapGormWritingToAPI(gormWriting models.GormWriting) models.Writing {
-	// Helper function to convert *int to *int32 for nullable fields
-	toInt32Ptr := func(i *int) *int32 {
-		if i == nil {
-			return nil
-		}
-		v := int32(*i)
-		return &v
+	apiWriting := models.Writing{
+		ID:              int64(gormWriting.ID),
+		UserID:          int64(gormWriting.UserID),
+		ThemeID:         int64(gormWriting.ThemeID),
+		Content:         gormWriting.Content,
+		DurationSeconds: int32(gormWriting.DurationSeconds),
+		CreatedAt:       gormWriting.CreatedAt,
+		UpdatedAt:       gormWriting.UpdatedAt,
 	}
 
-	return models.Writing{
-		ID:                     int64(gormWriting.ID),
-		UserID:                 int64(gormWriting.UserID),
-		ThemeID:                int64(gormWriting.ThemeID),
-		Content:                gormWriting.Content,
-		DurationSeconds:        int32(gormWriting.DurationSeconds),
-		AiScore:                *toInt32Ptr(gormWriting.AiScore),
-		AiFeedbackOverall:      *gormWriting.AiFeedbackOverall,
-		AiFeedbackClarity:      *gormWriting.AiFeedbackClarity,
-		AiFeedbackAccuracy:     *gormWriting.AiFeedbackAccuracy,
-		AiFeedbackCompleteness: *gormWriting.AiFeedbackCompleteness,
-		AiFeedbackStructure:    *gormWriting.AiFeedbackStructure,
-		AiFeedbackConciseness:  *gormWriting.AiFeedbackConciseness,
-		CreatedAt:              gormWriting.CreatedAt,
-		UpdatedAt:              gormWriting.UpdatedAt,
+	// Safely handle nullable fields. If the DB value is nil, the API model's
+	// value will be the zero value (0 for int32, "" for string), and `omitempty`
+	// will prevent it from being serialized into the JSON response.
+	if gormWriting.AiScore != nil {
+		apiWriting.AiScore = int32(*gormWriting.AiScore)
 	}
+	if gormWriting.AiFeedbackOverall != nil {
+		apiWriting.AiFeedbackOverall = *gormWriting.AiFeedbackOverall
+	}
+	if gormWriting.AiFeedbackClarity != nil {
+		apiWriting.AiFeedbackClarity = *gormWriting.AiFeedbackClarity
+	}
+	if gormWriting.AiFeedbackAccuracy != nil {
+		apiWriting.AiFeedbackAccuracy = *gormWriting.AiFeedbackAccuracy
+	}
+	if gormWriting.AiFeedbackCompleteness != nil {
+		apiWriting.AiFeedbackCompleteness = *gormWriting.AiFeedbackCompleteness
+	}
+	if gormWriting.AiFeedbackStructure != nil {
+		apiWriting.AiFeedbackStructure = *gormWriting.AiFeedbackStructure
+	}
+	if gormWriting.AiFeedbackConciseness != nil {
+		apiWriting.AiFeedbackConciseness = *gormWriting.AiFeedbackConciseness
+	}
+
+	return apiWriting
 }
