@@ -1,37 +1,19 @@
-# Stage 1: Builder
-# 依存関係のインストールとアプリケーションのビルドを行います
-FROM node:20-alpine AS builder
+# Use a Node.js base image suitable for development
+FROM node:20-alpine
+
+# Set the working directory inside the container
 WORKDIR /app
 
-# package.jsonとlockファイルをコピー
+# Copy package.json and lock file to leverage Docker cache
 COPY package.json ./
 COPY package-lock.json ./
-# yarnやpnpmを使用している場合は、yarn.lockやpnpm-lock.yamlをコピーしてください
 
-# 依存関係をインストール
+# Install dependencies
 RUN npm install
 
-# アプリケーションのソースコードをコピー
-COPY . .
-
-# Next.jsアプリケーションをビルド
-# 注意: next.config.jsに `output: 'standalone'` を設定してください
-RUN npm run build
-
-# Stage 2: Runner
-# ビルドされたアプリケーションを実行するための最小限のイメージを作成します
-FROM node:20-alpine AS runner
-WORKDIR /app
-
-ENV NODE_ENV=production
-
-# ビルダーからスタンドアロンの出力と静的ファイルをコピー
-COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/.next/static ./.next/static
-
+# Expose the port the app runs on
 EXPOSE 3000
-ENV PORT 3000
 
-# アプリケーションを起動
-CMD ["node", "server.js"]
+# The command to run the development server will be provided by docker-compose.
+# This CMD is a fallback for running the container directly.
+CMD ["npm", "run", "dev"]
