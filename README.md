@@ -23,6 +23,7 @@
 - スキーマ定義: OpenAPI
 - DB: MySQL
 - インフラ: Docker（Docker Compose）, openapi-generator
+- テスト: Go 標準テスト機能 (バックエンド), Jest (フロントエンド)
 - AI レビュー: OpenAI API（GPT-4）
 - 認証（任意）: email ＋ password ベースのシンプルな認証で OK
 
