@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "gen:types": "openapi-generator generate -i ../openapi.yml -g typescript -o src/types/generated --additional-properties=modelPropertyNaming=original,enumPropertyNaming=original"
   },
   "dependencies": {
     "next": "15.3.4",
