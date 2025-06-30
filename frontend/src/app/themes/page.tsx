@@ -1,30 +1,5 @@
 import Link from 'next/link';
-import { Theme } from '@/types/generated/models/Theme';
-
-async function getThemes(): Promise<Theme[]> {
-  // このfetchはサーバーサイドで実行されるため、Dockerの内部ネットワークURLを使用できます。
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!apiUrl) {
-    throw new Error('NEXT_PUBLIC_API_URL is not defined');
-  }
-
-  try {
-    const res = await fetch(`${apiUrl}/themes`, {
-      // 開発中は常に最新のデータを取得するためにキャッシュを無効化します。
-      cache: 'no-store',
-    });
-
-    if (!res.ok) {
-      throw new Error('Failed to fetch themes');
-    }
-
-    return res.json();
-  } catch (error) {
-    console.error('API call failed:', error);
-    // エラーが発生した場合は空の配列を返し、ページがクラッシュするのを防ぎます。
-    return [];
-  }
-}
+import { getThemes } from '@/lib/api/themes';
 
 export default async function ThemesPage() {
   const themes = await getThemes();
@@ -36,6 +11,7 @@ export default async function ThemesPage() {
         {themes.map((theme) => (
           <div
             key={theme.id}
+            id={theme.id.toString()}
             className="overflow-hidden rounded-lg bg-white shadow-md transition-shadow duration-300 hover:shadow-lg"
           >
             <div className="p-6">
@@ -47,7 +23,7 @@ export default async function ThemesPage() {
               </h2>
               <p className="mb-4 text-gray-600">{theme.description}</p>
               <Link
-                href={`/themes/${theme.id}/write`}
+                href={`/themes/${theme.id.toString()}/write`}
                 className="inline-block rounded bg-blue-500 px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-blue-600"
               >
                 このテーマで言語化する
