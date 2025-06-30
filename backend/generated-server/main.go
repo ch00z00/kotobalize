@@ -6,6 +6,7 @@ import (
 	"github.com/ch00z00/kotobalize/handlers"
 	"github.com/ch00z00/kotobalize/middleware"
 	"github.com/ch00z00/kotobalize/seeder"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -31,6 +32,16 @@ func main() {
 	// Initialize Gin router
 	router := gin.Default()
 
+	// Configure and use CORS middleware
+	config := cors.DefaultConfig()
+	// Allow requests from the frontend development server
+	config.AllowOrigins = []string{"http://localhost:3000"}
+	// Allow necessary headers for authentication and content type
+	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
+	// Allow all standard HTTP methods
+	config.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}
+	router.Use(cors.New(config))
+
 	// Create auth middleware instance
 	authMiddleware := middleware.AuthMiddleware(c.JWTSecret)
 
@@ -49,10 +60,6 @@ func main() {
 		protected.Use(authMiddleware)
 		{
 			protected.GET("/auth/me", c.GetCurrentUser)
-
-			// TODO: Implement theme endpoints after login page is ready
-			// protected.GET("/themes", c.ListThemes)
-			// protected.GET("/themes/:themeId", c.GetThemeByID)
 
 			protected.GET("/writings", c.ListUserWritings)
 			protected.POST("/writings", c.CreateWriting)

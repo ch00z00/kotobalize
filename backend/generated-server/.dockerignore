@@ -1,0 +1,6 @@
+# Git files
+.git
+.gitignore
+
+# Local database file (if used for testing)
+kotobalize.db

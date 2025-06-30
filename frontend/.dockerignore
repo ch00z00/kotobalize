@@ -1,0 +1,12 @@
+# Git files
+.git
+.gitignore
+
+# Dependencies
+node_modules
+
+# Build output
+.next
+
+# Local environment variables
+.env.local
