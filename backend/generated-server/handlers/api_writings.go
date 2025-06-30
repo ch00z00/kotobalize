@@ -2,12 +2,11 @@ package handlers
 
 import (
 	"errors"
-	"math/rand"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/ch00z00/kotobalize/models"
+	"github.com/ch00z00/kotobalize/services"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -55,7 +54,6 @@ func (c *Container) CreateWriting(ctx *gin.Context) {
 }
 
 // ReviewWriting - Trigger AI review for a writing
-// TODO: Fix this function using OpenAI API
 func (c *Container) ReviewWriting(ctx *gin.Context) {
 	// Get user ID from the context (set by the auth middleware)
 	userID, exists := ctx.Get("userId")
@@ -73,7 +71,7 @@ func (c *Container) ReviewWriting(ctx *gin.Context) {
 
 	// Find the writing record in the database
 	var gormWriting models.GormWriting
-	if err := c.DB.First(&gormWriting, req.WritingID).Error; err != nil {
+	if err := c.DB.Preload("Theme").First(&gormWriting, req.WritingID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, gin.H{"code": "WRITING_NOT_FOUND", "message": "Writing not found"})
 			return
@@ -88,25 +86,22 @@ func (c *Container) ReviewWriting(ctx *gin.Context) {
 		return
 	}
 
-	// --- Simulate AI Review Process ---
-	// In a real application, this would be an asynchronous call to an AI service (e.g., OpenAI API).
-	// For this simulation, we'll generate random feedback and a score.
-	rand.New(rand.NewSource(time.Now().UnixNano()))
-	score := rand.Intn(51) + 50 // Random score between 50 and 100
-	overallFeedback := "全体的によく書けていますが、結論をもう少し明確にすると、より説得力が増すでしょう。"
-	clarityFeedback := "専門用語の使い方が的確で、非常に分かりやすいです。"
-	accuracyFeedback := "技術的な記述に誤りは見られません。正確性が高いです。"
-	completenessFeedback := "背景の説明が少し不足しています。前提知識がない読者にも伝わるよう、補足すると良いでしょう。"
-	structureFeedback := "序論、本論、結論の構成がしっかりしており、論理的な流れが作れています。"
-	concisenessFeedback := "冗長な表現がなく、簡潔にまとめられています。"
+	// --- Call OpenAI API for review ---
+	openAIService := services.OpenAIService{Client: c.OpenAIClient}
+	aiResponse, err := openAIService.GetAIReview(ctx.Request.Context(), gormWriting.Theme.Title, gormWriting.Content)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"code": "AI_SERVICE_ERROR", "message": "Failed to get AI review: " + err.Error()})
+		return
+	}
 
-	gormWriting.AiScore = &score
-	gormWriting.AiFeedbackOverall = &overallFeedback
-	gormWriting.AiFeedbackClarity = &clarityFeedback
-	gormWriting.AiFeedbackAccuracy = &accuracyFeedback
-	gormWriting.AiFeedbackCompleteness = &completenessFeedback
-	gormWriting.AiFeedbackStructure = &structureFeedback
-	gormWriting.AiFeedbackConciseness = &concisenessFeedback
+	// Update the writing record with the AI's feedback
+	gormWriting.AiScore = &aiResponse.Score
+	gormWriting.AiFeedbackOverall = &aiResponse.FeedbackOverall
+	gormWriting.AiFeedbackClarity = &aiResponse.FeedbackClarity
+	gormWriting.AiFeedbackAccuracy = &aiResponse.FeedbackAccuracy
+	gormWriting.AiFeedbackCompleteness = &aiResponse.FeedbackCompleteness
+	gormWriting.AiFeedbackStructure = &aiResponse.FeedbackStructure
+	gormWriting.AiFeedbackConciseness = &aiResponse.FeedbackConciseness
 
 	// Save the updated writing record to the database
 	if err := c.DB.Save(&gormWriting).Error; err != nil {

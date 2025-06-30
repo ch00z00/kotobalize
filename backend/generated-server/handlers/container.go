@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/ch00z00/kotobalize/models"
+	openai "github.com/sashabaranov/go-openai"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -13,6 +14,7 @@ import (
 type Container struct {
 	DB        *gorm.DB
 	JWTSecret string
+	OpenAIClient *openai.Client
 }
 
 // NewContainer returns an empty or an initialized container for your handlers.
@@ -24,6 +26,7 @@ func NewContainer() (Container, error) {
 	port := os.Getenv("DB_PORT")
 	dbname := os.Getenv("DB_NAME")
 	jwtSecret := os.Getenv("JWT_SECRET")
+	openaiAPIKey := os.Getenv("OPENAI_API_KEY")
 
 	// Build DSN (Data Source Name)
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", user, password, host, port, dbname)
@@ -37,6 +40,9 @@ func NewContainer() (Container, error) {
 	// Auto migrate the schema
 	db.AutoMigrate(&models.GormUser{}, &models.GormTheme{}, &models.GormWriting{})
 
-	c := Container{DB: db, JWTSecret: jwtSecret}
+	// Initialize OpenAI client
+	openaiClient := openai.NewClient(openaiAPIKey)
+
+	c := Container{DB: db, JWTSecret: jwtSecret, OpenAIClient: openaiClient}
 	return c, nil
 }

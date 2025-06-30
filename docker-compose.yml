@@ -17,6 +17,7 @@ services:
    - DB_PORT=3306
    - DB_NAME=kotobalize_db
    - JWT_SECRET=a_very_secret_key_that_should_be_changed
+   - OPENAI_API_KEY=your_openai_api_key_here #TODO: Change this to your OpenAI API key
   networks:
    - kotobalize-net
 
