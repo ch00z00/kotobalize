@@ -41,14 +41,18 @@ func main() {
 		v1.POST("/auth/signup", c.SignupUser)
 		v1.POST("/auth/login", c.LoginUser)
 
+		v1.GET("/themes", c.ListThemes)
+		v1.GET("/themes/:themeId", c.GetThemeByID)
+
 		// Protected routes (authentication required)
 		protected := v1.Group("/")
 		protected.Use(authMiddleware)
 		{
 			protected.GET("/auth/me", c.GetCurrentUser)
 
-			protected.GET("/themes", c.ListThemes)
-			protected.GET("/themes/:themeId", c.GetThemeByID)
+			// TODO: Implement theme endpoints after login page is ready
+			// protected.GET("/themes", c.ListThemes)
+			// protected.GET("/themes/:themeId", c.GetThemeByID)
 
 			protected.GET("/writings", c.ListUserWritings)
 			protected.POST("/writings", c.CreateWriting)
