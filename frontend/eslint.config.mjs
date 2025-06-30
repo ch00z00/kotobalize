@@ -10,9 +10,10 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  // next/core-web-vitals には prettier の設定が含まれていますが、
-  // 明示的に最後に prettier を指定することで、
-  // 他のルールとの競合を確実に防ぎます。
+  {
+    // generated files are should not be linted
+    ignores: ['src/types/generated/**'],
+  },
   ...compat.extends('next/core-web-vitals', 'next/typescript', 'prettier'),
 ];
 

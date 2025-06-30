@@ -26,6 +26,14 @@ services:
    context: ./frontend
   ports:
    - "3000:3000"
+  volumes:
+   # ホストのソースコードをコンテナにマウントして、ホットリロードを有効にします
+   # :delegated はmacOSでのパフォーマンスを向上させます
+   - ./frontend:/app:delegated
+   # コンテナ内のnode_modulesがホストのもので上書きされるのを防ぎます
+   - /app/node_modules
+  # DockerfileのCMDを上書きし、開発サーバーを起動します
+  command: npm run dev
   depends_on:
    - backend
   environment:
