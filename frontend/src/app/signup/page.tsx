@@ -3,12 +3,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { loginUser } from '@/lib/api/auth';
-import { useAuthStore } from '@/store/auth';
+import { signupUser } from '@/lib/api/auth';
 
-export default function LoginPage() {
+export default function SignupPage() {
   const router = useRouter();
-  const { login } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -20,10 +18,12 @@ export default function LoginPage() {
     setIsLoading(true);
 
     try {
-      const { token, user } = await loginUser({ email, password });
-      login(token, user);
-      router.push('/themes');
+      const data = await signupUser({ email, password });
+      console.log('Signup successful:', data);
+      // On successful signup, redirect to the login page to have the user log in.
+      router.push('/login');
     } catch (err) {
+      // Standardize error handling
       setError(
         err instanceof Error ? err.message : 'An unexpected error occurred.'
       );
@@ -36,7 +36,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-md">
         <h2 className="mb-6 text-center text-3xl font-bold text-gray-900">
-          ログイン
+          新規登録
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -68,7 +68,7 @@ export default function LoginPage() {
               id="password"
               name="password"
               type="password"
-              autoComplete="current-password"
+              autoComplete="new-password"
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -82,17 +82,17 @@ export default function LoginPage() {
               disabled={isLoading}
               className="flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-blue-400"
             >
-              {isLoading ? 'ログイン中...' : 'ログイン'}
+              {isLoading ? '登録中...' : '登録する'}
             </button>
           </div>
         </form>
         <p className="mt-6 text-center text-sm text-gray-600">
-          アカウントをお持ちでないですか？{' '}
+          アカウントをお持ちですか？{' '}
           <Link
-            href="/signup"
+            href="/login"
             className="font-medium text-blue-600 hover:text-blue-500"
           >
-            新規登録
+            ログイン
           </Link>
         </p>
       </div>
