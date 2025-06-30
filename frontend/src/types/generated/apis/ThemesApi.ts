@@ -8,6 +8,7 @@ import {canConsumeForm, isCodeInRange} from '../util';
 import {SecurityAuthentication} from '../auth/auth';
 
 
+import { ApiError } from '../models/ApiError';
 import { Theme } from '../models/Theme';
 
 /**
@@ -102,18 +103,18 @@ export class ThemesApiResponseProcessor {
             return new HttpInfo(response.httpStatusCode, response.headers, response.body, body);
         }
         if (isCodeInRange("401", response.httpStatusCode)) {
-            const body: Error = ObjectSerializer.deserialize(
+            const body: ApiError = ObjectSerializer.deserialize(
                 ObjectSerializer.parse(await response.body.text(), contentType),
-                "Error", ""
-            ) as Error;
-            throw new ApiException<Error>(response.httpStatusCode, "Unauthorized - Authentication required or invalid credentials", body, response.headers);
+                "ApiError", ""
+            ) as ApiError;
+            throw new ApiException<ApiError>(response.httpStatusCode, "Unauthorized - Authentication required or invalid credentials", body, response.headers);
         }
         if (isCodeInRange("404", response.httpStatusCode)) {
-            const body: Error = ObjectSerializer.deserialize(
+            const body: ApiError = ObjectSerializer.deserialize(
                 ObjectSerializer.parse(await response.body.text(), contentType),
-                "Error", ""
-            ) as Error;
-            throw new ApiException<Error>(response.httpStatusCode, "Not Found - Resource not found", body, response.headers);
+                "ApiError", ""
+            ) as ApiError;
+            throw new ApiException<ApiError>(response.httpStatusCode, "Not Found - Resource not found", body, response.headers);
         }
 
         // Work around for missing responses in specification, e.g. for petstore.yaml
@@ -145,11 +146,11 @@ export class ThemesApiResponseProcessor {
             return new HttpInfo(response.httpStatusCode, response.headers, response.body, body);
         }
         if (isCodeInRange("401", response.httpStatusCode)) {
-            const body: Error = ObjectSerializer.deserialize(
+            const body: ApiError = ObjectSerializer.deserialize(
                 ObjectSerializer.parse(await response.body.text(), contentType),
-                "Error", ""
-            ) as Error;
-            throw new ApiException<Error>(response.httpStatusCode, "Unauthorized - Authentication required or invalid credentials", body, response.headers);
+                "ApiError", ""
+            ) as ApiError;
+            throw new ApiException<ApiError>(response.httpStatusCode, "Unauthorized - Authentication required or invalid credentials", body, response.headers);
         }
 
         // Work around for missing responses in specification, e.g. for petstore.yaml

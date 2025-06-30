@@ -1,6 +1,5 @@
 .gitattributes
 .gitignore
-.openapi-generator-ignore
 AuthApi.md
 README.md
 ThemesApi.md
@@ -17,9 +16,9 @@ http/http.ts
 http/isomorphic-fetch.ts
 index.ts
 middleware.ts
+models/ApiError.ts
 models/AuthResponse.ts
 models/LoginRequest.ts
-models/ModelError.ts
 models/NewReviewRequest.ts
 models/NewWritingRequest.ts
 models/ObjectSerializer.ts

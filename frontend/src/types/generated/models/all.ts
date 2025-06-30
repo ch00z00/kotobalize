@@ -1,6 +1,6 @@
+export * from '../models/ApiError'
 export * from '../models/AuthResponse'
 export * from '../models/LoginRequest'
-export * from '../models/ModelError'
 export * from '../models/NewReviewRequest'
 export * from '../models/NewWritingRequest'
 export * from '../models/RegisterRequest'

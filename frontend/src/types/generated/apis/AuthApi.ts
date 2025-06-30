@@ -8,6 +8,7 @@ import {canConsumeForm, isCodeInRange} from '../util';
 import {SecurityAuthentication} from '../auth/auth';
 
 
+import { ApiError } from '../models/ApiError';
 import { AuthResponse } from '../models/AuthResponse';
 import { LoginRequest } from '../models/LoginRequest';
 import { RegisterRequest } from '../models/RegisterRequest';
@@ -162,11 +163,11 @@ export class AuthApiResponseProcessor {
             return new HttpInfo(response.httpStatusCode, response.headers, response.body, body);
         }
         if (isCodeInRange("401", response.httpStatusCode)) {
-            const body: Error = ObjectSerializer.deserialize(
+            const body: ApiError = ObjectSerializer.deserialize(
                 ObjectSerializer.parse(await response.body.text(), contentType),
-                "Error", ""
-            ) as Error;
-            throw new ApiException<Error>(response.httpStatusCode, "Unauthorized - Authentication required or invalid credentials", body, response.headers);
+                "ApiError", ""
+            ) as ApiError;
+            throw new ApiException<ApiError>(response.httpStatusCode, "Unauthorized - Authentication required or invalid credentials", body, response.headers);
         }
 
         // Work around for missing responses in specification, e.g. for petstore.yaml
@@ -198,18 +199,18 @@ export class AuthApiResponseProcessor {
             return new HttpInfo(response.httpStatusCode, response.headers, response.body, body);
         }
         if (isCodeInRange("400", response.httpStatusCode)) {
-            const body: Error = ObjectSerializer.deserialize(
+            const body: ApiError = ObjectSerializer.deserialize(
                 ObjectSerializer.parse(await response.body.text(), contentType),
-                "Error", ""
-            ) as Error;
-            throw new ApiException<Error>(response.httpStatusCode, "Bad Request - Invalid input", body, response.headers);
+                "ApiError", ""
+            ) as ApiError;
+            throw new ApiException<ApiError>(response.httpStatusCode, "Bad Request - Invalid input", body, response.headers);
         }
         if (isCodeInRange("401", response.httpStatusCode)) {
-            const body: Error = ObjectSerializer.deserialize(
+            const body: ApiError = ObjectSerializer.deserialize(
                 ObjectSerializer.parse(await response.body.text(), contentType),
-                "Error", ""
-            ) as Error;
-            throw new ApiException<Error>(response.httpStatusCode, "Unauthorized - Authentication required or invalid credentials", body, response.headers);
+                "ApiError", ""
+            ) as ApiError;
+            throw new ApiException<ApiError>(response.httpStatusCode, "Unauthorized - Authentication required or invalid credentials", body, response.headers);
         }
 
         // Work around for missing responses in specification, e.g. for petstore.yaml
@@ -241,18 +242,18 @@ export class AuthApiResponseProcessor {
             return new HttpInfo(response.httpStatusCode, response.headers, response.body, body);
         }
         if (isCodeInRange("400", response.httpStatusCode)) {
-            const body: Error = ObjectSerializer.deserialize(
+            const body: ApiError = ObjectSerializer.deserialize(
                 ObjectSerializer.parse(await response.body.text(), contentType),
-                "Error", ""
-            ) as Error;
-            throw new ApiException<Error>(response.httpStatusCode, "Bad Request - Invalid input", body, response.headers);
+                "ApiError", ""
+            ) as ApiError;
+            throw new ApiException<ApiError>(response.httpStatusCode, "Bad Request - Invalid input", body, response.headers);
         }
         if (isCodeInRange("409", response.httpStatusCode)) {
-            const body: Error = ObjectSerializer.deserialize(
+            const body: ApiError = ObjectSerializer.deserialize(
                 ObjectSerializer.parse(await response.body.text(), contentType),
-                "Error", ""
-            ) as Error;
-            throw new ApiException<Error>(response.httpStatusCode, "User with this email already exists", body, response.headers);
+                "ApiError", ""
+            ) as ApiError;
+            throw new ApiException<ApiError>(response.httpStatusCode, "User with this email already exists", body, response.headers);
         }
 
         // Work around for missing responses in specification, e.g. for petstore.yaml

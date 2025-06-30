@@ -1,6 +1,6 @@
+export * from '../models/ApiError';
 export * from '../models/AuthResponse';
 export * from '../models/LoginRequest';
-export * from '../models/ModelError';
 export * from '../models/NewReviewRequest';
 export * from '../models/NewWritingRequest';
 export * from '../models/RegisterRequest';
@@ -8,9 +8,9 @@ export * from '../models/Theme';
 export * from '../models/User';
 export * from '../models/Writing';
 
+import { ApiError } from '../models/ApiError';
 import { AuthResponse } from '../models/AuthResponse';
 import { LoginRequest } from '../models/LoginRequest';
-import { ModelError } from '../models/ModelError';
 import { NewReviewRequest } from '../models/NewReviewRequest';
 import { NewWritingRequest } from '../models/NewWritingRequest';
 import { RegisterRequest } from '../models/RegisterRequest';
@@ -34,9 +34,9 @@ let enumsMap: Set<string> = new Set<string>([
 ]);
 
 let typeMap: {[index: string]: any} = {
+    "ApiError": ApiError,
     "AuthResponse": AuthResponse,
     "LoginRequest": LoginRequest,
-    "ModelError": ModelError,
     "NewReviewRequest": NewReviewRequest,
     "NewWritingRequest": NewWritingRequest,
     "RegisterRequest": RegisterRequest,

@@ -37,7 +37,7 @@ paths:
      content:
       application/json:
        schema:
-        $ref: "#/components/schemas/Error"
+        $ref: "#/components/schemas/ApiError"
 
  /auth/login:
   post:
@@ -176,7 +176,7 @@ paths:
      content:
       application/json:
        schema:
-        $ref: "#/components/schemas/Error"
+        $ref: "#/components/schemas/ApiError"
 
  /writings/{writingId}:
   get:
@@ -207,7 +207,7 @@ paths:
      content:
       application/json:
        schema:
-        $ref: "#/components/schemas/Error"
+        $ref: "#/components/schemas/ApiError"
     "404":
      $ref: "#/components/responses/NotFound"
 
@@ -241,7 +241,7 @@ paths:
      content:
       application/json:
        schema:
-        $ref: "#/components/schemas/Error"
+        $ref: "#/components/schemas/ApiError"
     "404":
      $ref: "#/components/responses/NotFound"
 
@@ -427,7 +427,7 @@ components:
     - token
     - user
 
-  Error:
+  ApiError:
    type: object
    properties:
     code:
@@ -444,16 +444,16 @@ components:
    content:
     application/json:
      schema:
-      $ref: "#/components/schemas/Error"
+      $ref: "#/components/schemas/ApiError"
   Unauthorized:
    description: Unauthorized - Authentication required or invalid credentials
    content:
     application/json:
      schema:
-      $ref: "#/components/schemas/Error"
+      $ref: "#/components/schemas/ApiError"
   NotFound:
    description: Not Found - Resource not found
    content:
     application/json:
      schema:
-      $ref: "#/components/schemas/Error"
+      $ref: "#/components/schemas/ApiError"

@@ -3,9 +3,9 @@ import { Configuration, ConfigurationOptions, mergeConfiguration } from '../conf
 import type { Middleware } from '../middleware';
 import { Observable, of, from } from '../rxjsStub';
 import {mergeMap, map} from  '../rxjsStub';
+import { ApiError } from '../models/ApiError';
 import { AuthResponse } from '../models/AuthResponse';
 import { LoginRequest } from '../models/LoginRequest';
-import { ModelError } from '../models/ModelError';
 import { NewReviewRequest } from '../models/NewReviewRequest';
 import { NewWritingRequest } from '../models/NewWritingRequest';
 import { RegisterRequest } from '../models/RegisterRequest';
