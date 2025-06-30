@@ -1,4 +1,4 @@
-import { Theme } from '@/types/generated/models/Theme';
+import { Theme } from '@/types/generated/models';
 
 /**
  * Fetches a list of all available themes from the backend API.

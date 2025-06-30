@@ -1,6 +1,8 @@
-import { AuthResponse } from '@/types/generated/models/AuthResponse';
-import { LoginRequest } from '@/types/generated/models/LoginRequest';
-import { RegisterRequest } from '@/types/generated/models/RegisterRequest';
+import {
+  AuthResponse,
+  LoginRequest,
+  RegisterRequest,
+} from '@/types/generated/models';
 
 /**
  * Logs in a user by sending their credentials to the backend API.
