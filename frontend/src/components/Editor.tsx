@@ -1,31 +1,50 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/store/auth';
+import { createWriting } from '@/lib/api/writings';
 
 interface EditorProps {
   themeId: number;
 }
 
 export default function Editor({ themeId }: EditorProps) {
+  const router = useRouter();
+  const { token } = useAuthStore();
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     setIsLoading(true);
 
-    console.log('Submitting writing:', {
-      themeId,
-      content,
-    });
+    if (!token) {
+      setError('Authentication error. Please log in again.');
+      setIsLoading(false);
+      return;
+    }
 
-    // TODO: Implement API call to POST /writings
-    // For now, we'll just simulate a network delay.
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-
-    console.log('Submission complete.');
-    setIsLoading(false);
-    // TODO: Redirect to the review page or dashboard.
+    try {
+      const newWriting = await createWriting(
+        {
+          themeId: themeId,
+          content: content,
+          durationSeconds: 0, // Placeholder for now
+        },
+        token
+      );
+      // On success, redirect to the new writing's detail page
+      router.push(`/dashboard/writings/${newWriting.id}`);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'An unexpected error occurred.'
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -38,9 +57,10 @@ export default function Editor({ themeId }: EditorProps) {
           value={content}
           onChange={(e) => setContent(e.target.value)}
           placeholder="ここに説明を入力..."
-          className="h-64 w-full rounded-md border border-gray-300 p-4 focus:border-blue-500 focus:ring-blue-500"
+          className="h-64 w-full rounded-md border border-gray-300 p-4 text-gray-800 focus:border-blue-500 focus:ring-blue-500"
           required
         />
+        {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
       </div>
       <div className="mt-6 flex justify-end">
         <button
