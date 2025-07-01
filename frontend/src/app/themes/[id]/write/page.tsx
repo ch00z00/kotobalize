@@ -1,6 +1,7 @@
 import { getThemeById } from '@/lib/api/themes';
 import { notFound } from 'next/navigation';
-import Editor from '@/app/themes/[id]/write/Editor';
+import Editor from '@/components/Editor';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 interface WritePageProps {
   params: {
@@ -25,7 +26,9 @@ export default async function WritePage({ params }: WritePageProps) {
         <p className="text-gray-600">{theme.description}</p>
       </div>
       {/* The Editor component handles the client-side state and interactions */}
-      <Editor themeId={theme.id} />
+      <ProtectedRoute>
+        <Editor themeId={theme.id} />
+      </ProtectedRoute>
     </div>
   );
 }
