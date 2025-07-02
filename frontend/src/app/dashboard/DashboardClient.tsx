@@ -7,6 +7,7 @@ import { getWritings } from '@/lib/api/writings';
 import { getThemesForClient } from '@/lib/api/themes';
 import { Writing, Theme } from '@/types/generated/models';
 import StatCard from './StatCard';
+import DashboardSkeleton from './DashboardSkeleton';
 
 // A new interface for our grouped and sorted data structure
 interface GroupedWriting {
@@ -113,7 +114,7 @@ export default function DashboardClient() {
   }, [fetchData]);
 
   if (isLoading) {
-    return <div className="container mx-auto p-8 text-center">Loading...</div>;
+    return <DashboardSkeleton />;
   }
 
   if (error) {
