@@ -6,6 +6,7 @@ import { getWritingById, requestAiReview } from '@/lib/api/writings';
 import { Writing } from '@/types/generated/models';
 import ScoreCircle from './ScoreCircle';
 import FeedbackCard from './FeedbackCard';
+import WritingDetailSkeleton from './WritingDetailSkeleton';
 
 interface WritingDetailClientProps {
   writingId: string;
@@ -58,7 +59,7 @@ export default function WritingDetailClient({
   };
 
   if (isLoading) {
-    return <div className="container mx-auto p-8 text-center">Loading...</div>;
+    return <WritingDetailSkeleton />;
   }
 
   if (error) {
