@@ -37,6 +37,30 @@ export async function createWriting(
 }
 
 /**
+ * Fetches a list of all writings for the authenticated user.
+ * Requires authentication.
+ * @param token - The user's JWT for authorization.
+ * @returns A promise that resolves to an array of writing objects.
+ */
+export async function getWritings(token: string): Promise<Writing[]> {
+  const apiUrl = 'http://localhost:8080/api/v1';
+
+  const res = await fetch(`${apiUrl}/writings`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(data.message || 'Failed to fetch writings');
+  }
+
+  return data;
+}
+
+/**
  * Fetches a single writing record by its ID.
  * Requires authentication.
  * @param id - The ID of the writing to fetch.
