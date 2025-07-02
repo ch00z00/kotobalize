@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/auth';
 import { getWritings } from '@/lib/api/writings';
 import { getThemesForClient } from '@/lib/api/themes';
 import { Writing, Theme } from '@/types/generated/models';
+import StatCard from './StatCard';
 
 // A new interface for our grouped and sorted data structure
 interface GroupedWriting {
@@ -41,6 +42,11 @@ export default function DashboardClient() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [openThemeId, setOpenThemeId] = useState<number | null>(null); // State for the accordion
+  const [stats, setStats] = useState({
+    themeCount: 0,
+    writingCount: 0,
+    averageScore: 0,
+  });
 
   const handleToggle = (themeId: number) => {
     setOpenThemeId((prevId) => (prevId === themeId ? null : themeId));
@@ -78,6 +84,21 @@ export default function DashboardClient() {
         .sort((a, b) => b.writings.length - a.writings.length); // Sort by number of writings
 
       setGroupedWritings(grouped);
+
+      // Calculate stats
+      const themeCount = grouped.length;
+      const writingCount = writingsData.length;
+      const scoredWritings = writingsData.filter((w) => w.aiScore != null);
+      const totalScore = scoredWritings.reduce(
+        (sum, w) => sum + (w.aiScore ?? 0),
+        0
+      );
+      const averageScore =
+        scoredWritings.length > 0
+          ? Math.round(totalScore / scoredWritings.length)
+          : 0;
+
+      setStats({ themeCount, writingCount, averageScore });
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'Failed to load dashboard data.'
@@ -106,6 +127,14 @@ export default function DashboardClient() {
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8">
       <h1 className="mb-6 text-3xl font-bold text-gray-800">ダッシュボード</h1>
+
+      {/* Stats Section */}
+      <dl className="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-3">
+        <StatCard label="トライしたテーマ数" value={stats.themeCount} />
+        <StatCard label="合計回答数" value={stats.writingCount} />
+        <StatCard label="平均スコア" value={stats.averageScore} unit="点" />
+      </dl>
+
       <div className="space-y-6">
         {groupedWritings.length > 0 ? (
           groupedWritings.map(({ theme, writings }) => (
