@@ -4,6 +4,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { useAuthStore } from '@/store/auth';
 import { getWritingById, requestAiReview } from '@/lib/api/writings';
 import { Writing } from '@/types/generated/models';
+import ScoreCircle from './ScoreCircle';
+import FeedbackCard from './FeedbackCard';
 
 interface WritingDetailClientProps {
   writingId: string;
@@ -89,8 +91,29 @@ export default function WritingDetailClient({
           AIレビュー結果
         </h2>
         {writing.aiScore != null ? (
-          <div className="space-y-6">
-            {/* Feedback sections will be rendered here */}
+          <div className="space-y-8">
+            <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
+              <ScoreCircle score={writing.aiScore} />
+              <div className="flex-1">
+                <FeedbackCard title="全体的なフィードバック">
+                  <p>{writing.aiFeedbackOverall}</p>
+                </FeedbackCard>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <FeedbackCard title="明確さ">
+                <p>{writing.aiFeedbackClarity}</p>
+              </FeedbackCard>
+              <FeedbackCard title="正確さ">
+                <p>{writing.aiFeedbackAccuracy}</p>
+              </FeedbackCard>
+              <FeedbackCard title="網羅性">
+                <p>{writing.aiFeedbackCompleteness}</p>
+              </FeedbackCard>
+              <FeedbackCard title="構造化">
+                <p>{writing.aiFeedbackStructure}</p>
+              </FeedbackCard>
+            </div>
           </div>
         ) : (
           <div className="text-center">
