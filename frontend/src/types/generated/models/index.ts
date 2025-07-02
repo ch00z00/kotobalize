@@ -1,5 +1,5 @@
 export * from './AuthResponse';
-// export * from './Error';
+export * from './ApiError';
 export * from './LoginRequest';
 export * from './NewReviewRequest';
 export * from './NewWritingRequest';

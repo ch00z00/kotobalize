@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
-import { createWriting } from '@/lib/api/writings';
+import { createWriting, requestAiReview } from '@/lib/api/writings';
 
 interface EditorProps {
   themeId: number;
@@ -28,6 +28,7 @@ export default function Editor({ themeId }: EditorProps) {
     }
 
     try {
+      // ステップ1: 記述内容を記録として保存する
       const newWriting = await createWriting(
         {
           themeId: themeId,
@@ -36,7 +37,11 @@ export default function Editor({ themeId }: EditorProps) {
         },
         token
       );
-      // On success, redirect to the new writing's detail page
+
+      // ステップ2: 保存した記録のIDを使って、即座にAIレビューをリクエストする
+      await requestAiReview({ writingId: newWriting.id }, token);
+
+      // ステップ3: AIレビューが完了した結果を表示する詳細ページに遷移する
       router.push(`/dashboard/writings/${newWriting.id}`);
     } catch (err) {
       setError(

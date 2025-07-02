@@ -57,3 +57,28 @@ export async function getThemeById(id: string): Promise<Theme | null> {
     return null;
   }
 }
+
+/**
+ * Fetches a list of all available themes from the backend API.
+ * This function is designed to be called from the client-side (browser).
+ * @returns A promise that resolves to an array of themes.
+ */
+export async function getThemesForClient(): Promise<Theme[]> {
+  // For client-side requests, the API is accessed via localhost.
+  const apiUrl = 'http://localhost:8080/api/v1';
+
+  try {
+    // The /themes endpoint is public and does not require a token.
+    const res = await fetch(`${apiUrl}/themes`);
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch themes: ${res.statusText}`);
+    }
+
+    return res.json();
+  } catch (error) {
+    console.error('API call failed:', error);
+    // Return an empty array on error to prevent the page from crashing.
+    return [];
+  }
+}

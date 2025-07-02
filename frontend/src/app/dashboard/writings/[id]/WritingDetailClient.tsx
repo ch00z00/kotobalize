@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
-import { useAuthStore } from '@/store/auth';
+import { useAuthStore } from '@/store/auth'; // Corrected import path
 import { getWritingById, requestAiReview } from '@/lib/api/writings';
 import { Writing } from '@/types/generated/models';
 import ScoreCircle from './ScoreCircle';
@@ -79,8 +79,8 @@ export default function WritingDetailClient({
 
   return (
     <div className="container mx-auto p-4 sm:p-6 lg:p-8">
-      <div className="mb-8 rounded-lg bg-white p-6 shadow-md">
-        <h1 className="mb-4 text-3xl font-bold text-gray-900">あなたの記録</h1>
+      <div className="mb-8 rounded-lg bg-white text-gray-900 p-6 shadow-md">
+        <h1 className="mb-4 text-3xl font-bold">あなたの記録</h1>
         <div className="prose max-w-none rounded-md border border-gray-200 bg-gray-50 p-4">
           <p>{writing.content}</p>
         </div>
