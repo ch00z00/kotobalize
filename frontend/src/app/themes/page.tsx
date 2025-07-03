@@ -1,38 +1,78 @@
-import { getThemes } from '@/lib/api/themes';
-import LinkButton from '@/components/atoms/LinkButton';
+'use client';
 
-export default async function ThemesPage() {
-  const themes = await getThemes();
+import { useState, useEffect, useCallback } from 'react';
+import { getThemesForClient } from '@/lib/api/themes';
+import { Theme } from '@/types/generated/models';
+import ThemeCard from '@/components/themes/ThemeCard';
+import CreateThemeModal from '@/components/themes/CreateThemeModal';
+
+export default function ThemesPage() {
+  const [themes, setThemes] = useState<Theme[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const fetchThemes = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const fetchedThemes = await getThemesForClient();
+      setThemes(fetchedThemes);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'テーマの読み込みに失敗しました。'
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchThemes();
+  }, [fetchThemes]);
+
+  const handleThemeCreated = () => {
+    // 新しく作成されたテーマを表示するために、テーマ一覧を再取得します
+    fetchThemes();
+  };
 
   return (
-    <div className="container min-h-[calc(100vh-168px)] mx-auto p-4 sm:p-6 lg:p-8">
-      <h1 className="mb-6 text-3xl font-bold text-gray-800">テーマを選択</h1>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {/* TODO: テーマが取得できなかった場合は、「テーマがありません」を表示する
-         * テーマを手動追加するボタンを追加する
-         * モーダルでテーマを追加する
-         */}
-        {themes.map((theme) => (
-          <div
-            key={theme.id}
-            id={theme.id.toString()}
-            className="overflow-hidden rounded-lg bg-white shadow-md transition-shadow duration-300 hover:shadow-lg"
+    <>
+      <div className="container min-h-[calc(100vh-168px)] mx-auto p-4 sm:p-6 lg:p-8">
+        <div className="mb-6 flex items-center justify-between">
+          <h1 className="text-3xl font-bold text-gray-800">テーマを選択</h1>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="rounded-md bg-primary px-4 py-2 font-semibold text-white shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
           >
-            <div className="p-6">
-              <span className="mb-2 inline-block rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
-                {theme.category}
-              </span>
-              <h2 className="mb-2 text-xl font-semibold text-gray-900">
-                {theme.title}
-              </h2>
-              <p className="mb-4 text-gray-600">{theme.description}</p>
-              <LinkButton href={`/themes/${theme.id.toString()}/write`}>
-                このテーマで言語化する
-              </LinkButton>
-            </div>
+            新しいテーマを追加
+          </button>
+        </div>
+
+        {isLoading ? (
+          <p className="text-center text-gray-500">読み込み中...</p>
+        ) : error ? (
+          <div className="text-center text-red-600">{error}</div>
+        ) : themes.length > 0 ? (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {themes.map((theme) => (
+              <ThemeCard key={theme.id} theme={theme} />
+            ))}
           </div>
-        ))}
+        ) : (
+          <div className="mt-16 text-center text-gray-500">
+            <p className="text-lg">テーマがまだありません。</p>
+            <p className="mt-2">
+              右上の「新しいテーマを追加」ボタンから最初のテーマを作成しましょう！
+            </p>
+          </div>
+        )}
       </div>
-    </div>
+      <CreateThemeModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onThemeCreated={handleThemeCreated}
+      />
+    </>
   );
 }

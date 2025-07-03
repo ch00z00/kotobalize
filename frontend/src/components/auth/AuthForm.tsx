@@ -37,9 +37,17 @@ export default function AuthForm({
     try {
       await onSubmit(email, password);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'An unexpected error occurred.'
-      );
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const status = (err as any)?.response?.status;
+      if (status === 401) {
+        setError('メールアドレスまたはパスワードが正しくありません。');
+      } else if (err instanceof Error) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const apiMessage = (err as any)?.response?.data?.message;
+        setError(apiMessage || 'ログイン中にエラーが発生しました。');
+      } else {
+        setError('予期せぬエラーが発生しました。');
+      }
     } finally {
       setIsLoading(false);
     }
