@@ -1,19 +1,25 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import localFont from 'next/font/local';
 import { useAuthStore } from '@/store/auth';
 
 const monumentExtended = localFont({
   // Next.jsの最適化のため、フォントは`src`ディレクトリ内に配置するのが推奨です
-  src: '../../public/fonts/MonumentExtended-Ultrabold.otf',
+  src: '../../../public/fonts/MonumentExtended-Ultrabold.otf',
   display: 'swap',
 });
 
 export default function Header() {
+  const [isClient, setIsClient] = useState(false);
   const { isLoggedIn, logout, user } = useAuthStore();
   const router = useRouter();
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -24,40 +30,41 @@ export default function Header() {
     <header className="bg-white shadow-sm">
       <nav className="container mx-auto flex items-center justify-between p-4">
         <Link
-          href={isLoggedIn() ? '/dashboard' : '/'}
+          href={isClient && isLoggedIn() ? '/dashboard' : '/'}
           className={`text-2xl font-bold text-primary transition-all duration-300 hover:[text-shadow:0_4px_8px_rgba(0,0,0,0.2)] ${monumentExtended.className}`}
         >
           Kotobalize
         </Link>
-        <div className="flex items-center space-x-4">
-          {isLoggedIn() ? (
-            <>
-              <span className="hidden text-gray-700 sm:inline">
-                こんにちは, {user?.email} さん
-              </span>
-              <button
-                onClick={handleLogout}
-                className="rounded-xl bg-gray-600 px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-gray-800"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
-              <Link
-                href="/login"
-                className="rounded-xl px-4 py-2 font-medium text-gray-700 transition-colors duration-300 hover:bg-gray-100"
-              >
-                Login
-              </Link>
-              <Link
-                href="/signup"
-                className="rounded-xl bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-              >
-                Sign up
-              </Link>
-            </>
-          )}
+        <div className="flex h-[40px] items-center space-x-4">
+          {isClient &&
+            (isLoggedIn() ? (
+              <>
+                <span className="hidden text-gray-700 sm:inline">
+                  こんにちは, {user?.email} さん
+                </span>
+                <button
+                  onClick={handleLogout}
+                  className="rounded-xl bg-gray-600 px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-gray-800"
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="rounded-xl px-4 py-2 font-medium text-gray-700 transition-colors duration-300 hover:bg-gray-100"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/signup"
+                  className="rounded-xl bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                >
+                  Sign up
+                </Link>
+              </>
+            ))}
         </div>
       </nav>
     </header>

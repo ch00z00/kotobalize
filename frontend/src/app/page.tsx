@@ -12,13 +12,13 @@ export default function HomePage() {
   const router = useRouter();
 
   useEffect(() => {
-    // クライアント側でログイン状態を確認し、ログイン済みならダッシュボードへリダイレクト
+    // Redirect to dashboard if logged in
     if (isLoggedIn()) {
       router.push('/dashboard');
     }
   }, [isLoggedIn, router]);
 
-  // 未ログインユーザー向けの表示
+  // Display for non-logged-in users
   return (
     <>
       <LandingHero />

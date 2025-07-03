@@ -126,7 +126,7 @@ export default function DashboardClient() {
   }
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 lg:p-8">
+    <div className="container min-h-[calc(100vh-168px)] mx-auto p-4 sm:p-6 lg:p-8">
       <h1 className="mb-6 text-3xl font-bold text-gray-800">ダッシュボード</h1>
 
       {/* Stats Section */}
