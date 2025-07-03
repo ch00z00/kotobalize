@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import ChatIcon from '@/components/icons/ChatIcon';
-import SparkleIcon from '@/components/icons/SparkleIcon';
-import TrendingUpIcon from '@/components/icons/TrendingUpIcon';
+import ChatIcon from '@/components/atoms/icons/ChatIcon';
+import SparkleIcon from '@/components/atoms/icons/SparkleIcon';
+import TrendingUpIcon from '@/components/atoms/icons/TrendingUpIcon';
 
 const iconMap: { [key: string]: React.ElementType } = {
   chat: ChatIcon,
