@@ -1,5 +1,5 @@
-import ProtectedRoute from '@/components/ProtectedRoute';
-import WritingDetailClient from './WritingDetailClient';
+import ProtectedRoute from '@/components/common/ProtectedRoute';
+import WritingDetailClient from '../../../../components/write/WritingDetailClient';
 
 interface WritingDetailPageProps {
   params: {

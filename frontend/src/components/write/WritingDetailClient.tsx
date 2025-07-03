@@ -4,8 +4,8 @@ import { useEffect, useState, useCallback } from 'react';
 import { useAuthStore } from '@/store/auth'; // Corrected import path
 import { getWritingById, requestAiReview } from '@/lib/api/writings';
 import { Writing } from '@/types/generated/models';
-import ScoreCircle from './ScoreCircle';
-import FeedbackCard from './FeedbackCard';
+import ScoreCircle from '../molecules/ScoreCircle';
+import FeedbackCard from '../molecules/card/FeedbackCard';
 import WritingDetailSkeleton from './WritingDetailSkeleton';
 
 interface WritingDetailClientProps {

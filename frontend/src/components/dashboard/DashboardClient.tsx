@@ -6,7 +6,7 @@ import { useAuthStore } from '@/store/auth';
 import { getWritings } from '@/lib/api/writings';
 import { getThemesForClient } from '@/lib/api/themes';
 import { Writing, Theme } from '@/types/generated/models';
-import StatCard from './StatCard';
+import StatCard from '../molecules/card/StatCard';
 import DashboardSkeleton from './DashboardSkeleton';
 
 // A new interface for our grouped and sorted data structure

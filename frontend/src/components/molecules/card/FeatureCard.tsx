@@ -25,7 +25,7 @@ export default function FeatureCard({
   const Icon = iconMap[iconName];
 
   return (
-    <div className="rounded-xl bg-white p-8 border border-gray-200 shadow-sm transition-shadow duration-300 hover:shadow-lg">
+    <div className="rounded-xl bg-white p-8 border border-gray-200 shadow-md transition-shadow duration-300 hover:shadow-xl">
       <div className="relative pl-16">
         <dt className="text-base font-semibold leading-7 text-gray-900">
           <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-primary">

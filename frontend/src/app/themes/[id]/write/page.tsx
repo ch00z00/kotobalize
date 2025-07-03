@@ -1,7 +1,7 @@
 import { getThemeById } from '@/lib/api/themes';
 import { notFound } from 'next/navigation';
-import Editor from '@/components/Editor';
-import ProtectedRoute from '@/components/ProtectedRoute';
+import Editor from '@/components/edit/Editor';
+import ProtectedRoute from '@/components/common/ProtectedRoute';
 
 interface WritePageProps {
   params: {

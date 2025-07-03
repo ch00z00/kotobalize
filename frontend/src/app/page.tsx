@@ -3,9 +3,9 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
-import LandingHero from '@/components/landing/LandingHero';
-import LandingFeature from '@/components/landing/LandingFeature';
-import LandingCTA from '@/components/landing/LandingCTA';
+import LandingHero from '@/components/home/LandingHero';
+import LandingFeature from '@/components/home/LandingFeature';
+import LandingCTA from '@/components/home/LandingCTA';
 
 export default function HomePage() {
   const { isLoggedIn } = useAuthStore();

@@ -1,7 +1,7 @@
 'use client';
 
 import features from '@/constants/features.json';
-import FeatureCard from './FeatureCard';
+import FeatureCard from '@/components/molecules/card/FeatureCard';
 
 export default function LandingFeature() {
   return (
