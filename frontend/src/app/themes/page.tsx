@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import { getThemes } from '@/lib/api/themes';
+import LinkButton from '@/components/atoms/LinkButton';
 
 export default async function ThemesPage() {
   const themes = await getThemes();
@@ -22,12 +22,9 @@ export default async function ThemesPage() {
                 {theme.title}
               </h2>
               <p className="mb-4 text-gray-600">{theme.description}</p>
-              <Link
-                href={`/themes/${theme.id.toString()}/write`}
-                className="inline-block rounded bg-blue-500 px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-blue-600"
-              >
+              <LinkButton href={`/themes/${theme.id.toString()}/write`}>
                 このテーマで言語化する
-              </Link>
+              </LinkButton>
             </div>
           </div>
         ))}

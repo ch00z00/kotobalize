@@ -1,7 +1,7 @@
 'use client';
 
-import Link from 'next/link';
-import ScrollReveal from '../common/ScrollReveal';
+import LinkButton from '@/components/atoms/LinkButton';
+import ScrollReveal from '@/components/common/ScrollReveal';
 
 export default function LandingCTA() {
   return (
@@ -16,18 +16,12 @@ export default function LandingCTA() {
         </ScrollReveal>
         <ScrollReveal delay={0.2}>
           <div className="mt-10 flex items-center justify-center gap-x-6">
-            <Link
-              href="/themes"
-              className="rounded-md bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
-            >
-              今すぐ始める
-            </Link>
-            <Link
-              href="/signup"
-              className="text-sm font-semibold leading-6 text-gray-900"
-            >
-              新規登録はこちら <span aria-hidden="true">→</span>
-            </Link>
+            <LinkButton href="/themes" variant="primary">
+              Get started
+            </LinkButton>
+            <LinkButton href="/signup" variant="secondary">
+              Sign up
+            </LinkButton>
           </div>
         </ScrollReveal>
       </div>

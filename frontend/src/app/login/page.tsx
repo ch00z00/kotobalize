@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { loginUser } from '@/lib/api/auth';
 import { useAuthStore } from '@/store/auth';
+import LinkButton from '@/components/atoms/LinkButton';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -88,12 +88,9 @@ export default function LoginPage() {
         </form>
         <p className="mt-6 text-center text-sm text-gray-600">
           アカウントをお持ちでないですか？{' '}
-          <Link
-            href="/signup"
-            className="font-medium text-primary hover:text-primary/90"
-          >
-            新規登録
-          </Link>
+          <LinkButton href="/signup" variant="ghost">
+            Sign up
+          </LinkButton>
         </p>
       </div>
     </div>
