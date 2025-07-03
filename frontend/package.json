@@ -13,6 +13,7 @@
     "gen:types": "openapi-generator generate -i ../openapi.yml -g typescript -o src/types/generated --additional-properties=modelPropertyNaming=original,enumPropertyNaming=original"
   },
   "dependencies": {
+    "framer-motion": "^12.23.0",
     "next": "15.3.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
