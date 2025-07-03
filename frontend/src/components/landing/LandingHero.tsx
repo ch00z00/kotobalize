@@ -1,15 +1,26 @@
 'use client';
 
 import Link from 'next/link';
+import localFont from 'next/font/local';
+
+const monumentExtended = localFont({
+  src: '../../../public/fonts/MonumentExtended-Ultrabold.otf',
+  display: 'swap',
+});
 
 export default function LandingHero() {
   return (
     <div className="container mx-auto flex h-[calc(100vh-68px)] items-center justify-center text-center">
       <div>
-        <h1 className="text-5xl font-extrabold tracking-tight text-gray-900 sm:text-6xl">
-          言語化で、差をつけろ。
+        <h1
+          className={`font-bold tracking-wide text-primary text-[10vw] ${monumentExtended.className}`}
+        >
+          Kotobalize
         </h1>
-        <p className="mt-6 text-lg leading-8 text-gray-600">
+        <h2 className="mt-4 font-bold tracking-tight text-gray-900 text-[4vw]">
+          言語化で、差をつけろ。
+        </h2>
+        <p className="mt-6 text-gray-600 text-[3vw] sm:text-lg">
           Kotobalizeは、エンジニアの「技術を言葉で語る力」を鍛えるための
           <br />
           言語化トレーニングプラットフォームです。

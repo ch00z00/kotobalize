@@ -5,7 +5,6 @@
   --color-foreground: var(--foreground);
   --color-primary: #0606b0;
   --color-gray: #ededed;
-  --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -19,5 +18,4 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }

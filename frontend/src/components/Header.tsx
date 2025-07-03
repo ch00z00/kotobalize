@@ -2,7 +2,14 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import localFont from 'next/font/local';
 import { useAuthStore } from '@/store/auth';
+
+const monumentExtended = localFont({
+  // Next.jsの最適化のため、フォントは`src`ディレクトリ内に配置するのが推奨です
+  src: '../../public/fonts/MonumentExtended-Ultrabold.otf',
+  display: 'swap',
+});
 
 export default function Header() {
   const { isLoggedIn, logout, user } = useAuthStore();
@@ -18,7 +25,7 @@ export default function Header() {
       <nav className="container mx-auto flex items-center justify-between p-4">
         <Link
           href={isLoggedIn() ? '/dashboard' : '/'}
-          className="text-2xl font-bold text-primary"
+          className={`text-2xl font-bold text-primary transition-all duration-300 hover:[text-shadow:0_4px_8px_rgba(0,0,0,0.2)] ${monumentExtended.className}`}
         >
           Kotobalize
         </Link>
@@ -30,7 +37,7 @@ export default function Header() {
               </span>
               <button
                 onClick={handleLogout}
-                className="rounded bg-red-500 px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-red-600"
+                className="rounded-xl bg-gray-600 px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-gray-800"
               >
                 Logout
               </button>
@@ -39,13 +46,13 @@ export default function Header() {
             <>
               <Link
                 href="/login"
-                className="rounded px-4 py-2 font-medium text-gray-700 transition-colors duration-300 hover:bg-gray-100"
+                className="rounded-xl px-4 py-2 font-medium text-gray-700 transition-colors duration-300 hover:bg-gray-100"
               >
                 Login
               </Link>
               <Link
                 href="/signup"
-                className="rounded bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+                className="rounded-xl bg-primary px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
               >
                 Sign up
               </Link>

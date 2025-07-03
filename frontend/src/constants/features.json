@@ -5,7 +5,7 @@
     "iconName": "chat"
   },
   {
-    "name": "AIによる即時レビュー",
+    "name": "AIの即時レビュー",
     "description": "あなたの説明をAIが多角的に分析。スコアと具体的なフィードバックで、改善点がすぐに分かります。",
     "iconName": "sparkle"
   },
