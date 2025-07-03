@@ -8,6 +8,10 @@ export default async function ThemesPage() {
     <div className="container min-h-[calc(100vh-168px)] mx-auto p-4 sm:p-6 lg:p-8">
       <h1 className="mb-6 text-3xl font-bold text-gray-800">テーマを選択</h1>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {/* TODO: テーマが取得できなかった場合は、「テーマがありません」を表示する
+         * テーマを手動追加するボタンを追加する
+         * モーダルでテーマを追加する
+         */}
         {themes.map((theme) => (
           <div
             key={theme.id}
