@@ -22,7 +22,7 @@ export default function LoginPage() {
     try {
       const { token, user } = await loginUser({ email, password });
       login(token, user);
-      router.push('/themes');
+      router.push('/dashboard');
     } catch (err) {
       setError(
         err instanceof Error ? err.message : 'An unexpected error occurred.'

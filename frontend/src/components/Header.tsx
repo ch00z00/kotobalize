@@ -16,7 +16,10 @@ export default function Header() {
   return (
     <header className="bg-white shadow-sm">
       <nav className="container mx-auto flex items-center justify-between p-4">
-        <Link href="/" className="text-2xl font-bold text-blue-600">
+        <Link
+          href={isLoggedIn() ? '/dashboard' : '/'}
+          className="text-2xl font-bold text-blue-600"
+        >
           Kotobalize
         </Link>
         <div className="flex items-center space-x-4">
