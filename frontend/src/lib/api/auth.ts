@@ -3,6 +3,7 @@ import {
   LoginRequest,
   RegisterRequest,
 } from '@/types/generated/models';
+import { PUBLIC_API_BASE_URL } from '@/lib/api/config';
 
 /**
  * Logs in a user by sending their credentials to the backend API.
@@ -13,11 +14,7 @@ import {
 export async function loginUser(
   credentials: LoginRequest
 ): Promise<AuthResponse> {
-  // For client-side requests, the API is accessed via localhost,
-  // which is mapped to the backend container by Docker Compose.
-  const apiUrl = 'http://localhost:8080/api/v1';
-
-  const res = await fetch(`${apiUrl}/auth/login`, {
+  const res = await fetch(`${PUBLIC_API_BASE_URL}/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -44,9 +41,7 @@ export async function loginUser(
 export async function signupUser(
   credentials: RegisterRequest
 ): Promise<AuthResponse> {
-  const apiUrl = 'http://localhost:8080/api/v1';
-
-  const res = await fetch(`${apiUrl}/auth/signup`, {
+  const res = await fetch(`${PUBLIC_API_BASE_URL}/auth/signup`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

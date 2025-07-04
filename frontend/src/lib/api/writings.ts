@@ -3,6 +3,7 @@ import {
   NewWritingRequest,
   Writing,
 } from '@/types/generated/models';
+import { PUBLIC_API_BASE_URL } from '@/lib/api/config';
 
 /**
  * Submits a new writing to the backend.
@@ -15,9 +16,7 @@ export async function createWriting(
   writingData: NewWritingRequest,
   token: string
 ): Promise<Writing> {
-  const apiUrl = 'http://localhost:8080/api/v1';
-
-  const res = await fetch(`${apiUrl}/writings`, {
+  const res = await fetch(`${PUBLIC_API_BASE_URL}/writings`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -43,9 +42,7 @@ export async function createWriting(
  * @returns A promise that resolves to an array of writing objects.
  */
 export async function getWritings(token: string): Promise<Writing[]> {
-  const apiUrl = 'http://localhost:8080/api/v1';
-
-  const res = await fetch(`${apiUrl}/writings`, {
+  const res = await fetch(`${PUBLIC_API_BASE_URL}/writings`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -71,9 +68,7 @@ export async function getWritingById(
   id: string,
   token: string
 ): Promise<Writing> {
-  const apiUrl = 'http://localhost:8080/api/v1';
-
-  const res = await fetch(`${apiUrl}/writings/${id}`, {
+  const res = await fetch(`${PUBLIC_API_BASE_URL}/writings/${id}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -99,9 +94,7 @@ export async function requestAiReview(
   reviewRequest: NewReviewRequest,
   token: string
 ): Promise<Writing> {
-  const apiUrl = 'http://localhost:8080/api/v1';
-
-  const res = await fetch(`${apiUrl}/review`, {
+  const res = await fetch(`${PUBLIC_API_BASE_URL}/review`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -1,4 +1,5 @@
 import { Theme } from '@/types/generated/models';
+import { INTERNAL_API_BASE_URL, PUBLIC_API_BASE_URL } from '@/lib/api/config';
 
 export interface NewThemeRequest {
   title: string;
@@ -12,14 +13,8 @@ export interface NewThemeRequest {
  * @returns A promise that resolves to an array of themes.
  */
 export async function getThemes(): Promise<Theme[]> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!apiUrl) {
-    // This error should now be prevented by .env.local
-    throw new Error('NEXT_PUBLIC_API_URL is not defined');
-  }
-
   try {
-    const res = await fetch(`${apiUrl}/themes`, {
+    const res = await fetch(`${INTERNAL_API_BASE_URL}/themes`, {
       cache: 'no-store', // Always fetch the latest data in development
     });
 
@@ -46,12 +41,7 @@ export async function createTheme(
   themeData: NewThemeRequest,
   token: string
 ): Promise<Theme> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!apiUrl) {
-    throw new Error('NEXT_PUBLIC_API_URL is not defined');
-  }
-
-  const res = await fetch(`${apiUrl}/themes`, {
+  const res = await fetch(`${PUBLIC_API_BASE_URL}/themes`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -77,13 +67,8 @@ export async function createTheme(
  * @returns A promise that resolves to the theme object, or null if not found.
  */
 export async function getThemeById(id: string): Promise<Theme | null> {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-  if (!apiUrl) {
-    throw new Error('NEXT_PUBLIC_API_URL is not defined');
-  }
-
   try {
-    const res = await fetch(`${apiUrl}/themes/${id}`, {
+    const res = await fetch(`${INTERNAL_API_BASE_URL}/themes/${id}`, {
       cache: 'no-store', // Always fetch the latest data
     });
 
@@ -105,12 +90,9 @@ export async function getThemeById(id: string): Promise<Theme | null> {
  * @returns A promise that resolves to an array of themes.
  */
 export async function getThemesForClient(): Promise<Theme[]> {
-  // For client-side requests, the API is accessed via localhost.
-  const apiUrl = 'http://localhost:8080/api/v1';
-
   try {
     // The /themes endpoint is public and does not require a token.
-    const res = await fetch(`${apiUrl}/themes`);
+    const res = await fetch(`${PUBLIC_API_BASE_URL}/themes`);
 
     if (!res.ok) {
       throw new Error(`Failed to fetch themes: ${res.statusText}`);
