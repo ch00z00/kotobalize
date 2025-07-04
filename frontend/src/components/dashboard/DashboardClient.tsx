@@ -14,9 +14,9 @@ import { getThemesForClient } from '@/lib/api/themes.client';
 import { Writing, Theme } from '@/types/generated/models';
 
 // components
-import Button from '@/components/atoms/Button';
 import StatCard from '@/components/molecules/card/StatCard';
 import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton';
+import LinkButton from '../atoms/LinkButton';
 
 interface GroupedWriting {
   theme: Theme;
@@ -137,7 +137,7 @@ export default function DashboardClient() {
     <div className="container min-h-[calc(100vh-168px)] mx-auto p-4 sm:p-6 lg:p-8">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-800">ダッシュボード</h1>
-        <Button href="/themes">新しい言語化に挑戦する</Button>
+        <LinkButton href="/themes">新しい言語化に挑戦する</LinkButton>
       </div>
 
       {/* Stats Section */}

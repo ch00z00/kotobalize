@@ -6,15 +6,16 @@ import { Theme } from '@/types/generated/models';
 import ThemeCard from '@/components/themes/ThemeCard';
 import CreateThemeModal from '@/components/themes/CreateThemeModal';
 import { useAuthStore } from '@/store/auth';
+import Button from '@/components/atoms/Button';
 
 export default function ThemesPage() {
   const [themes, setThemes] = useState<Theme[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const { token } = useAuthStore();
-  // フィルタリングと検索のための新しいstate
-  const [searchQuery, setSearchQuery] = useState('');
+  // Filter & Search state
+  const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const fetchThemes = useCallback(async () => {
@@ -46,14 +47,14 @@ export default function ThemesPage() {
     fetchThemes();
   };
 
-  // フィルターボタン用にユニークなカテゴリを取得する
+  // Filter button用にユニークなカテゴリを取得する
   const categories = useMemo(() => {
     if (themes.length === 0) return [];
     const uniqueCategories = new Set(themes.map((theme) => theme.category));
     return ['すべて', ...Array.from(uniqueCategories)];
   }, [themes]);
 
-  // 検索クエリと選択されたカテゴリに基づいてテーマをフィルタリングする
+  // Search & Filter based on search query and selected category
   const filteredThemes = useMemo(() => {
     return themes.filter((theme) => {
       const matchesCategory =
@@ -72,15 +73,12 @@ export default function ThemesPage() {
       <div className="container min-h-[calc(100vh-168px)] mx-auto p-4 sm:p-6 lg:p-8">
         <div className="mb-6 flex items-center justify-between">
           <h1 className="text-3xl font-bold text-gray-800">テーマを選択</h1>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="rounded-md bg-primary px-4 py-2 font-semibold text-white shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-          >
+          <Button onClick={() => setIsModalOpen(true)}>
             新しいテーマを追加
-          </button>
+          </Button>
         </div>
 
-        {/* 検索とフィルタUI */}
+        {/* Search & Filter UI */}
         <div className="mb-8 rounded-lg bg-white p-4 shadow">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div className="md:col-span-2">

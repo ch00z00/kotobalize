@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useAuthStore } from '@/store/auth';
 import { createTheme, NewThemeRequest } from '@/lib/api/themes.client';
+import Button from '../atoms/Button';
 
 interface CreateThemeModalProps {
   isOpen: boolean;
@@ -110,20 +111,12 @@ export default function CreateThemeModal({
           </div>
           {error && <p className="text-sm text-red-600">{error}</p>}
           <div className="flex justify-end space-x-4">
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2"
-            >
+            <Button type="button" onClick={onClose} variant="outline">
               キャンセル
-            </button>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="flex justify-center rounded-md border border-transparent bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-primary/70"
-            >
+            </Button>
+            <Button type="submit" disabled={isLoading} variant="primary">
               {isLoading ? '作成中...' : '作成する'}
-            </button>
+            </Button>
           </div>
         </form>
       </div>

@@ -1,37 +1,43 @@
-import Link from 'next/link';
-import { ReactNode } from 'react';
+import { ReactNode, ButtonHTMLAttributes } from 'react';
 
-interface ButtonProps {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
-  href?: string;
   onClick?: () => void;
-  variant?: 'primary' | 'secondary';
+  variant?: 'primary' | 'secondary' | 'outline';
+  className?: string;
 }
 
 export default function Button({
   children,
-  href,
   onClick,
   variant = 'primary',
+  className = '',
+  disabled = false,
+  type = 'button',
+  ...props
 }: ButtonProps) {
-  const baseStyle =
-    'rounded-md px-4 py-2 font-semibold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2';
+  const baseStyles =
+    'inline-flex items-center justify-center rounded-xl px-4 py-2 text-sm font-medium shadow-sm transition-colors disabled:cursor-not-allowed';
 
-  const buttonStyle =
-    variant === 'primary'
-      ? `bg-primary hover:bg-primary/90 ${baseStyle}`
-      : `bg-gray-500 hover:bg-gray-400 ${baseStyle}`;
+  const variantStyles = {
+    primary:
+      'border-transparent bg-primary text-white hover:bg-primary/90 disabled:bg-primary/70',
+    secondary:
+      'border-transparent bg-gray-600 text-white hover:bg-gray-700 disabled:bg-gray-400',
+    outline:
+      'border-gray-500 bg-white text-gray-700 hover:bg-gray-50 disabled:bg-gray-100',
+  };
 
-  if (href) {
-    return (
-      <Link href={href} className={buttonStyle}>
-        {children}
-      </Link>
-    );
-  }
+  const combinedClassName = `${baseStyles} ${variantStyles[variant]} ${className}`;
 
   return (
-    <button className={buttonStyle} onClick={onClick}>
+    <button
+      type={type}
+      className={combinedClassName}
+      onClick={onClick}
+      disabled={disabled}
+      {...props}
+    >
       {children}
     </button>
   );
