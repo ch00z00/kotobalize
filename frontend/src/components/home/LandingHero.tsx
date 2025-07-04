@@ -15,7 +15,7 @@ export default function LandingHero() {
       <div>
         <ScrollReveal delay={0.1}>
           <h1
-            className={`font-bold tracking-wide text-primary text-[10vw] ${monumentExtended.className}`}
+            className={`tracking-wide text-primary text-[10vw] ${monumentExtended.className}`}
           >
             Kotobalize
           </h1>
@@ -33,7 +33,7 @@ export default function LandingHero() {
             <LinkButton href="/themes" variant="primary">
               Get started
             </LinkButton>
-            <LinkButton href="/signup" variant="ghost">
+            <LinkButton href="/signup" variant="outline">
               Sign up
             </LinkButton>
           </div>

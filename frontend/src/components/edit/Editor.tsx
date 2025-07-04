@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
 import { createWriting, requestAiReview } from '@/lib/api/writings';
+import Button from '../atoms/Button';
 
 interface EditorProps {
   themeId: number;
@@ -68,13 +69,13 @@ export default function Editor({ themeId }: EditorProps) {
         {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
       </div>
       <div className="mt-6 flex justify-end">
-        <button
+        <Button
           type="submit"
           disabled={isLoading || !content.trim()}
           className="rounded-md bg-blue-600 px-6 py-3 font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-blue-400"
         >
           {isLoading ? '送信中...' : 'AIレビューをリクエスト'}
-        </button>
+        </Button>
       </div>
     </form>
   );

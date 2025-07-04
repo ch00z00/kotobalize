@@ -7,6 +7,7 @@ import { Writing } from '@/types/generated/models';
 import ScoreCircle from '../molecules/ScoreCircle';
 import FeedbackCard from '../molecules/card/FeedbackCard';
 import WritingDetailSkeleton from './WritingDetailSkeleton';
+import Button from '../atoms/Button';
 
 interface WritingDetailClientProps {
   writingId: string;
@@ -121,13 +122,13 @@ export default function WritingDetailClient({
             <p className="mb-4 text-gray-600">
               まだAIレビューが実行されていません。
             </p>
-            <button
+            <Button
               onClick={handleRequestReview}
               disabled={isReviewing}
               className="rounded-md bg-green-600 px-6 py-3 font-semibold text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-green-400"
             >
               {isReviewing ? 'レビュー中...' : 'AIレビューを実行する'}
-            </button>
+            </Button>
           </div>
         )}
       </div>

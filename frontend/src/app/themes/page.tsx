@@ -97,7 +97,7 @@ export default function ThemesPage() {
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 {categories.map((category) => (
-                  <button
+                  <Button
                     key={category}
                     onClick={() => setSelectedCategory(category)}
                     className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${
@@ -107,7 +107,7 @@ export default function ThemesPage() {
                     }`}
                   >
                     {category}
-                  </button>
+                  </Button>
                 ))}
               </div>
             </div>

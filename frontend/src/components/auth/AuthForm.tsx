@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import LinkButton from '@/components/atoms/LinkButton';
+import Button from '../atoms/Button';
 
 interface AuthFormProps {
   title: string;
@@ -98,13 +99,13 @@ export default function AuthForm({
           </div>
           {error && <p className="text-sm text-red-600">{error}</p>}
           <div>
-            <button
+            <Button
               type="submit"
               disabled={isLoading}
               className="flex w-full justify-center rounded-md border border-transparent bg-primary px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-primary/70"
             >
               {isLoading ? loadingButtonText : buttonText}
-            </button>
+            </Button>
           </div>
         </form>
         <p className="mt-6 text-center text-sm text-gray-600">

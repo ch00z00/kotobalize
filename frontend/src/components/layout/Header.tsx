@@ -32,7 +32,7 @@ export default function Header() {
       <nav className="container mx-auto flex items-center justify-between p-4">
         <Link
           href={isClient && isLoggedIn() ? '/dashboard' : '/'}
-          className={`text-2xl font-bold text-primary transition-all duration-300 hover:[text-shadow:0_4px_8px_rgba(0,0,0,0.2)] ${monumentExtended.className}`}
+          className={`text-2xl tracking-wide text-primary transition-all duration-300 hover:[text-shadow:0_4px_8px_rgba(0,0,0,0.2)] ${monumentExtended.className}`}
         >
           Kotobalize
         </Link>
@@ -54,7 +54,7 @@ export default function Header() {
               <>
                 <LinkButton
                   href="/login"
-                  variant="ghost"
+                  variant="outline"
                   className="rounded-xl"
                 >
                   Login
