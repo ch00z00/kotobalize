@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/ch00z00/kotobalize/models"
 	"github.com/gin-gonic/gin"
@@ -14,7 +15,7 @@ import (
 func (c *Container) ListThemes(ctx *gin.Context) {
 	var gormThemes []models.GormTheme
 	if err := c.DB.Find(&gormThemes).Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"code": "DATABASE_ERROR", "message": "Failed to fetch themes"})
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to fetch themes"})
 		return
 	}
 
@@ -33,7 +34,7 @@ func (c *Container) GetThemeByID(ctx *gin.Context) {
 	themeIDStr := ctx.Param("themeId")
 	themeID, err := strconv.ParseUint(themeIDStr, 10, 64)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"code": "INVALID_INPUT", "message": "Invalid theme ID format"})
+		ctx.JSON(http.StatusBadRequest, models.APIError{Code: "INVALID_INPUT", Message: "Invalid theme ID format"})
 		return
 	}
 
@@ -41,10 +42,10 @@ func (c *Container) GetThemeByID(ctx *gin.Context) {
 	var gormTheme models.GormTheme
 	if err := c.DB.First(&gormTheme, themeID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ctx.JSON(http.StatusNotFound, gin.H{"code": "THEME_NOT_FOUND", "message": "Theme not found"})
+			ctx.JSON(http.StatusNotFound, models.APIError{Code: "THEME_NOT_FOUND", Message: "Theme not found"})
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, gin.H{"code": "DATABASE_ERROR", "message": "Failed to fetch theme"})
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to fetch theme"})
 		return
 	}
 
@@ -57,20 +58,20 @@ func (c *Container) CreateTheme(ctx *gin.Context) {
 	// Get user ID from the context, which is set by the authentication middleware.
 	userIDVal, exists := ctx.Get("userId")
 	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"code": "UNAUTHORIZED", "message": "User not authenticated"})
+		ctx.JSON(http.StatusUnauthorized, models.APIError{Code: "UNAUTHORIZED", Message: "User not authenticated"})
 		return
 	}
 
 	userID, ok := userIDVal.(uint)
 	if !ok {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"code": "INTERNAL_ERROR", "message": "Invalid user ID type in context"})
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "INTERNAL_ERROR", Message: "Invalid user ID type in context"})
 		return
 	}
 
 	// Bind the incoming JSON to the NewThemeRequest struct (API Model).
 	var req models.NewThemeRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"code": "BAD_REQUEST", "message": "Invalid request body: " + err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.APIError{Code: "BAD_REQUEST", Message: "Invalid request body: " + err.Error()})
 		return
 	}
 
@@ -84,7 +85,7 @@ func (c *Container) CreateTheme(ctx *gin.Context) {
 
 	// Save the new theme to the database.
 	if result := c.DB.Create(&gormTheme); result.Error != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"code": "DB_ERROR", "message": "Failed to save theme to database"})
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to save theme to database"})
 		return
 	}
 
@@ -99,7 +100,7 @@ func mapGormThemeToAPI(gormTheme models.GormTheme) models.Theme {
 		Title:       gormTheme.Title,
 		Description: gormTheme.Description,
 		Category:    gormTheme.Category,
-		CreatedAt:   gormTheme.CreatedAt,
-		UpdatedAt:   gormTheme.UpdatedAt,
+		CreatedAt:   time.Time(gormTheme.CreatedAt),
+		UpdatedAt:   time.Time(gormTheme.UpdatedAt),
 	}
 }

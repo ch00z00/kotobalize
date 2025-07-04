@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/ch00z00/kotobalize/models"
 	"github.com/ch00z00/kotobalize/services"
@@ -16,21 +17,21 @@ func (c *Container) CreateWriting(ctx *gin.Context) {
 	// Get user ID from the context (set by the auth middleware)
 	userID, exists := ctx.Get("userId")
 	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"code": "UNAUTHORIZED", "message": "User ID not found in token"})
+		ctx.JSON(http.StatusUnauthorized, models.APIError{Code: "UNAUTHORIZED", Message: "User ID not found in token"})
 		return
 	}
 
 	// Bind the incoming JSON to the NewWritingRequest struct
 	var req models.NewWritingRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"code": "INVALID_INPUT", "message": err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.APIError{Code: "INVALID_INPUT", Message: err.Error()})
 		return
 	}
 
 	// Check if the theme exists
 	var theme models.GormTheme
 	if err := c.DB.First(&theme, req.ThemeID).Error; err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"code": "THEME_NOT_FOUND", "message": "Theme not found"})
+		ctx.JSON(http.StatusNotFound, models.APIError{Code: "THEME_NOT_FOUND", Message: "Theme not found"})
 		return
 	}
 
@@ -43,7 +44,7 @@ func (c *Container) CreateWriting(ctx *gin.Context) {
 	}
 
 	if err := c.DB.Create(&newWriting).Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"code": "DATABASE_ERROR", "message": "Failed to create writing"})
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to create writing"})
 		return
 	}
 
@@ -58,14 +59,14 @@ func (c *Container) ReviewWriting(ctx *gin.Context) {
 	// Get user ID from the context (set by the auth middleware)
 	userID, exists := ctx.Get("userId")
 	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"code": "UNAUTHORIZED", "message": "User ID not found in token"})
+		ctx.JSON(http.StatusUnauthorized, models.APIError{Code: "UNAUTHORIZED", Message: "User ID not found in token"})
 		return
 	}
 
 	// Bind the incoming JSON to the NewReviewRequest struct
 	var req models.NewReviewRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"code": "INVALID_INPUT", "message": err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.APIError{Code: "INVALID_INPUT", Message: err.Error()})
 		return
 	}
 
@@ -73,16 +74,16 @@ func (c *Container) ReviewWriting(ctx *gin.Context) {
 	var gormWriting models.GormWriting
 	if err := c.DB.Preload("Theme").First(&gormWriting, req.WritingID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ctx.JSON(http.StatusNotFound, gin.H{"code": "WRITING_NOT_FOUND", "message": "Writing not found"})
+			ctx.JSON(http.StatusNotFound, models.APIError{Code: "WRITING_NOT_FOUND", Message: "Writing not found"})
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, gin.H{"code": "DATABASE_ERROR", "message": "Failed to fetch writing"})
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to fetch writing"})
 		return
 	}
 
 	// Authorization check: Ensure the writing belongs to the authenticated user
 	if gormWriting.UserID != userID.(uint) {
-		ctx.JSON(http.StatusForbidden, gin.H{"code": "FORBIDDEN", "message": "You do not have permission to review this writing"})
+		ctx.JSON(http.StatusForbidden, models.APIError{Code: "FORBIDDEN", Message: "You do not have permission to review this writing"})
 		return
 	}
 
@@ -90,7 +91,7 @@ func (c *Container) ReviewWriting(ctx *gin.Context) {
 	openAIService := services.OpenAIService{Client: c.OpenAIClient}
 	aiResponse, err := openAIService.GetAIReview(ctx.Request.Context(), gormWriting.Theme.Title, gormWriting.Content)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"code": "AI_SERVICE_ERROR", "message": "Failed to get AI review: " + err.Error()})
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "AI_SERVICE_ERROR", Message: "Failed to get AI review: " + err.Error()})
 		return
 	}
 
@@ -105,7 +106,7 @@ func (c *Container) ReviewWriting(ctx *gin.Context) {
 
 	// Save the updated writing record to the database
 	if err := c.DB.Save(&gormWriting).Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"code": "DATABASE_ERROR", "message": "Failed to save AI review"})
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to save AI review"})
 		return
 	}
 
@@ -119,14 +120,14 @@ func (c *Container) GetWritingByID(ctx *gin.Context) {
 	writingIDStr := ctx.Param("writingId")
 	writingID, err := strconv.ParseUint(writingIDStr, 10, 64)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"code": "INVALID_INPUT", "message": "Invalid writing ID format"})
+		ctx.JSON(http.StatusBadRequest, models.APIError{Code: "INVALID_INPUT", Message: "Invalid writing ID format"})
 		return
 	}
 
 	// Get user ID from the context (set by the auth middleware)
 	userID, exists := ctx.Get("userId")
 	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"code": "UNAUTHORIZED", "message": "User ID not found in token"})
+		ctx.JSON(http.StatusUnauthorized, models.APIError{Code: "UNAUTHORIZED", Message: "User ID not found in token"})
 		return
 	}
 
@@ -134,10 +135,10 @@ func (c *Container) GetWritingByID(ctx *gin.Context) {
 	var gormWriting models.GormWriting
 	if err := c.DB.Where("id = ? AND user_id = ?", writingID, userID).First(&gormWriting).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ctx.JSON(http.StatusNotFound, gin.H{"code": "WRITING_NOT_FOUND", "message": "Writing not found or you don't have permission to view it"})
+			ctx.JSON(http.StatusNotFound, models.APIError{Code: "WRITING_NOT_FOUND", Message: "Writing not found or you don't have permission to view it"})
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, gin.H{"code": "DATABASE_ERROR", "message": "Failed to fetch writing"})
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to fetch writing"})
 		return
 	}
 
@@ -150,14 +151,14 @@ func (c *Container) ListUserWritings(ctx *gin.Context) {
 	// Get user ID from the context (set by the auth middleware)
 	userID, exists := ctx.Get("userId")
 	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"code": "UNAUTHORIZED", "message": "User ID not found in token"})
+		ctx.JSON(http.StatusUnauthorized, models.APIError{Code: "UNAUTHORIZED", Message: "User ID not found in token"})
 		return
 	}
 
 	// Find all writings for the authenticated user, ordered by most recent
 	var gormWritings []models.GormWriting
 	if err := c.DB.Where("user_id = ?", userID).Order("created_at desc").Find(&gormWritings).Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"code": "DATABASE_ERROR", "message": "Failed to fetch writings"})
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to fetch writings"})
 		return
 	}
 
@@ -178,8 +179,8 @@ func mapGormWritingToAPI(gormWriting models.GormWriting) models.Writing {
 		ThemeID:         int64(gormWriting.ThemeID),
 		Content:         gormWriting.Content,
 		DurationSeconds: int32(gormWriting.DurationSeconds),
-		CreatedAt:       gormWriting.CreatedAt,
-		UpdatedAt:       gormWriting.UpdatedAt,
+		CreatedAt:       time.Time(gormWriting.CreatedAt),
+		UpdatedAt:       time.Time(gormWriting.UpdatedAt),
 	}
 
 	// Safely handle nullable fields. If the DB value is nil, the API model's
