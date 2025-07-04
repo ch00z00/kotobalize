@@ -17,14 +17,14 @@ func (c *Container) GetCurrentUser(ctx *gin.Context) {
 	// Get user ID from the context (set by the auth middleware)
 	userID, exists := ctx.Get("userId")
 	if !exists {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"code": "UNAUTHORIZED", "message": "User ID not found in token"})
+		ctx.JSON(http.StatusUnauthorized, models.APIError{Code: "UNAUTHORIZED", Message: "User ID not found in token"})
 		return
 	}
 
 	// Find the user in the database
 	var user models.GormUser
 	if err := c.DB.First(&user, userID).Error; err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"code": "USER_NOT_FOUND", "message": "User not found"})
+		ctx.JSON(http.StatusNotFound, models.APIError{Code: "USER_NOT_FOUND", Message: "User not found"})
 		return
 	}
 
@@ -44,7 +44,7 @@ func (c *Container) LoginUser(ctx *gin.Context) {
 	var req models.LoginRequest
 	// Bind the incoming JSON to the LoginRequest struct
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"code": "INVALID_INPUT", "message": err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.APIError{Code: "INVALID_INPUT", Message: err.Error()})
 		return
 	}
 
@@ -52,21 +52,21 @@ func (c *Container) LoginUser(ctx *gin.Context) {
 	var user models.GormUser
 	if err := c.DB.Model(&models.GormUser{}).Where("email = ?", req.Email).First(&user).Error; err != nil {
 		// To prevent email enumeration attacks, return a generic error for both "not found" and other DB errors.
-		ctx.JSON(http.StatusUnauthorized, gin.H{"code": "INVALID_CREDENTIALS", "message": "Invalid email or password"})
+		ctx.JSON(http.StatusUnauthorized, models.APIError{Code: "INVALID_CREDENTIALS", Message: "Invalid email or password"})
 		return
 	}
 
 	// Compare the provided password with the stored hash
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 		// If passwords don't match, return unauthorized
-		ctx.JSON(http.StatusUnauthorized, gin.H{"code": "INVALID_CREDENTIALS", "message": "Invalid email or password"})
+		ctx.JSON(http.StatusUnauthorized, models.APIError{Code: "INVALID_CREDENTIALS", Message: "Invalid email or password"})
 		return
 	}
 
 	// Generate JWT
 	token, err := generateJWT(user, c.JWTSecret)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"code": "INTERNAL_ERROR", "message": "Failed to generate token"})
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "INTERNAL_ERROR", Message: "Failed to generate token"})
 		return
 	}
 
@@ -90,7 +90,7 @@ func (c *Container) SignupUser(ctx *gin.Context) {
 	var req models.RegisterRequest
 	// Bind the incoming JSON to the RegisterRequest struct
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"code": "INVALID_INPUT", "message": err.Error()})
+		ctx.JSON(http.StatusBadRequest, models.APIError{Code: "INVALID_INPUT", Message: err.Error()})
 		return
 	}
 
@@ -98,18 +98,18 @@ func (c *Container) SignupUser(ctx *gin.Context) {
 	var existingUser models.GormUser
 	if err := c.DB.Model(&models.GormUser{}).Where("email = ?", req.Email).First(&existingUser).Error; err == nil {
 		// User found, return conflict
-		ctx.JSON(http.StatusConflict, gin.H{"code": "USER_EXISTS", "message": "User with this email already exists"})
+		ctx.JSON(http.StatusConflict, models.APIError{Code: "USER_EXISTS", Message: "User with this email already exists"})
 		return
 	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
 		// Another database error occurred
-		ctx.JSON(http.StatusInternalServerError, gin.H{"code": "DATABASE_ERROR", "message": "Failed to check for existing user"})
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to check for existing user"})
 		return
 	}
 
 	// Hash the password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"code": "INTERNAL_ERROR", "message": "Failed to hash password"})
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "INTERNAL_ERROR", Message: "Failed to hash password"})
 		return
 	}
 
@@ -120,14 +120,14 @@ func (c *Container) SignupUser(ctx *gin.Context) {
 	}
 
 	if err := c.DB.Create(&newUser).Error; err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"code": "DATABASE_ERROR", "message": "Failed to create user"})
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to create user"})
 		return
 	}
 
 	// Generate JWT
 	token, err := generateJWT(newUser, c.JWTSecret)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"code": "INTERNAL_ERROR", "message": "Failed to generate token"})
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "INTERNAL_ERROR", Message: "Failed to generate token"})
 		return
 	}
 

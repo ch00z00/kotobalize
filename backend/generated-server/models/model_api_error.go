@@ -1,7 +1,7 @@
 package models
 
-// Error model
-type Error struct {
+// APIError model
+type APIError struct {
 
 	Code string `json:"code"`
 
