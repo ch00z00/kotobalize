@@ -4,7 +4,6 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/ch00z00/kotobalize/models"
 	"github.com/ch00z00/kotobalize/services"
@@ -179,8 +178,8 @@ func mapGormWritingToAPI(gormWriting models.GormWriting) models.Writing {
 		ThemeID:         int64(gormWriting.ThemeID),
 		Content:         gormWriting.Content,
 		DurationSeconds: int32(gormWriting.DurationSeconds),
-		CreatedAt:       time.Time(gormWriting.CreatedAt),
-		UpdatedAt:       time.Time(gormWriting.UpdatedAt),
+		CreatedAt:       gormWriting.CreatedAt,
+		UpdatedAt:       gormWriting.UpdatedAt,
 	}
 
 	// Safely handle nullable fields. If the DB value is nil, the API model's

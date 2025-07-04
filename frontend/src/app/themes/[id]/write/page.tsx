@@ -1,4 +1,4 @@
-import { getThemeById } from '@/lib/api/themes';
+import { getThemeById } from '@/lib/api/themes.server';
 import { notFound } from 'next/navigation';
 import Editor from '@/components/edit/Editor';
 import ProtectedRoute from '@/components/common/ProtectedRoute';

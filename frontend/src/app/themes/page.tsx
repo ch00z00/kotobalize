@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { getThemesForClient } from '@/lib/api/themes';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { getThemesForClient } from '@/lib/api/themes.client';
 import { Theme } from '@/types/generated/models';
 import ThemeCard from '@/components/themes/ThemeCard';
 import CreateThemeModal from '@/components/themes/CreateThemeModal';
@@ -13,6 +13,9 @@ export default function ThemesPage() {
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { token } = useAuthStore();
+  // フィルタリングと検索のための新しいstate
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   const fetchThemes = useCallback(async () => {
     setIsLoading(true);
@@ -43,6 +46,27 @@ export default function ThemesPage() {
     fetchThemes();
   };
 
+  // フィルターボタン用にユニークなカテゴリを取得する
+  const categories = useMemo(() => {
+    if (themes.length === 0) return [];
+    const uniqueCategories = new Set(themes.map((theme) => theme.category));
+    return ['すべて', ...Array.from(uniqueCategories)];
+  }, [themes]);
+
+  // 検索クエリと選択されたカテゴリに基づいてテーマをフィルタリングする
+  const filteredThemes = useMemo(() => {
+    return themes.filter((theme) => {
+      const matchesCategory =
+        !selectedCategory ||
+        selectedCategory === 'すべて' ||
+        theme.category === selectedCategory;
+      const matchesSearch =
+        theme.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        theme.description.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [themes, searchQuery, selectedCategory]);
+
   return (
     <>
       <div className="container min-h-[calc(100vh-168px)] mx-auto p-4 sm:p-6 lg:p-8">
@@ -56,15 +80,56 @@ export default function ThemesPage() {
           </button>
         </div>
 
+        {/* 検索とフィルタUI */}
+        <div className="mb-8 rounded-lg bg-white p-4 shadow">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div className="md:col-span-2">
+              <label htmlFor="search-theme" className="sr-only">
+                テーマを検索
+              </label>
+              <input
+                type="text"
+                id="search-theme"
+                placeholder="キーワードで検索..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
+              />
+            </div>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                {categories.map((category) => (
+                  <button
+                    key={category}
+                    onClick={() => setSelectedCategory(category)}
+                    className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+                      selectedCategory === category
+                        ? 'bg-primary text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
         {isLoading ? (
           <p className="text-center text-gray-500">読み込み中...</p>
         ) : error ? (
           <div className="text-center text-red-600">{error}</div>
-        ) : themes.length > 0 ? (
+        ) : filteredThemes.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {themes.map((theme) => (
+            {filteredThemes.map((theme) => (
               <ThemeCard key={theme.id} theme={theme} />
             ))}
+          </div>
+        ) : themes.length > 0 ? (
+          <div className="mt-16 text-center text-gray-500">
+            <p className="text-lg">該当するテーマが見つかりませんでした。</p>
+            <p className="mt-2">検索条件を変更してお試しください。</p>
           </div>
         ) : (
           <div className="mt-16 text-center text-gray-500">

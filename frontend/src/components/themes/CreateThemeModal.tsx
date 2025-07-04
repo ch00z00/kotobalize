@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAuthStore } from '@/store/auth';
-import { createTheme, NewThemeRequest } from '@/lib/api/themes';
+import { createTheme, NewThemeRequest } from '@/lib/api/themes.client';
 
 interface CreateThemeModalProps {
   isOpen: boolean;

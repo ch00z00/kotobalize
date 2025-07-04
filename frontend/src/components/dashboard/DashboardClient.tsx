@@ -8,7 +8,7 @@ import { useAuthStore } from '@/store/auth';
 
 // apis
 import { getWritings } from '@/lib/api/writings';
-import { getThemesForClient } from '@/lib/api/themes';
+import { getThemesForClient } from '@/lib/api/themes.client';
 
 // types
 import { Writing, Theme } from '@/types/generated/models';

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/ch00z00/kotobalize/models"
 	"github.com/gin-gonic/gin"
@@ -100,7 +99,7 @@ func mapGormThemeToAPI(gormTheme models.GormTheme) models.Theme {
 		Title:       gormTheme.Title,
 		Description: gormTheme.Description,
 		Category:    gormTheme.Category,
-		CreatedAt:   time.Time(gormTheme.CreatedAt),
-		UpdatedAt:   time.Time(gormTheme.UpdatedAt),
+		CreatedAt:   gormTheme.CreatedAt,
+		UpdatedAt:   gormTheme.UpdatedAt,
 	}
 }
