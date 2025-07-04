@@ -134,9 +134,9 @@ export default function DashboardClient() {
   }
 
   return (
-    <div className="container min-h-[calc(100vh-168px)] mx-auto p-4 sm:p-6 lg:p-8">
+    <div className="container min-h-[calc(100vh-168px)] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-12 lg:py-14">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-800">ダッシュボード</h1>
+        <h1 className="text-3xl font-bold text-gray-800">DASHBOARD</h1>
         <LinkButton href="/themes">新しい言語化に挑戦する</LinkButton>
       </div>
 

@@ -58,56 +58,58 @@ export default function CreateThemeModal({
           新しいテーマを作成
         </h2>
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label
-              htmlFor="title"
-              className="block text-sm font-medium text-gray-700"
-            >
-              テーマタイトル
-            </label>
-            <input
-              id="title"
-              type="text"
-              required
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
-              placeholder="例: RESTful APIの設計原則"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="category"
-              className="block text-sm font-medium text-gray-700"
-            >
-              カテゴリ
-            </label>
-            <input
-              id="category"
-              type="text"
-              required
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
-              placeholder="例: バックエンド"
-            />
-          </div>
-          <div>
-            <label
-              htmlFor="description"
-              className="block text-sm font-medium text-gray-700"
-            >
-              説明
-            </label>
-            <textarea
-              id="description"
-              rows={4}
-              required
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
-              placeholder="例: ステートレス性、統一インターフェースなどの主要な原則を含めて説明してください。"
-            />
+          <div className="space-y-4">
+            <div>
+              <label
+                htmlFor="title"
+                className="block text-sm font-medium text-gray-700"
+              >
+                テーマタイトル
+              </label>
+              <input
+                id="title"
+                type="text"
+                required
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="mt-1 block w-full py-2 px-3 rounded-lg border-2 border-gray-300 bg-gray-100 sm:text-md"
+                placeholder="例: RESTful APIの設計原則"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="category"
+                className="block text-sm font-medium text-gray-700"
+              >
+                カテゴリ
+              </label>
+              <input
+                id="category"
+                type="text"
+                required
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="mt-1 block w-full py-2 px-3 rounded-lg border-2 border-gray-300 bg-gray-100 sm:text-md"
+                placeholder="例: バックエンド"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="description"
+                className="block text-sm font-medium text-gray-700"
+              >
+                説明
+              </label>
+              <textarea
+                id="description"
+                rows={4}
+                required
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className="mt-1 block w-full py-2 px-3 rounded-lg border-2 border-gray-300 bg-gray-100 sm:text-md"
+                placeholder="例: ステートレス性、統一インターフェースなどの主要な原則を含めて説明してください。"
+              />
+            </div>
           </div>
           {error && <p className="text-sm text-red-600">{error}</p>}
           <div className="flex justify-end space-x-4">

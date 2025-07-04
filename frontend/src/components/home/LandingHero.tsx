@@ -30,10 +30,18 @@ export default function LandingHero() {
             言語化トレーニングプラットフォームです。
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6">
-            <LinkButton href="/themes" variant="primary">
-              Get started
+            <LinkButton
+              href="/login"
+              variant="outline"
+              className="text-xl px-6 py-2"
+            >
+              Login
             </LinkButton>
-            <LinkButton href="/signup" variant="outline">
+            <LinkButton
+              href="/signup"
+              variant="primary"
+              className="text-xl px-6 py-2"
+            >
               Sign up
             </LinkButton>
           </div>

@@ -70,9 +70,9 @@ export default function ThemesPage() {
 
   return (
     <>
-      <div className="container min-h-[calc(100vh-168px)] mx-auto p-4 sm:p-6 lg:p-8">
+      <div className="container min-h-[calc(100vh-168px)] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-12 lg:py-14">
         <div className="mb-6 flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-gray-800">テーマを選択</h1>
+          <h1 className="text-3xl font-bold text-gray-800">THEMES</h1>
           <Button onClick={() => setIsModalOpen(true)}>
             新しいテーマを追加
           </Button>
@@ -91,13 +91,13 @@ export default function ThemesPage() {
                 placeholder="キーワードで検索..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="block w-full rounded-md border-gray-300 shadow-sm sm:text-sm"
+                className="block w-full py-2 px-3 rounded-xl border-2 border-gray-300 bg-gray-100 sm:text-md"
               />
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 {categories.map((category) => (
-                  <Button
+                  <button
                     key={category}
                     onClick={() => setSelectedCategory(category)}
                     className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${
@@ -107,7 +107,7 @@ export default function ThemesPage() {
                     }`}
                   >
                     {category}
-                  </Button>
+                  </button>
                 ))}
               </div>
             </div>

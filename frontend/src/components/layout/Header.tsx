@@ -41,7 +41,7 @@ export default function Header() {
             (isLoggedIn() ? (
               <>
                 <span className="hidden text-gray-700 sm:inline">
-                  こんにちは, {user?.email} さん
+                  Hello, {user?.email}!
                 </span>
                 <button
                   onClick={handleLogout}
