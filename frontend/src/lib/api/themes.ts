@@ -41,6 +41,7 @@ export async function createTheme(
   themeData: NewThemeRequest,
   token: string
 ): Promise<Theme> {
+  console.log('createTheme called with:', themeData);
   const res = await fetch(`${PUBLIC_API_BASE_URL}/themes`, {
     method: 'POST',
     headers: {
@@ -87,12 +88,16 @@ export async function getThemeById(id: string): Promise<Theme | null> {
 /**
  * Fetches a list of all available themes from the backend API.
  * This function is designed to be called from the client-side (browser).
+ * @param token - The user's JWT for authorization.
  * @returns A promise that resolves to an array of themes.
  */
-export async function getThemesForClient(): Promise<Theme[]> {
+export async function getThemesForClient(token: string): Promise<Theme[]> {
   try {
-    // The /themes endpoint is public and does not require a token.
-    const res = await fetch(`${PUBLIC_API_BASE_URL}/themes`);
+    const res = await fetch(`${PUBLIC_API_BASE_URL}/themes`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
     if (!res.ok) {
       throw new Error(`Failed to fetch themes: ${res.statusText}`);

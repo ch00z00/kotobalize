@@ -5,18 +5,25 @@ import { getThemesForClient } from '@/lib/api/themes';
 import { Theme } from '@/types/generated/models';
 import ThemeCard from '@/components/themes/ThemeCard';
 import CreateThemeModal from '@/components/themes/CreateThemeModal';
+import { useAuthStore } from '@/store/auth';
 
 export default function ThemesPage() {
   const [themes, setThemes] = useState<Theme[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { token } = useAuthStore();
 
   const fetchThemes = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
-      const fetchedThemes = await getThemesForClient();
+      if (!token) {
+        setError('テーマの読み込みには認証が必要です。');
+        setIsLoading(false);
+        return;
+      }
+      const fetchedThemes = await getThemesForClient(token);
       setThemes(fetchedThemes);
     } catch (err) {
       setError(
@@ -25,7 +32,7 @@ export default function ThemesPage() {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     fetchThemes();

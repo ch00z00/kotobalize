@@ -2,14 +2,22 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
+
+// stores
 import { useAuthStore } from '@/store/auth';
+
+// apis
 import { getWritings } from '@/lib/api/writings';
 import { getThemesForClient } from '@/lib/api/themes';
-import { Writing, Theme } from '@/types/generated/models';
-import StatCard from '../molecules/card/StatCard';
-import DashboardSkeleton from './DashboardSkeleton';
 
-// A new interface for our grouped and sorted data structure
+// types
+import { Writing, Theme } from '@/types/generated/models';
+
+// components
+import Button from '@/components/atoms/Button';
+import StatCard from '@/components/molecules/card/StatCard';
+import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton';
+
 interface GroupedWriting {
   theme: Theme;
   writings: Writing[];
@@ -60,7 +68,7 @@ export default function DashboardClient() {
       // Fetch both writings and themes concurrently
       const [writingsData, themesData] = await Promise.all([
         getWritings(token),
-        getThemesForClient(),
+        getThemesForClient(token),
       ]);
 
       // Create a map for quick theme lookup
@@ -127,7 +135,10 @@ export default function DashboardClient() {
 
   return (
     <div className="container min-h-[calc(100vh-168px)] mx-auto p-4 sm:p-6 lg:p-8">
-      <h1 className="mb-6 text-3xl font-bold text-gray-800">ダッシュボード</h1>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-3xl font-bold text-gray-800">ダッシュボード</h1>
+        <Button href="/themes">新しい言語化に挑戦する</Button>
+      </div>
 
       {/* Stats Section */}
       <dl className="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-3">
@@ -136,6 +147,7 @@ export default function DashboardClient() {
         <StatCard label="平均スコア" value={stats.averageScore} unit="点" />
       </dl>
 
+      {/* Accordion List */}
       <div className="space-y-6">
         {groupedWritings.length > 0 ? (
           groupedWritings.map(({ theme, writings }) => (
@@ -191,14 +203,11 @@ export default function DashboardClient() {
             </div>
           ))
         ) : (
-          <div className="text-center text-gray-500">
-            <p>まだ記録がありません。</p>
-            <Link
-              href="/themes"
-              className="mt-4 inline-block text-blue-600 hover:underline"
-            >
-              最初のテーマに挑戦する
-            </Link>
+          <div className="mt-16 text-center text-gray-500">
+            <p className="text-lg">まだ記録がありません。</p>
+            <p className="mt-2">
+              右上の「新しい言語化に挑戦する」ボタンから最初のテーマに挑戦しましょう！
+            </p>
           </div>
         )}
       </div>
