@@ -20,6 +20,7 @@ models/ApiError.ts
 models/AuthResponse.ts
 models/LoginRequest.ts
 models/NewReviewRequest.ts
+models/NewThemeRequest.ts
 models/NewWritingRequest.ts
 models/ObjectSerializer.ts
 models/RegisterRequest.ts

@@ -10,7 +10,7 @@
     "lint:fix": "next lint --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "gen:types": "openapi-generator generate -i ../openapi.yml -g typescript -o src/types/generated --additional-properties=modelPropertyNaming=original,enumPropertyNaming=original"
+    "gen:types": "openapi-generator generate -i ../openapi.yaml -g typescript -o src/types/generated --additional-properties=modelPropertyNaming=original,enumPropertyNaming=original"
   },
   "dependencies": {
     "framer-motion": "^12.23.0",

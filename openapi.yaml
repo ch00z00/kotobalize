@@ -101,6 +101,31 @@ paths:
     "401":
      $ref: "#/components/responses/Unauthorized"
 
+  post:
+   summary: Create a new theme
+   operationId: createTheme
+   tags:
+    - Themes
+   security:
+    - bearerAuth: []
+   requestBody:
+    required: true
+    content:
+     application/json:
+      schema:
+       $ref: "#/components/schemas/NewThemeRequest"
+   responses:
+    "201":
+     description: Theme created successfully
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Theme"
+    "400":
+     $ref: "#/components/responses/BadRequest"
+    "401":
+     $ref: "#/components/responses/Unauthorized"
+
  /themes/{themeId}:
   get:
    summary: Get details of a specific theme by ID
@@ -380,6 +405,20 @@ components:
     - themeId
     - content
     - durationSeconds
+
+  NewThemeRequest:
+   type: object
+   properties:
+    title:
+     type: string
+    description:
+     type: string
+    category:
+     type: string
+   required:
+    - title
+    - description
+    - category
 
   NewReviewRequest:
    type: object

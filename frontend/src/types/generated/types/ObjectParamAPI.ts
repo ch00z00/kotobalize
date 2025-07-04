@@ -6,6 +6,7 @@ import { ApiError } from '../models/ApiError';
 import { AuthResponse } from '../models/AuthResponse';
 import { LoginRequest } from '../models/LoginRequest';
 import { NewReviewRequest } from '../models/NewReviewRequest';
+import { NewThemeRequest } from '../models/NewThemeRequest';
 import { NewWritingRequest } from '../models/NewWritingRequest';
 import { RegisterRequest } from '../models/RegisterRequest';
 import { Theme } from '../models/Theme';
@@ -96,6 +97,15 @@ export class ObjectAuthApi {
 import { ObservableThemesApi } from "./ObservableAPI";
 import { ThemesApiRequestFactory, ThemesApiResponseProcessor} from "../apis/ThemesApi";
 
+export interface ThemesApiCreateThemeRequest {
+    /**
+     * 
+     * @type NewThemeRequest
+     * @memberof ThemesApicreateTheme
+     */
+    newThemeRequest: NewThemeRequest
+}
+
 export interface ThemesApiGetThemeByIdRequest {
     /**
      * 
@@ -114,6 +124,22 @@ export class ObjectThemesApi {
 
     public constructor(configuration: Configuration, requestFactory?: ThemesApiRequestFactory, responseProcessor?: ThemesApiResponseProcessor) {
         this.api = new ObservableThemesApi(configuration, requestFactory, responseProcessor);
+    }
+
+    /**
+     * Create a new theme
+     * @param param the request object
+     */
+    public createThemeWithHttpInfo(param: ThemesApiCreateThemeRequest, options?: ConfigurationOptions): Promise<HttpInfo<Theme>> {
+        return this.api.createThemeWithHttpInfo(param.newThemeRequest,  options).toPromise();
+    }
+
+    /**
+     * Create a new theme
+     * @param param the request object
+     */
+    public createTheme(param: ThemesApiCreateThemeRequest, options?: ConfigurationOptions): Promise<Theme> {
+        return this.api.createTheme(param.newThemeRequest,  options).toPromise();
     }
 
     /**

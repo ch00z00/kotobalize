@@ -7,6 +7,7 @@ import { ApiError } from '../models/ApiError';
 import { AuthResponse } from '../models/AuthResponse';
 import { LoginRequest } from '../models/LoginRequest';
 import { NewReviewRequest } from '../models/NewReviewRequest';
+import { NewThemeRequest } from '../models/NewThemeRequest';
 import { NewWritingRequest } from '../models/NewWritingRequest';
 import { RegisterRequest } from '../models/RegisterRequest';
 import { Theme } from '../models/Theme';
@@ -139,6 +140,38 @@ export class ObservableThemesApi {
         this.configuration = configuration;
         this.requestFactory = requestFactory || new ThemesApiRequestFactory(configuration);
         this.responseProcessor = responseProcessor || new ThemesApiResponseProcessor();
+    }
+
+    /**
+     * Create a new theme
+     * @param newThemeRequest
+     */
+    public createThemeWithHttpInfo(newThemeRequest: NewThemeRequest, _options?: ConfigurationOptions): Observable<HttpInfo<Theme>> {
+        const _config = mergeConfiguration(this.configuration, _options);
+
+        const requestContextPromise = this.requestFactory.createTheme(newThemeRequest, _config);
+        // build promise chain
+        let middlewarePreObservable = from<RequestContext>(requestContextPromise);
+        for (const middleware of _config.middleware) {
+            middlewarePreObservable = middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => middleware.pre(ctx)));
+        }
+
+        return middlewarePreObservable.pipe(mergeMap((ctx: RequestContext) => _config.httpApi.send(ctx))).
+            pipe(mergeMap((response: ResponseContext) => {
+                let middlewarePostObservable = of(response);
+                for (const middleware of _config.middleware.reverse()) {
+                    middlewarePostObservable = middlewarePostObservable.pipe(mergeMap((rsp: ResponseContext) => middleware.post(rsp)));
+                }
+                return middlewarePostObservable.pipe(map((rsp: ResponseContext) => this.responseProcessor.createThemeWithHttpInfo(rsp)));
+            }));
+    }
+
+    /**
+     * Create a new theme
+     * @param newThemeRequest
+     */
+    public createTheme(newThemeRequest: NewThemeRequest, _options?: ConfigurationOptions): Observable<Theme> {
+        return this.createThemeWithHttpInfo(newThemeRequest, _options).pipe(map((apiResponse: HttpInfo<Theme>) => apiResponse.data));
     }
 
     /**

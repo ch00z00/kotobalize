@@ -2,6 +2,7 @@ export * from '../models/ApiError';
 export * from '../models/AuthResponse';
 export * from '../models/LoginRequest';
 export * from '../models/NewReviewRequest';
+export * from '../models/NewThemeRequest';
 export * from '../models/NewWritingRequest';
 export * from '../models/RegisterRequest';
 export * from '../models/Theme';
@@ -12,6 +13,7 @@ import { ApiError } from '../models/ApiError';
 import { AuthResponse } from '../models/AuthResponse';
 import { LoginRequest } from '../models/LoginRequest';
 import { NewReviewRequest } from '../models/NewReviewRequest';
+import { NewThemeRequest } from '../models/NewThemeRequest';
 import { NewWritingRequest } from '../models/NewWritingRequest';
 import { RegisterRequest } from '../models/RegisterRequest';
 import { Theme } from '../models/Theme';
@@ -38,6 +40,7 @@ let typeMap: {[index: string]: any} = {
     "AuthResponse": AuthResponse,
     "LoginRequest": LoginRequest,
     "NewReviewRequest": NewReviewRequest,
+    "NewThemeRequest": NewThemeRequest,
     "NewWritingRequest": NewWritingRequest,
     "RegisterRequest": RegisterRequest,
     "Theme": Theme,

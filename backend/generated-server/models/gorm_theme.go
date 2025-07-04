@@ -1,13 +1,14 @@
 package models
 
-import "time"
+import (
+	"gorm.io/gorm"
+)
 
-// GormTheme represents the theme model for database operations.
+// GormTheme represents a theme for verbalization exercises in the database.
 type GormTheme struct {
-	ID          uint `gorm:"primarykey"`
-	Title       string
-	Description string
-	Category    string
-	CreatedAt   time.Time
-	UpdatedAt   time.Time
+	gorm.Model
+	Title       string `gorm:"size:255;not null"`
+	Description string `gorm:"type:text;not null"`
+	Category    string `gorm:"size:100;not null"`
+	CreatorID   uint   // FK to the users table
 }

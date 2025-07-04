@@ -6,6 +6,7 @@ import { ApiError } from '../models/ApiError';
 import { AuthResponse } from '../models/AuthResponse';
 import { LoginRequest } from '../models/LoginRequest';
 import { NewReviewRequest } from '../models/NewReviewRequest';
+import { NewThemeRequest } from '../models/NewThemeRequest';
 import { NewWritingRequest } from '../models/NewWritingRequest';
 import { RegisterRequest } from '../models/RegisterRequest';
 import { Theme } from '../models/Theme';
@@ -100,6 +101,26 @@ export class PromiseThemesApi {
         responseProcessor?: ThemesApiResponseProcessor
     ) {
         this.api = new ObservableThemesApi(configuration, requestFactory, responseProcessor);
+    }
+
+    /**
+     * Create a new theme
+     * @param newThemeRequest
+     */
+    public createThemeWithHttpInfo(newThemeRequest: NewThemeRequest, _options?: PromiseConfigurationOptions): Promise<HttpInfo<Theme>> {
+        const observableOptions = wrapOptions(_options);
+        const result = this.api.createThemeWithHttpInfo(newThemeRequest, observableOptions);
+        return result.toPromise();
+    }
+
+    /**
+     * Create a new theme
+     * @param newThemeRequest
+     */
+    public createTheme(newThemeRequest: NewThemeRequest, _options?: PromiseConfigurationOptions): Promise<Theme> {
+        const observableOptions = wrapOptions(_options);
+        const result = this.api.createTheme(newThemeRequest, observableOptions);
+        return result.toPromise();
     }
 
     /**

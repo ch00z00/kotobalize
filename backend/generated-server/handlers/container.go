@@ -38,7 +38,7 @@ func NewContainer() (Container, error) {
 	}
 
 	// Auto migrate the schema
-	db.AutoMigrate(&models.GormUser{}, &models.GormTheme{}, &models.GormWriting{})
+	db.AutoMigrate(&models.GormUser{}, &models.GormWriting{}, &models.GormTheme{})
 
 	// Initialize OpenAI client
 	openaiClient := openai.NewClient(openaiAPIKey)
