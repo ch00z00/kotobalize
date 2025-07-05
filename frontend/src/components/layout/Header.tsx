@@ -15,7 +15,7 @@ const monumentExtended = localFont({
 
 export default function Header() {
   const [isClient, setIsClient] = useState(false);
-  const { isLoggedIn, logout, user } = useAuthStore();
+  const { isLoggedIn, logout } = useAuthStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -40,9 +40,8 @@ export default function Header() {
           {isClient &&
             (isLoggedIn() ? (
               <>
-                <span className="hidden text-gray-700 sm:inline">
-                  Hello, {user?.email}!
-                </span>
+                {/* TODO: バッジを表示する */}
+                {/* TODO: アカウントアイコンを表示する */}
                 <button
                   onClick={handleLogout}
                   className="rounded-xl bg-gray-600 px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-gray-800"

@@ -157,19 +157,39 @@ export default function DashboardClient() {
             >
               <button
                 onClick={() => handleToggle(theme.id)}
-                className="flex w-full items-center justify-between p-6 text-left transition-colors hover:bg-gray-50 focus:outline-none"
+                className="flex w-full flex-col p-6 text-left transition-colors hover:bg-gray-50 focus:outline-none sm:flex-row sm:items-center sm:justify-between"
               >
-                <div className="flex-1">
-                  <h2 className="text-xl font-semibold text-gray-800">
-                    {theme.title}
-                  </h2>
-                  <div className="mt-1 text-sm text-gray-500">
+                <div className="w-full flex-1">
+                  <div className="flex flex-col items-start gap-y-2 sm:flex-row sm:items-center sm:gap-x-3">
+                    <h2 className="text-xl font-semibold text-gray-800">
+                      {theme.title}
+                    </h2>
+                    <span className="inline-flex flex-shrink-0 items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+                      {theme.category}
+                    </span>
+                  </div>
+                  <div className="mt-2 text-sm text-gray-500 sm:mt-1">
                     回答回数: {writings.length}回
                   </div>
                 </div>
-                <ChevronIcon open={openThemeId === theme.id} />
+                <div className="mt-4 flex w-full items-center justify-end space-x-4 sm:mt-0 sm:w-auto sm:flex-shrink-0 sm:space-x-8">
+                  <LinkButton
+                    href={`/themes/${theme.id}`}
+                    variant="outline"
+                    onClick={(e: React.MouseEvent) => {
+                      e.stopPropagation();
+                    }}
+                  >
+                    リトライする
+                  </LinkButton>
+                  <ChevronIcon open={openThemeId === theme.id} />
+                </div>
               </button>
-              {openThemeId === theme.id && (
+              <div
+                className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                  openThemeId === theme.id ? 'max-h-[500px]' : 'max-h-0'
+                }`}
+              >
                 <div className="border-t border-gray-200 bg-gray-50/50 px-6 py-4">
                   <div className="space-y-2">
                     {writings.map((writing) => (
@@ -199,7 +219,7 @@ export default function DashboardClient() {
                     ))}
                   </div>
                 </div>
-              )}
+              </div>
             </div>
           ))
         ) : (
