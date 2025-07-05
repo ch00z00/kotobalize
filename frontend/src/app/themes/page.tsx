@@ -3,10 +3,12 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getThemesForClient } from '@/lib/api/themes.client';
 import { Theme } from '@/types/generated/models';
-import ThemeCard from '@/components/themes/ThemeCard';
-import CreateThemeModal from '@/components/themes/CreateThemeModal';
 import { useAuthStore } from '@/store/auth';
 import Button from '@/components/atoms/Button';
+import CreateThemeModal from '@/components/themes/CreateThemeModal';
+import ThemeCard from '@/components/themes/ThemeCard';
+import SearchInput from '@/components/common/SearchInput';
+import CategoryFilter from '@/components/common/CategoryFilter';
 
 export default function ThemesPage() {
   const [themes, setThemes] = useState<Theme[]>([]);
@@ -16,7 +18,7 @@ export default function ThemesPage() {
   const { token } = useAuthStore();
   // Filter & Search state
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('すべて');
 
   const fetchThemes = useCallback(async () => {
     setIsLoading(true);
@@ -58,9 +60,7 @@ export default function ThemesPage() {
   const filteredThemes = useMemo(() => {
     return themes.filter((theme) => {
       const matchesCategory =
-        !selectedCategory ||
-        selectedCategory === 'すべて' ||
-        theme.category === selectedCategory;
+        selectedCategory === 'すべて' || theme.category === selectedCategory;
       const matchesSearch =
         theme.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         theme.description.toLowerCase().includes(searchQuery.toLowerCase());
@@ -80,37 +80,17 @@ export default function ThemesPage() {
 
         {/* Search & Filter UI */}
         <div className="mb-8 rounded-lg bg-white p-4 shadow">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-            <div className="md:col-span-2">
-              <label htmlFor="search-theme" className="sr-only">
-                テーマを検索
-              </label>
-              <input
-                type="text"
-                id="search-theme"
-                placeholder="キーワードで検索..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="block w-full py-2 px-3 rounded-xl border-2 border-gray-300 bg-gray-100 sm:text-md"
-              />
-            </div>
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                {categories.map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => setSelectedCategory(category)}
-                    className={`rounded-full px-3 py-1 text-sm font-medium transition-colors ${
-                      selectedCategory === category
-                        ? 'bg-primary text-white'
-                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    }`}
-                  >
-                    {category}
-                  </button>
-                ))}
-              </div>
-            </div>
+          <div className="space-y-4">
+            <SearchInput
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="テーマを検索..."
+            />
+            <CategoryFilter
+              categories={categories}
+              selectedCategory={selectedCategory}
+              onSelectCategory={setSelectedCategory}
+            />
           </div>
         </div>
 

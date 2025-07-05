@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 
 // stores
@@ -17,6 +17,8 @@ import { Writing, Theme } from '@/types/generated/models';
 import StatCard from '@/components/molecules/card/StatCard';
 import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton';
 import LinkButton from '../atoms/LinkButton';
+import SearchInput from '../common/SearchInput';
+import CategoryFilter from '../common/CategoryFilter';
 
 interface GroupedWriting {
   theme: Theme;
@@ -51,6 +53,8 @@ export default function DashboardClient() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [openThemeId, setOpenThemeId] = useState<number | null>(null); // State for the accordion
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('すべて');
   const [stats, setStats] = useState({
     themeCount: 0,
     writingCount: 0,
@@ -121,6 +125,27 @@ export default function DashboardClient() {
     fetchData();
   }, [fetchData]);
 
+  // カテゴリ一覧を生成
+  const categories = useMemo(() => {
+    if (groupedWritings.length === 0) return ['すべて'];
+    const uniqueCategories = new Set(
+      groupedWritings.map(({ theme }) => theme.category)
+    );
+    return ['すべて', ...Array.from(uniqueCategories)];
+  }, [groupedWritings]);
+
+  // フィルタリングされたリストを生成
+  const filteredGroupedWritings = useMemo(() => {
+    return groupedWritings.filter(({ theme }) => {
+      const matchesCategory =
+        selectedCategory === 'すべて' || theme.category === selectedCategory;
+      const matchesSearch = theme.title
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [groupedWritings, searchQuery, selectedCategory]);
+
   if (isLoading) {
     return <DashboardSkeleton />;
   }
@@ -147,10 +172,26 @@ export default function DashboardClient() {
         <StatCard label="平均スコア" value={stats.averageScore} unit="点" />
       </dl>
 
+      {/* Search & Filter UI */}
+      <div className="mb-8 rounded-lg bg-white p-4 shadow">
+        <div className="space-y-4">
+          <SearchInput
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="履歴をテーマ名で検索..."
+          />
+          <CategoryFilter
+            categories={categories}
+            selectedCategory={selectedCategory}
+            onSelectCategory={setSelectedCategory}
+          />
+        </div>
+      </div>
+
       {/* Accordion List */}
       <div className="space-y-6">
-        {groupedWritings.length > 0 ? (
-          groupedWritings.map(({ theme, writings }) => (
+        {filteredGroupedWritings.length > 0 ? (
+          filteredGroupedWritings.map(({ theme, writings }) => (
             <div
               key={theme.id}
               className="overflow-hidden rounded-lg bg-white shadow-md"
@@ -222,6 +263,11 @@ export default function DashboardClient() {
               </div>
             </div>
           ))
+        ) : groupedWritings.length > 0 ? (
+          <div className="mt-16 text-center text-gray-500">
+            <p className="text-lg">該当する履歴が見つかりませんでした。</p>
+            <p className="mt-2">検索条件を変更してお試しください。</p>
+          </div>
         ) : (
           <div className="mt-16 text-center text-gray-500">
             <p className="text-lg">まだ記録がありません。</p>
