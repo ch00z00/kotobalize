@@ -159,123 +159,132 @@ export default function DashboardClient() {
   }
 
   return (
-    <div className="container min-h-[calc(100vh-168px)] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-12 lg:py-14">
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-800">DASHBOARD</h1>
-        <LinkButton href="/themes">新しい言語化に挑戦する</LinkButton>
-      </div>
-
-      {/* Stats Section */}
-      <dl className="mb-8 grid grid-cols-1 gap-5 sm:grid-cols-3">
-        <StatCard label="トライしたテーマ数" value={stats.themeCount} />
-        <StatCard label="合計回答数" value={stats.writingCount} />
-        <StatCard label="平均スコア" value={stats.averageScore} unit="点" />
-      </dl>
-
-      {/* Search & Filter UI */}
-      <div className="mb-8 rounded-lg bg-white p-4 shadow">
-        <div className="space-y-4">
-          <SearchInput
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="履歴をテーマ名で検索..."
-          />
-          <CategoryFilter
-            categories={categories}
-            selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
-          />
+    <div className="min-h-[calc(100vh-168px)] bg-white py-12">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Top Section: Title and Stats */}
+        <div className="mb-6 flex items-center justify-between">
+          <h1 className="text-3xl font-bold text-gray-800">DASHBOARD</h1>
+          <LinkButton href="/themes">新しい言語化に挑戦する</LinkButton>
         </div>
-      </div>
+        <dl className="grid grid-cols-1 gap-5 sm:grid-cols-3 mb-6">
+          <StatCard label="トライしたテーマ数" value={stats.themeCount} />
+          <StatCard label="合計回答数" value={stats.writingCount} />
+          <StatCard label="平均スコア" value={stats.averageScore} unit="点" />
+        </dl>
 
-      {/* Accordion List */}
-      <div className="space-y-6">
-        {filteredGroupedWritings.length > 0 ? (
-          filteredGroupedWritings.map(({ theme, writings }) => (
-            <div
-              key={theme.id}
-              className="overflow-hidden rounded-lg bg-white shadow-md"
-            >
-              <button
-                onClick={() => handleToggle(theme.id)}
-                className="flex w-full flex-col p-6 text-left transition-colors hover:bg-gray-50 focus:outline-none sm:flex-row sm:items-center sm:justify-between"
-              >
-                <div className="w-full flex-1">
-                  <div className="flex flex-col items-start gap-y-2 sm:flex-row sm:items-center sm:gap-x-3">
-                    <h2 className="text-xl font-semibold text-gray-800">
-                      {theme.title}
-                    </h2>
-                    <span className="inline-flex flex-shrink-0 items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
-                      {theme.category}
-                    </span>
-                  </div>
-                  <div className="mt-2 text-sm text-gray-500 sm:mt-1">
-                    回答回数: {writings.length}回
-                  </div>
-                </div>
-                <div className="mt-4 flex w-full items-center justify-end space-x-4 sm:mt-0 sm:w-auto sm:flex-shrink-0 sm:space-x-8">
-                  <LinkButton
-                    href={`/themes/${theme.id}`}
-                    variant="outline"
-                    onClick={(e: React.MouseEvent) => {
-                      e.stopPropagation();
-                    }}
-                  >
-                    リトライする
-                  </LinkButton>
-                  <ChevronIcon open={openThemeId === theme.id} />
-                </div>
-              </button>
-              <div
-                className={`overflow-hidden transition-all duration-500 ease-in-out ${
-                  openThemeId === theme.id ? 'max-h-[500px]' : 'max-h-0'
-                }`}
-              >
-                <div className="border-t border-gray-200 bg-gray-50/50 px-6 py-4">
-                  <div className="space-y-2">
-                    {writings.map((writing) => (
-                      <Link
-                        key={writing.id}
-                        href={`/dashboard/writings/${writing.id}`}
-                        className="block rounded-md p-3 transition-colors hover:bg-gray-200"
-                      >
-                        <div className="flex items-center justify-between">
-                          <p className="truncate pr-4 text-sm text-gray-700">
-                            {writing.content}
-                          </p>
-                          {writing.aiScore != null && (
-                            <div className="flex flex-shrink-0 items-center space-x-2">
-                              <span className="font-bold text-blue-600">
-                                {writing.aiScore}
-                              </span>
-                              <span className="text-sm text-gray-500">点</span>
-                            </div>
-                          )}
-                        </div>
-                        <p className="mt-1 text-xs text-gray-400">
-                          作成日時:{' '}
-                          {new Date(writing.createdAt).toLocaleString('ja-JP')}
-                        </p>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              </div>
+        {/* History Table */}
+        <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+          {/* Table Header */}
+          <div className="p-6">
+            <div className="space-y-4">
+              <SearchInput
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="履歴をテーマ名で検索..."
+              />
+              <CategoryFilter
+                categories={categories}
+                selectedCategory={selectedCategory}
+                onSelectCategory={setSelectedCategory}
+              />
             </div>
-          ))
-        ) : groupedWritings.length > 0 ? (
-          <div className="mt-16 text-center text-gray-500">
-            <p className="text-lg">該当する履歴が見つかりませんでした。</p>
-            <p className="mt-2">検索条件を変更してお試しください。</p>
           </div>
-        ) : (
-          <div className="mt-16 text-center text-gray-500">
-            <p className="text-lg">まだ記録がありません。</p>
-            <p className="mt-2">
-              右上の「新しい言語化に挑戦する」ボタンから最初のテーマに挑戦しましょう！
-            </p>
+
+          {/* Table Body */}
+          <div>
+            {filteredGroupedWritings.length > 0 ? (
+              filteredGroupedWritings.map(({ theme, writings }, index) => (
+                <div
+                  key={theme.id}
+                  className={`${index > 0 ? 'border-t border-gray-200' : ''}`}
+                >
+                  <button
+                    onClick={() => handleToggle(theme.id)}
+                    className="flex w-full flex-col p-6 text-left transition-colors hover:bg-gray-50 focus:outline-none sm:flex-row sm:items-center sm:justify-between"
+                  >
+                    <div className="w-full flex-1">
+                      <div className="flex flex-col items-start gap-y-2 sm:flex-row sm:items-center sm:gap-x-3">
+                        <h2 className="text-xl font-semibold text-gray-800">
+                          {theme.title}
+                        </h2>
+                        <span className="inline-flex flex-shrink-0 items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+                          {theme.category}
+                        </span>
+                      </div>
+                      <div className="mt-2 text-sm text-gray-500 sm:mt-1">
+                        回答回数: {writings.length}回
+                      </div>
+                    </div>
+                    <div className="mt-4 flex w-full items-center justify-end space-x-4 sm:mt-0 sm:w-auto sm:flex-shrink-0 sm:space-x-8">
+                      <LinkButton
+                        href={`/themes/${theme.id}`}
+                        variant="outline"
+                        onClick={(e: React.MouseEvent) => {
+                          e.stopPropagation();
+                        }}
+                      >
+                        リトライする
+                      </LinkButton>
+                      <ChevronIcon open={openThemeId === theme.id} />
+                    </div>
+                  </button>
+                  <div
+                    className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                      openThemeId === theme.id ? 'max-h-[500px]' : 'max-h-0'
+                    }`}
+                  >
+                    <div className="bg-gray-50/50 px-6 py-4">
+                      <div className="space-y-2">
+                        {writings.map((writing) => (
+                          <Link
+                            key={writing.id}
+                            href={`/dashboard/writings/${writing.id}`}
+                            className="block rounded-md p-3 transition-colors hover:bg-gray-200"
+                          >
+                            <div className="flex items-center justify-between">
+                              <p className="truncate pr-4 text-sm text-gray-700">
+                                {writing.content}
+                              </p>
+                              {writing.aiScore != null && (
+                                <div className="flex flex-shrink-0 items-center space-x-2">
+                                  <span className="font-bold text-blue-600">
+                                    {writing.aiScore}
+                                  </span>
+                                  <span className="text-sm text-gray-500">
+                                    点
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            <p className="mt-1 text-xs text-gray-400">
+                              作成日時:{' '}
+                              {new Date(writing.createdAt).toLocaleString(
+                                'ja-JP'
+                              )}
+                            </p>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="p-16 text-center text-gray-500">
+                <p className="text-lg">
+                  {groupedWritings.length > 0
+                    ? '該当する履歴が見つかりませんでした。'
+                    : 'まだ記録がありません。'}
+                </p>
+                <p className="mt-2">
+                  {groupedWritings.length > 0
+                    ? '検索条件を変更してお試しください。'
+                    : '右上の「新しい言語化に挑戦する」ボタンから最初のテーマに挑戦しましょう！'}
+                </p>
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
