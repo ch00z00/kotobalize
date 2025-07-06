@@ -3,12 +3,13 @@
 import { useState } from 'react';
 import { useAuthStore } from '@/store/auth';
 import { createTheme, NewThemeRequest } from '@/lib/api/themes.client';
+import { Theme } from '@/types/generated/models';
 import Button from '../atoms/Button';
 
 interface CreateThemeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onThemeCreated: () => void;
+  onThemeCreated: (newTheme: Theme) => void;
 }
 
 export default function CreateThemeModal({
@@ -34,8 +35,8 @@ export default function CreateThemeModal({
 
     try {
       const themeData: NewThemeRequest = { title, description, category };
-      await createTheme(themeData, token);
-      onThemeCreated();
+      const newTheme = await createTheme(themeData, token);
+      onThemeCreated(newTheme);
       setTitle('');
       setDescription('');
       setCategory('');
