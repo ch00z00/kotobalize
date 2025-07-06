@@ -24,7 +24,7 @@ function UserIcon() {
 
 export default function UserMenu() {
   const [isOpen, setIsOpen] = useState(false);
-  const { logout } = useAuthStore();
+  const { logout, user } = useAuthStore();
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -64,28 +64,38 @@ export default function UserMenu() {
       </button>
 
       <div
-        className={`absolute right-0 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 transition-all duration-200 ease-in-out ${
+        className={`absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-2 ring-gray-200 transition-all duration-300 ease-in-out ${
           isOpen
-            ? 'transform opacity-100 scale-100'
-            : 'pointer-events-none transform opacity-0 scale-95'
+            ? 'transform opacity-100 scale-100 translate-y-0'
+            : 'pointer-events-none transform opacity-0 scale-95 -translate-y-2'
         }`}
       >
-        {menuItems.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            onClick={() => setIsOpen(false)}
-            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+        <div className="px-4 py-3">
+          <p className="text-sm text-gray-600">Signed in as</p>
+          <p className="truncate text-sm font-medium text-gray-900">
+            {user?.email}
+          </p>
+        </div>
+        <div className="border-t border-gray-100 py-1">
+          {menuItems.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => setIsOpen(false)}
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+        <div className="border-t border-gray-100 py-1">
+          <button
+            onClick={handleLogout}
+            className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100"
           >
-            {item.label}
-          </Link>
-        ))}
-        <button
-          onClick={handleLogout}
-          className="block w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100"
-        >
-          Logout
-        </button>
+            Logout
+          </button>
+        </div>
       </div>
     </div>
   );
