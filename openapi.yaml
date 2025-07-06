@@ -81,6 +81,54 @@ paths:
     "401":
      $ref: "#/components/responses/Unauthorized"
 
+ /users/me/avatar:
+  put:
+   summary: Update user's avatar URL
+   operationId: updateUserAvatar
+   tags:
+    - Users
+   security:
+    - bearerAuth: []
+   requestBody:
+    required: true
+    content:
+     application/json:
+      schema:
+       $ref: "#/components/schemas/UpdateAvatarRequest"
+   responses:
+    "200":
+     description: Avatar URL updated successfully
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/User"
+    "401":
+     $ref: "#/components/responses/Unauthorized"
+
+ /users/me/avatar/upload-url:
+  post:
+   summary: Get a presigned URL for avatar upload
+   operationId: getAvatarUploadURL
+   tags:
+    - Users
+   security:
+    - bearerAuth: []
+   requestBody:
+    required: true
+    content:
+     application/json:
+      schema:
+       $ref: "#/components/schemas/AvatarUploadRequest"
+   responses:
+    "200":
+     description: Presigned URL generated successfully
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/AvatarUploadResponse"
+    "401":
+     $ref: "#/components/responses/Unauthorized"
+
  /themes:
   get:
    summary: Get a list of all available themes
@@ -458,6 +506,37 @@ components:
    required:
     - email
     - password
+
+  UpdateAvatarRequest:
+   type: object
+   properties:
+    avatarUrl:
+     type: string
+     format: uri
+   required:
+    - avatarUrl
+
+  AvatarUploadRequest:
+   type: object
+   properties:
+    fileName:
+     type: string
+    fileType:
+     type: string
+   required:
+    - fileName
+    - fileType
+
+  AvatarUploadResponse:
+   type: object
+   properties:
+    uploadUrl:
+     type: string
+    key:
+     type: string
+   required:
+    - uploadUrl
+    - key
 
   AuthResponse:
    type: object

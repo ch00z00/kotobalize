@@ -64,6 +64,44 @@ export interface AuthResponse {
 /**
  * 
  * @export
+ * @interface AvatarUploadRequest
+ */
+export interface AvatarUploadRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof AvatarUploadRequest
+     */
+    'fileName': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AvatarUploadRequest
+     */
+    'fileType': string;
+}
+/**
+ * 
+ * @export
+ * @interface AvatarUploadResponse
+ */
+export interface AvatarUploadResponse {
+    /**
+     * 
+     * @type {string}
+     * @memberof AvatarUploadResponse
+     */
+    'uploadUrl': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof AvatarUploadResponse
+     */
+    'key': string;
+}
+/**
+ * 
+ * @export
  * @interface LoginRequest
  */
 export interface LoginRequest {
@@ -204,6 +242,19 @@ export interface Theme {
      * @memberof Theme
      */
     'updatedAt': string;
+}
+/**
+ * 
+ * @export
+ * @interface UpdateAvatarRequest
+ */
+export interface UpdateAvatarRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateAvatarRequest
+     */
+    'avatarUrl': string;
 }
 /**
  * 
@@ -837,6 +888,195 @@ export class ThemesApi extends BaseAPI {
      */
     public listThemes(options?: RawAxiosRequestConfig) {
         return ThemesApiFp(this.configuration).listThemes(options).then((request) => request(this.axios, this.basePath));
+    }
+}
+
+
+
+/**
+ * UsersApi - axios parameter creator
+ * @export
+ */
+export const UsersApiAxiosParamCreator = function (configuration?: Configuration) {
+    return {
+        /**
+         * 
+         * @summary Get a presigned URL for avatar upload
+         * @param {AvatarUploadRequest} avatarUploadRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAvatarUploadUrl: async (avatarUploadRequest: AvatarUploadRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'avatarUploadRequest' is not null or undefined
+            assertParamExists('getAvatarUploadUrl', 'avatarUploadRequest', avatarUploadRequest)
+            const localVarPath = `/users/me/avatar/upload-url`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(avatarUploadRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Update user\'s avatar URL
+         * @param {UpdateAvatarRequest} updateAvatarRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateUserAvatar: async (updateAvatarRequest: UpdateAvatarRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'updateAvatarRequest' is not null or undefined
+            assertParamExists('updateUserAvatar', 'updateAvatarRequest', updateAvatarRequest)
+            const localVarPath = `/users/me/avatar`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateAvatarRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+    }
+};
+
+/**
+ * UsersApi - functional programming interface
+ * @export
+ */
+export const UsersApiFp = function(configuration?: Configuration) {
+    const localVarAxiosParamCreator = UsersApiAxiosParamCreator(configuration)
+    return {
+        /**
+         * 
+         * @summary Get a presigned URL for avatar upload
+         * @param {AvatarUploadRequest} avatarUploadRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getAvatarUploadUrl(avatarUploadRequest: AvatarUploadRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AvatarUploadResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getAvatarUploadUrl(avatarUploadRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UsersApi.getAvatarUploadUrl']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Update user\'s avatar URL
+         * @param {UpdateAvatarRequest} updateAvatarRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateUserAvatar(updateAvatarRequest: UpdateAvatarRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateUserAvatar(updateAvatarRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UsersApi.updateUserAvatar']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+    }
+};
+
+/**
+ * UsersApi - factory interface
+ * @export
+ */
+export const UsersApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
+    const localVarFp = UsersApiFp(configuration)
+    return {
+        /**
+         * 
+         * @summary Get a presigned URL for avatar upload
+         * @param {AvatarUploadRequest} avatarUploadRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getAvatarUploadUrl(avatarUploadRequest: AvatarUploadRequest, options?: RawAxiosRequestConfig): AxiosPromise<AvatarUploadResponse> {
+            return localVarFp.getAvatarUploadUrl(avatarUploadRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Update user\'s avatar URL
+         * @param {UpdateAvatarRequest} updateAvatarRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateUserAvatar(updateAvatarRequest: UpdateAvatarRequest, options?: RawAxiosRequestConfig): AxiosPromise<User> {
+            return localVarFp.updateUserAvatar(updateAvatarRequest, options).then((request) => request(axios, basePath));
+        },
+    };
+};
+
+/**
+ * UsersApi - object-oriented interface
+ * @export
+ * @class UsersApi
+ * @extends {BaseAPI}
+ */
+export class UsersApi extends BaseAPI {
+    /**
+     * 
+     * @summary Get a presigned URL for avatar upload
+     * @param {AvatarUploadRequest} avatarUploadRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsersApi
+     */
+    public getAvatarUploadUrl(avatarUploadRequest: AvatarUploadRequest, options?: RawAxiosRequestConfig) {
+        return UsersApiFp(this.configuration).getAvatarUploadUrl(avatarUploadRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Update user\'s avatar URL
+     * @param {UpdateAvatarRequest} updateAvatarRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsersApi
+     */
+    public updateUserAvatar(updateAvatarRequest: UpdateAvatarRequest, options?: RawAxiosRequestConfig) {
+        return UsersApiFp(this.configuration).updateUserAvatar(updateAvatarRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

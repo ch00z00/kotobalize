@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
+import Image from 'next/image';
 
 function UserIcon() {
   return (
@@ -61,8 +62,10 @@ export default function UserMenu() {
         className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-gray-200 text-gray-600 transition-colors hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
       >
         {user?.avatarUrl ? (
-          <img
+          <Image
             src={user.avatarUrl}
+            width={32}
+            height={32}
             alt="User Avatar"
             className="h-full w-full object-cover"
           />

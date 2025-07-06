@@ -76,6 +76,52 @@ paths:
       summary: Get current authenticated user's information
       tags:
       - Auth
+  /users/me/avatar:
+    put:
+      operationId: updateUserAvatar
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAvatarRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: Avatar URL updated successfully
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+      security:
+      - bearerAuth: []
+      summary: Update user's avatar URL
+      tags:
+      - Users
+  /users/me/avatar/upload-url:
+    post:
+      operationId: getAvatarUploadUrl
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AvatarUploadRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvatarUploadResponse'
+          description: Presigned URL generated successfully
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+      security:
+      - bearerAuth: []
+      summary: Get a presigned URL for avatar upload
+      tags:
+      - Users
   /themes:
     get:
       operationId: listThemes
@@ -493,6 +539,39 @@ components:
       required:
       - email
       - password
+    UpdateAvatarRequest:
+      example:
+        avatarUrl: https://openapi-generator.tech
+      properties:
+        avatarUrl:
+          format: uri
+          type: string
+      required:
+      - avatarUrl
+    AvatarUploadRequest:
+      example:
+        fileName: fileName
+        fileType: fileType
+      properties:
+        fileName:
+          type: string
+        fileType:
+          type: string
+      required:
+      - fileName
+      - fileType
+    AvatarUploadResponse:
+      example:
+        uploadUrl: uploadUrl
+        key: key
+      properties:
+        uploadUrl:
+          type: string
+        key:
+          type: string
+      required:
+      - key
+      - uploadUrl
     AuthResponse:
       example:
         user:

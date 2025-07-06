@@ -58,6 +58,9 @@ func main() {
 		{
 			protected.GET("/auth/me", c.GetCurrentUser)
 
+			protected.PUT("/users/me/avatar", c.UpdateUserAvatar)
+			protected.POST("/users/me/avatar/upload-url", c.GetAvatarUploadURL)
+
 			protected.GET("/themes", c.ListThemes)
 			protected.GET("/themes/:themeId", c.GetThemeByID)
 			protected.POST("/themes", c.CreateTheme)

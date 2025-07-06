@@ -9,15 +9,8 @@ services:
   depends_on:
    db:
     condition: service_healthy
-  environment:
-   # Connection information for the backend to communicate with the DB container
-   - DB_USER=kotobalize_user
-   - DB_PASSWORD=kotobalize_password
-   - DB_HOST=db
-   - DB_PORT=3306
-   - DB_NAME=kotobalize_db
-   - JWT_SECRET=a_very_secret_key_that_should_be_changed
-   - OPENAI_API_KEY=your_openai_api_key_here #TODO: Change this to your OpenAI API key
+  env_file:
+   - .env.local
   networks:
    - kotobalize-net
 
@@ -36,11 +29,8 @@ services:
   command: npm run dev
   depends_on:
    - backend
-  environment:
-   # ブラウザ(クライアントサイド)からバックエンドAPIにアクセスするためのURL
-   - NEXT_PUBLIC_API_URL=http://localhost:8080/api/v1
-   # Next.jsサーバー(コンテナ)からバックエンドAPIにアクセスするためのURL
-   - INTERNAL_API_URL=http://backend:8080/api/v1
+  env_file:
+   - .env.local
   networks:
    - kotobalize-net
 
@@ -48,11 +38,8 @@ services:
   image: mysql:8.0
   container_name: kotobalize-db
   restart: always
-  environment:
-   MYSQL_ROOT_PASSWORD: rootpassword
-   MYSQL_DATABASE: kotobalize_db
-   MYSQL_USER: kotobalize_user
-   MYSQL_PASSWORD: kotobalize_password
+  env_file:
+   - .env.local
   healthcheck:
    test:
     [

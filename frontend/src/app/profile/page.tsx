@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, ChangeEvent } from 'react';
+import Image from 'next/image';
 import { useAuthStore } from '@/store/auth';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
 import Button from '@/components/atoms/Button';
@@ -84,14 +85,18 @@ export default function ProfilePage() {
             <div className="relative h-32 w-32">
               <div className="h-full w-full overflow-hidden rounded-full bg-gray-200">
                 {preview ? (
-                  <img
+                  <Image
                     src={preview}
+                    width={320}
+                    height={320}
                     alt="Avatar preview"
                     className="h-full w-full object-cover"
                   />
                 ) : user?.avatarUrl ? (
-                  <img
+                  <Image
                     src={user.avatarUrl}
+                    width={320}
+                    height={320}
                     alt="Current avatar"
                     className="h-full w-full object-cover"
                   />

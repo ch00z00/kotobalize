@@ -32,9 +32,11 @@ func (c *Container) GetCurrentUser(ctx *gin.Context) {
 	apiUser := models.User{
 		ID:        int64(user.ID),
 		Email:     user.Email,
-		AvatarURL: user.AvatarURL,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
+	}
+	if user.AvatarURL != nil {
+		apiUser.AvatarURL = *user.AvatarURL
 	}
 
 	ctx.JSON(http.StatusOK, apiUser)
@@ -75,9 +77,11 @@ func (c *Container) LoginUser(ctx *gin.Context) {
 	apiUser := models.User{
 		ID:        int64(user.ID),
 		Email:     user.Email,
-		AvatarURL: user.AvatarURL,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
+	}
+	if user.AvatarURL != nil {
+		apiUser.AvatarURL = *user.AvatarURL
 	}
 
 	// Return the token and user info
@@ -138,9 +142,11 @@ func (c *Container) SignupUser(ctx *gin.Context) {
 	apiUser := models.User{
 		ID:        int64(newUser.ID),
 		Email:     newUser.Email,
-		AvatarURL: newUser.AvatarURL,
 		CreatedAt: newUser.CreatedAt,
 		UpdatedAt: newUser.UpdatedAt,
+	}
+	if newUser.AvatarURL != nil {
+		apiUser.AvatarURL = *newUser.AvatarURL
 	}
 
 	ctx.JSON(http.StatusCreated, models.AuthResponse{

@@ -66,6 +66,8 @@ type ApiHandleFunctions struct {
 	AuthAPI AuthAPI
 	// Routes for the ThemesAPI part of the API
 	ThemesAPI ThemesAPI
+	// Routes for the UsersAPI part of the API
+	UsersAPI UsersAPI
 	// Routes for the WritingsAPI part of the API
 	WritingsAPI WritingsAPI
 }
@@ -107,6 +109,18 @@ func getRoutes(handleFunctions ApiHandleFunctions) []Route {
 			http.MethodGet,
 			"/api/v1/themes",
 			handleFunctions.ThemesAPI.ListThemes,
+		},
+		{
+			"GetAvatarUploadUrl",
+			http.MethodPost,
+			"/api/v1/users/me/avatar/upload-url",
+			handleFunctions.UsersAPI.GetAvatarUploadUrl,
+		},
+		{
+			"UpdateUserAvatar",
+			http.MethodPut,
+			"/api/v1/users/me/avatar",
+			handleFunctions.UsersAPI.UpdateUserAvatar,
 		},
 		{
 			"CreateWriting",

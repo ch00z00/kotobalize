@@ -7,6 +7,8 @@ configuration.ts
 docs/ApiError.md
 docs/AuthApi.md
 docs/AuthResponse.md
+docs/AvatarUploadRequest.md
+docs/AvatarUploadResponse.md
 docs/LoginRequest.md
 docs/NewReviewRequest.md
 docs/NewThemeRequest.md
@@ -14,7 +16,9 @@ docs/NewWritingRequest.md
 docs/RegisterRequest.md
 docs/Theme.md
 docs/ThemesApi.md
+docs/UpdateAvatarRequest.md
 docs/User.md
+docs/UsersApi.md
 docs/Writing.md
 docs/WritingsApi.md
 git_push.sh
