@@ -53,7 +53,7 @@ export default function CreateThemeModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-xl">
         <h2 className="mb-6 text-2xl font-bold text-gray-900">
           新しいテーマを作成
@@ -65,7 +65,7 @@ export default function CreateThemeModal({
                 htmlFor="title"
                 className="block text-sm font-medium text-gray-700"
               >
-                テーマタイトル
+                タイトル
               </label>
               <input
                 id="title"

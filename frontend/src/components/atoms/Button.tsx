@@ -25,7 +25,7 @@ export default function Button({
     secondary:
       'border-transparent bg-gray-600 text-white hover:bg-gray-700 disabled:bg-gray-400',
     outline:
-      'border-gray-500 bg-white text-gray-700 hover:bg-gray-50 disabled:bg-gray-100',
+      'border-gray-500 bg-white text-gray-500 hover:bg-gray-50 disabled:bg-gray-100',
   };
 
   const combinedClassName = `${baseStyles} ${variantStyles[variant]} ${className}`;
