@@ -1,7 +1,7 @@
 import { getThemeById } from '@/lib/api/themes.server';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import Editor from '@/components/edit/Editor';
-import ProtectedRoute from '@/components/common/ProtectedRoute';
+import { cookies } from 'next/headers';
 
 interface WritePageProps {
   params: {
@@ -10,7 +10,18 @@ interface WritePageProps {
 }
 
 export default async function WritePage({ params }: WritePageProps) {
-  const theme = await getThemeById(params.id);
+  const { id } = params;
+  const cookieStore = await cookies();
+  const token = cookieStore.get('token')?.value;
+
+  if (!token) {
+    // Redirect to login page if not authenticated, preserving the intended destination
+    const callbackUrl = encodeURIComponent(`/themes/${id}/write`);
+    redirect(`/login?callbackUrl=${callbackUrl}`);
+  }
+
+  // Fetch the theme data on the server
+  const theme = await getThemeById(id, token);
 
   if (!theme) {
     notFound();
@@ -26,9 +37,7 @@ export default async function WritePage({ params }: WritePageProps) {
         <p className="text-gray-600">{theme.description}</p>
       </div>
       {/* The Editor component handles the client-side state and interactions */}
-      <ProtectedRoute>
-        <Editor themeId={theme.id} />
-      </ProtectedRoute>
+      <Editor themeId={theme.id} />
     </div>
   );
 }

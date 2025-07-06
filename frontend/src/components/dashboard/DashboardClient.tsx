@@ -3,17 +3,11 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 
-// stores
 import { useAuthStore } from '@/store/auth';
-
-// apis
 import { getWritings } from '@/lib/api/writings';
 import { getThemesForClient } from '@/lib/api/themes.client';
-
-// types
 import { Writing, Theme } from '@/types/generated/models';
 
-// components
 import StatCard from '@/components/molecules/card/StatCard';
 import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton';
 import LinkButton from '../atoms/LinkButton';
@@ -25,7 +19,6 @@ interface GroupedWriting {
   writings: Writing[];
 }
 
-// A simple chevron icon component for the accordion
 function ChevronIcon({ open }: { open: boolean }) {
   return (
     <svg
@@ -52,7 +45,7 @@ export default function DashboardClient() {
   const [groupedWritings, setGroupedWritings] = useState<GroupedWriting[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [openThemeId, setOpenThemeId] = useState<number | null>(null); // State for the accordion
+  const [openThemeId, setOpenThemeId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('すべて');
   const [stats, setStats] = useState({
@@ -90,11 +83,11 @@ export default function DashboardClient() {
       // Create the final grouped and sorted array
       const grouped = Array.from(writingsByTheme.entries())
         .map(([themeId, writings]) => ({
-          theme: themesMap.get(themeId)!, // Assume theme exists
+          theme: themesMap.get(themeId)!,
           writings: writings,
         }))
-        .filter((item) => item.theme) // Filter out any cases where theme might be missing
-        .sort((a, b) => b.writings.length - a.writings.length); // Sort by number of writings
+        .filter((item) => item.theme)
+        .sort((a, b) => b.writings.length - a.writings.length);
 
       setGroupedWritings(grouped);
 
@@ -125,7 +118,6 @@ export default function DashboardClient() {
     fetchData();
   }, [fetchData]);
 
-  // カテゴリ一覧を生成
   const categories = useMemo(() => {
     if (groupedWritings.length === 0) return ['すべて'];
     const uniqueCategories = new Set(
@@ -134,7 +126,6 @@ export default function DashboardClient() {
     return ['すべて', ...Array.from(uniqueCategories)];
   }, [groupedWritings]);
 
-  // フィルタリングされたリストを生成
   const filteredGroupedWritings = useMemo(() => {
     return groupedWritings.filter(({ theme }) => {
       const matchesCategory =
@@ -159,7 +150,7 @@ export default function DashboardClient() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-168px)] bg-white py-12">
+    <div className="min-h-[calc(100vh-168px)] bg-white px-4 sm:px-6 lg:px-8 py-12 sm:py-12 lg:py-14">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Top Section: Title and Stats */}
         <div className="mb-6 flex items-center justify-between">

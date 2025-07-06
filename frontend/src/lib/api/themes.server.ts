@@ -1,5 +1,4 @@
 import { Theme } from '@/types/generated/models';
-import { cookies } from 'next/headers';
 import { INTERNAL_API_BASE_URL } from '@/lib/api/config';
 
 /**
@@ -7,18 +6,20 @@ import { INTERNAL_API_BASE_URL } from '@/lib/api/config';
  * This function is designed to be run on the server side.
  * @returns A promise that resolves to an array of themes.
  */
-export async function getThemes(): Promise<Theme[]> {
+export async function getThemes(token: string | undefined): Promise<Theme[]> {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
-    const headers: HeadersInit = {};
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+    if (!token) {
+      // Depending on your app's logic, you might want to throw an error
+      // or return an empty array if no token is provided.
+      // Returning empty for now to avoid breaking pages that might call this without a user.
+      return [];
     }
 
     const res = await fetch(`${INTERNAL_API_BASE_URL}/themes`, {
       cache: 'no-store', // Always fetch the latest data in development
-      headers,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!res.ok) {
@@ -41,27 +42,28 @@ export async function getThemes(): Promise<Theme[]> {
  * @param id - The ID of the theme to fetch.
  * @returns A promise that resolves to the theme object, or null if not found.
  */
-export async function getThemeById(id: string): Promise<Theme | null> {
+export async function getThemeById(
+  id: string,
+  token: string
+): Promise<Theme | null> {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get('token')?.value;
-    const headers: HeadersInit = {};
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+    if (!token) {
+      throw new Error('Authorization token is required to fetch a theme.');
     }
 
     const res = await fetch(`${INTERNAL_API_BASE_URL}/themes/${id}`, {
       cache: 'no-store', // Always fetch the latest data
-      headers,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!res.ok) {
       // Return null for 404 to be handled by the page component
       if (res.status === 404) return null;
-      const errorData = await res.json().catch(() => ({}));
-      throw new Error(
-        errorData.message || `Failed to fetch theme: ${res.statusText}`
-      );
+
+      // For other errors, throw to be caught by the catch block
+      throw new Error(`Failed to fetch theme: ${res.statusText}`);
     }
     return res.json();
   } catch (error) {
