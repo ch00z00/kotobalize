@@ -32,6 +32,7 @@ func (c *Container) GetCurrentUser(ctx *gin.Context) {
 	apiUser := models.User{
 		ID:        int64(user.ID),
 		Email:     user.Email,
+		AvatarURL: user.AvatarURL,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 	}
@@ -74,6 +75,7 @@ func (c *Container) LoginUser(ctx *gin.Context) {
 	apiUser := models.User{
 		ID:        int64(user.ID),
 		Email:     user.Email,
+		AvatarURL: user.AvatarURL,
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 	}
@@ -136,6 +138,7 @@ func (c *Container) SignupUser(ctx *gin.Context) {
 	apiUser := models.User{
 		ID:        int64(newUser.ID),
 		Email:     newUser.Email,
+		AvatarURL: newUser.AvatarURL,
 		CreatedAt: newUser.CreatedAt,
 		UpdatedAt: newUser.UpdatedAt,
 	}

@@ -289,6 +289,10 @@ components:
      type: string
      format: email
      readOnly: true
+    avatarUrl:
+     type: string
+     nullable: true
+     description: URL of the user's avatar image.
     createdAt:
      type: string
      format: date-time

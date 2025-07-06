@@ -9,6 +9,7 @@ interface AuthState {
   isLoggedIn: () => boolean;
   login: (token: string, user: User) => void;
   logout: () => void;
+  updateAvatar: (avatarUrl: string) => void;
 }
 
 /**
@@ -33,6 +34,11 @@ export const useAuthStore = create<AuthState>()(
         set({ token: null, user: null });
         // 2. Clear Cookie
         Cookies.remove('token', { path: '/' });
+      },
+      updateAvatar: (avatarUrl: string) => {
+        set((state) => ({
+          user: state.user ? { ...state.user, avatarUrl } : null,
+        }));
       },
     }),
     {

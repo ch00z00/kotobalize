@@ -51,16 +51,24 @@ export default function UserMenu() {
     { href: '/about', label: 'ABOUT' },
     { href: '/dashboard', label: 'DASHBOARD' },
     { href: '/themes', label: 'THEMES' },
-    { href: '/my-page', label: 'MY PAGE' },
+    { href: '/profile', label: 'PROFILE' },
   ];
 
   return (
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-200 text-gray-600 transition-colors hover:bg-gray-300"
+        className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-gray-200 text-gray-600 transition-colors hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
       >
-        <UserIcon />
+        {user?.avatarUrl ? (
+          <img
+            src={user.avatarUrl}
+            alt="User Avatar"
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <UserIcon />
+        )}
       </button>
 
       <div
