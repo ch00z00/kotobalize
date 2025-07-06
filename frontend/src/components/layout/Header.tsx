@@ -1,10 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import localFont from 'next/font/local';
 import { useAuthStore } from '@/store/auth';
+import { useEffect, useState } from 'react';
+import localFont from 'next/font/local';
+import UserMenu from './UserMenu';
 import LinkButton from '../atoms/LinkButton';
 
 const monumentExtended = localFont({
@@ -15,17 +15,11 @@ const monumentExtended = localFont({
 
 export default function Header() {
   const [isClient, setIsClient] = useState(false);
-  const { isLoggedIn, logout } = useAuthStore();
-  const router = useRouter();
+  const { isLoggedIn } = useAuthStore();
 
   useEffect(() => {
     setIsClient(true);
   }, []);
-
-  const handleLogout = () => {
-    logout();
-    router.push('/login');
-  };
 
   return (
     <header className="bg-white shadow-sm">
@@ -36,19 +30,10 @@ export default function Header() {
         >
           Kotobalize
         </Link>
-        <div className="flex h-[40px] items-center space-x-4">
+        <div className="flex h-[48px] items-center space-x-4">
           {isClient &&
             (isLoggedIn() ? (
-              <>
-                {/* TODO: バッジを表示する */}
-                {/* TODO: アカウントアイコンを表示する */}
-                <button
-                  onClick={handleLogout}
-                  className="rounded-xl bg-gray-600 px-4 py-2 font-bold text-white transition-colors duration-300 hover:bg-gray-800"
-                >
-                  Logout
-                </button>
-              </>
+              <UserMenu />
             ) : (
               <>
                 <LinkButton
