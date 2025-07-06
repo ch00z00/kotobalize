@@ -50,11 +50,23 @@ export default function CreateThemeModal({
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-xl">
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300 ease-in-out ${
+        isOpen ? 'bg-black/50 opacity-100' : 'pointer-events-none opacity-0'
+      }`}
+      // 背景のオーバーレイをクリックしたときにモーダルを閉じる
+      onClick={onClose}
+    >
+      <div
+        className={`w-full max-w-md rounded-lg bg-white p-8 shadow-xl transition-all duration-300 ease-in-out ${
+          isOpen
+            ? 'translate-y-0 scale-100 opacity-100'
+            : '-translate-y-4 scale-95 opacity-0'
+        }`}
+        // モーダル内部のクリックで閉じてしまわないようにする
+        onClick={(e) => e.stopPropagation()}
+      >
         <h2 className="mb-6 text-2xl font-bold text-gray-900">
           新しいテーマを作成
         </h2>
