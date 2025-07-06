@@ -13,6 +13,7 @@ interface AuthFormProps {
   bottomLinkHref: string;
   bottomLinkText: string;
   bottomLinkPrompt: string;
+  error?: string | null;
 }
 
 export default function AuthForm({
@@ -24,32 +25,20 @@ export default function AuthForm({
   bottomLinkHref,
   bottomLinkText,
   bottomLinkPrompt,
+  error,
 }: AuthFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError(null);
     setIsLoading(true);
-
     try {
       await onSubmit(email, password);
-    } catch (err) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const status = (err as any)?.response?.status;
-      if (status === 401) {
-        setError('メールアドレスまたはパスワードが正しくありません。');
-      } else if (err instanceof Error) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const apiMessage = (err as any)?.response?.data?.message;
-        setError(apiMessage || 'ログイン中にエラーが発生しました。');
-      } else {
-        setError('予期せぬエラーが発生しました。');
-      }
     } finally {
+      // The parent component's onSubmit handles success or failure.
+      // We use finally to ensure the loading state is always reset.
       setIsLoading(false);
     }
   };
@@ -101,7 +90,9 @@ export default function AuthForm({
               />
             </div>
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && (
+            <p className="text-sm text-center text-red-600 mt-2">{error}</p>
+          )}
           <div>
             <Button
               type="submit"
