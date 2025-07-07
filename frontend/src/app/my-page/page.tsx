@@ -54,11 +54,19 @@ export default function ProfilePage() {
       );
 
       // 2. Upload file directly to S3
-      await fetch(uploadUrl, {
+      const s3Response = await fetch(uploadUrl, {
         method: 'PUT',
         body: file,
         headers: { 'Content-Type': file.type },
       });
+
+      if (!s3Response.ok) {
+        // S3からのエラーレスポンス(XML)をテキストとして取得し、より詳細なエラーを表示
+        const errorText = await s3Response.text();
+        throw new Error(
+          `S3へのアップロードに失敗しました: ${s3Response.status}. ${errorText}`
+        );
+      }
 
       // 3. Notify our backend with the new avatar URL
       const avatarUrl = uploadUrl.split('?')[0]; // The base URL is the final URL
@@ -114,13 +122,12 @@ export default function ProfilePage() {
               className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-primary/10 file:py-2 file:px-4 file:text-sm file:font-semibold file:text-primary hover:file:bg-primary/20"
             />
 
-            {error && <p className="text-sm text-red-500">{error}</p>}
-
             <Button onClick={handleSubmit} disabled={!file || isLoading}>
               {isLoading ? '更新中...' : 'アバターを更新'}
             </Button>
           </div>
         </div>
+        {error && <p className="text-sm text-red-500">{error}</p>}
       </div>
     </ProtectedRoute>
   );

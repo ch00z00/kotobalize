@@ -52,7 +52,7 @@ export default function UserMenu() {
     { href: '/about', label: 'ABOUT' },
     { href: '/dashboard', label: 'DASHBOARD' },
     { href: '/themes', label: 'THEMES' },
-    { href: '/profile', label: 'PROFILE' },
+    { href: '/my-page', label: 'PROFILE' },
   ];
 
   return (

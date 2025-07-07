@@ -8,6 +8,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/ch00z00/kotobalize/models"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -32,6 +33,7 @@ func (c *Container) GetAvatarUploadURL(ctx *gin.Context) {
 		Bucket:      aws.String(c.S3BucketName),
 		Key:         aws.String(objectKey),
 		ContentType: aws.String(req.FileType),
+		ACL:         types.ObjectCannedACLPublicRead,
 	}, func(opts *s3.PresignOptions) {
 		opts.Expires = time.Duration(15 * time.Minute)
 	})
