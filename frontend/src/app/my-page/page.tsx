@@ -70,10 +70,10 @@ export default function ProfilePage() {
 
       // 3. Notify our backend with the new avatar URL
       const avatarUrl = uploadUrl.split('?')[0]; // The base URL is the final URL
-      await updateUserAvatar(avatarUrl, token);
+      const updatedUser = await updateUserAvatar(avatarUrl, token);
 
       // 4. Update local state
-      updateAvatar(avatarUrl);
+      updateAvatar(updatedUser.avatarUrl || '');
       alert('アバターを更新しました。');
       setFile(null);
       setPreview(null);
@@ -127,6 +127,7 @@ export default function ProfilePage() {
             </Button>
           </div>
         </div>
+        {/* TODO: Remove this after the error handling is implemented */}
         {error && <p className="text-sm text-red-500">{error}</p>}
       </div>
     </ProtectedRoute>
