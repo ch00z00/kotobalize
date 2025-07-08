@@ -3,7 +3,7 @@ import { ReactNode, ButtonHTMLAttributes } from 'react';
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   onClick?: () => void;
-  variant?: 'primary' | 'secondary' | 'outline';
+  variant?: 'primary' | 'secondary' | 'outline' | 'danger';
   className?: string;
 }
 
@@ -26,6 +26,8 @@ export default function Button({
       'border-transparent bg-gray-600 text-white hover:bg-gray-700 disabled:bg-gray-400',
     outline:
       'border-gray-500 bg-white text-gray-500 hover:bg-gray-50 disabled:bg-gray-100',
+    danger:
+      'border-transparent bg-red-600 text-white hover:bg-red-700 disabled:bg-red-400',
   };
 
   const combinedClassName = `${baseStyles} ${variantStyles[variant]} ${className}`;

@@ -52,3 +52,22 @@ export async function updateUserAvatar(
   }
   return res.json();
 }
+
+/**
+ * Deletes the user's avatar.
+ * @param token - The user's JWT.
+ * @returns A promise that resolves to the updated user object.
+ */
+export async function deleteUserAvatar(token: string): Promise<User> {
+  const res = await fetch(`${PUBLIC_API_BASE_URL}/users/me/avatar`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error('Failed to delete avatar');
+  }
+  return res.json();
+}

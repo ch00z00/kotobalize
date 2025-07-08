@@ -5,7 +5,11 @@ import Image from 'next/image';
 import { useAuthStore } from '@/store/auth';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
 import Button from '@/components/atoms/Button';
-import { getAvatarUploadUrl, updateUserAvatar } from '@/lib/api/users.client';
+import {
+  getAvatarUploadUrl,
+  updateUserAvatar,
+  deleteUserAvatar,
+} from '@/lib/api/users.client';
 
 function UserIcon() {
   return (
@@ -70,15 +74,37 @@ export default function ProfilePage() {
 
       // 3. Notify our backend with the new avatar URL
       const avatarUrl = uploadUrl.split('?')[0]; // The base URL is the final URL
-      const updatedUser = await updateUserAvatar(avatarUrl, token);
+      await updateUserAvatar(avatarUrl, token);
 
       // 4. Update local state
-      updateAvatar(updatedUser.avatarUrl || '');
+      updateAvatar(avatarUrl);
       alert('アバターを更新しました。');
       setFile(null);
       setPreview(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Upload failed');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDeleteAvatar = async () => {
+    if (!token || !user?.avatarUrl) return;
+
+    const confirmDelete =
+      window.confirm('アバターを削除してもよろしいですか？');
+    if (!confirmDelete) return;
+
+    setIsLoading(true);
+    setError(null);
+    try {
+      const updatedUser = await deleteUserAvatar(token);
+      updateAvatar(updatedUser.avatarUrl || '');
+      alert('アバターを削除しました。');
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : 'アバターの削除に失敗しました。'
+      );
     } finally {
       setIsLoading(false);
     }
@@ -122,13 +148,24 @@ export default function ProfilePage() {
               className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-primary/10 file:py-2 file:px-4 file:text-sm file:font-semibold file:text-primary hover:file:bg-primary/20"
             />
 
-            <Button onClick={handleSubmit} disabled={!file || isLoading}>
-              {isLoading ? '更新中...' : 'アバターを更新'}
-            </Button>
+            {error && <p className="text-sm text-red-500">{error}</p>}
+
+            <div className="flex w-full items-center justify-center space-x-4">
+              {user?.avatarUrl && (
+                <Button
+                  onClick={handleDeleteAvatar}
+                  disabled={isLoading}
+                  variant="danger"
+                >
+                  削除
+                </Button>
+              )}
+              <Button onClick={handleSubmit} disabled={!file || isLoading}>
+                {isLoading ? '更新中...' : 'アバターを変更'}
+              </Button>
+            </div>
           </div>
         </div>
-        {/* TODO: Remove this after the error handling is implemented */}
-        {error && <p className="text-sm text-red-500">{error}</p>}
       </div>
     </ProtectedRoute>
   );

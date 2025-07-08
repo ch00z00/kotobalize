@@ -59,6 +59,7 @@ func main() {
 			protected.GET("/auth/me", c.GetCurrentUser)
 
 			protected.PUT("/users/me/avatar", c.UpdateUserAvatar)
+			protected.DELETE("/users/me/avatar", c.DeleteUserAvatar)
 			protected.POST("/users/me/avatar/upload-url", c.GetAvatarUploadURL)
 
 			protected.GET("/themes", c.ListThemes)
