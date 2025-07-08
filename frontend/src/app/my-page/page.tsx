@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, ChangeEvent } from 'react';
+import { useState, ChangeEvent, useEffect } from 'react';
 import Image from 'next/image';
 import { useAuthStore } from '@/store/auth';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
@@ -10,6 +10,8 @@ import {
   updateUserAvatar,
   deleteUserAvatar,
 } from '@/lib/api/users.client';
+import DeleteModal from '@/components/common/DeleteModal';
+import Banner from '@/components/molecules/Banner';
 
 function UserIcon() {
   return (
@@ -33,7 +35,11 @@ export default function ProfilePage() {
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [notification, setNotification] = useState<{
+    message: string;
+    type: 'success' | 'error';
+  } | null>(null);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -47,7 +53,7 @@ export default function ProfilePage() {
     if (!file || !token) return;
 
     setIsLoading(true);
-    setError(null);
+    setNotification(null);
 
     try {
       // 1. Get presigned URL from our backend
@@ -78,11 +84,14 @@ export default function ProfilePage() {
 
       // 4. Update local state
       updateAvatar(avatarUrl);
-      alert('アバターを更新しました。');
+      setNotification({ message: 'アバターを更新しました。', type: 'success' });
       setFile(null);
       setPreview(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Upload failed');
+      setNotification({
+        message: err instanceof Error ? err.message : 'Upload failed',
+        type: 'error',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -91,27 +100,42 @@ export default function ProfilePage() {
   const handleDeleteAvatar = async () => {
     if (!token || !user?.avatarUrl) return;
 
-    const confirmDelete =
-      window.confirm('アバターを削除してもよろしいですか？');
-    if (!confirmDelete) return;
-
     setIsLoading(true);
-    setError(null);
+    setNotification(null);
     try {
       const updatedUser = await deleteUserAvatar(token);
       updateAvatar(updatedUser.avatarUrl || '');
-      alert('アバターを削除しました。');
+      setNotification({ message: 'アバターを削除しました。', type: 'success' });
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'アバターの削除に失敗しました。'
-      );
+      setNotification({
+        message:
+          err instanceof Error ? err.message : 'アバターの削除に失敗しました。',
+        type: 'error',
+      });
     } finally {
       setIsLoading(false);
+      setIsDeleteModalOpen(false);
     }
   };
 
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => {
+        setNotification(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
+
   return (
     <ProtectedRoute>
+      {notification && (
+        <Banner
+          message={notification.message}
+          type={notification.type}
+          onClose={() => setNotification(null)}
+        />
+      )}
       <div className="container mx-auto min-h-[calc(100vh-168px)] py-12 px-4">
         <h1 className="mb-8 text-3xl font-bold text-gray-800">PROFILE</h1>
         <div className="max-w-md rounded-xl bg-white p-8 shadow-md">
@@ -148,12 +172,10 @@ export default function ProfilePage() {
               className="block w-full text-sm text-gray-500 file:mr-4 file:rounded-full file:border-0 file:bg-primary/10 file:py-2 file:px-4 file:text-sm file:font-semibold file:text-primary hover:file:bg-primary/20"
             />
 
-            {error && <p className="text-sm text-red-500">{error}</p>}
-
             <div className="flex w-full items-center justify-center space-x-4">
               {user?.avatarUrl && (
                 <Button
-                  onClick={handleDeleteAvatar}
+                  onClick={() => setIsDeleteModalOpen(true)}
                   disabled={isLoading}
                   variant="danger"
                 >
@@ -161,12 +183,20 @@ export default function ProfilePage() {
                 </Button>
               )}
               <Button onClick={handleSubmit} disabled={!file || isLoading}>
-                {isLoading ? '更新中...' : 'アバターを変更'}
+                {isLoading ? '変更中...' : 'アバターを変更'}
               </Button>
             </div>
           </div>
         </div>
       </div>
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteAvatar}
+        title="アバターの削除"
+        message="本当にアバターを削除しますか？この操作は元に戻せません。"
+        isLoading={isLoading}
+      />
     </ProtectedRoute>
   );
 }

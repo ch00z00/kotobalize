@@ -1,0 +1,52 @@
+'use client';
+
+import React from 'react';
+import Modal from './Modal';
+import Button from '../atoms/Button';
+
+interface DeleteModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => void;
+  title: string;
+  message: string;
+  isLoading: boolean;
+}
+
+export default function DeleteModal({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  message,
+  isLoading,
+}: DeleteModalProps) {
+  return (
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+        <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+        <div className="mt-2">
+          <p className="text-sm text-gray-500">{message}</p>
+        </div>
+        <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
+          <Button
+            onClick={onConfirm}
+            disabled={isLoading}
+            variant="danger"
+            className="w-full sm:ml-3 sm:w-auto"
+          >
+            {isLoading ? '削除中...' : '削除'}
+          </Button>
+          <Button
+            type="button"
+            onClick={onClose}
+            variant="outline"
+            className="mt-3 w-full sm:mt-0 sm:w-auto"
+          >
+            キャンセル
+          </Button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
