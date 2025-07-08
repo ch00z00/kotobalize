@@ -1,5 +1,6 @@
 import LinkButton from '@/components/atoms/LinkButton';
 import { Theme } from '@/types/generated/models';
+import Tag from '../atoms/Tag';
 
 interface ThemeCardProps {
   theme: Theme;
@@ -12,9 +13,7 @@ export default function ThemeCard({ theme }: ThemeCardProps) {
       className="overflow-hidden rounded-lg bg-white shadow-md transition-shadow duration-300 hover:shadow-lg"
     >
       <div className="p-6">
-        <span className="mb-2 inline-block rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
-          {theme.category}
-        </span>
+        <Tag className="mb-2">{theme.category}</Tag>
         <h2 className="mb-2 text-xl font-semibold text-gray-900">
           {theme.title}
         </h2>

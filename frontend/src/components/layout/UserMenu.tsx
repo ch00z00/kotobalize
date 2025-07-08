@@ -59,7 +59,7 @@ export default function UserMenu() {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-gray-200 text-gray-600 transition-colors hover:bg-gray-300"
+        className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-full border-2 border-gray-200 bg-gray-200 text-gray-600 transition-colors hover:bg-gray-300"
       >
         {user?.avatarUrl ? (
           <Image

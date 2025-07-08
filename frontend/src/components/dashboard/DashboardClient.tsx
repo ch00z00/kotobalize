@@ -13,6 +13,7 @@ import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton';
 import LinkButton from '../atoms/LinkButton';
 import SearchInput from '../common/SearchInput';
 import CategoryFilter from '../common/CategoryFilter';
+import Tag from '../atoms/Tag';
 
 interface GroupedWriting {
   theme: Theme;
@@ -197,9 +198,7 @@ export default function DashboardClient() {
                       <h2 className="text-xl font-semibold text-gray-800">
                         {theme.title}
                       </h2>
-                      <span className="inline-flex flex-shrink-0 items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
-                        {theme.category}
-                      </span>
+                      <Tag className="flex-shrink-0">{theme.category}</Tag>
                     </div>
                     <div className="mt-2 text-sm text-gray-500 sm:mt-1">
                       回答回数: {writings.length}回
