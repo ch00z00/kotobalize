@@ -10,7 +10,7 @@ import {
   updateUserAvatar,
   deleteUserAvatar,
 } from '@/lib/api/users.client';
-import DeleteModal from '@/components/common/DeleteModal';
+import DeleteModal from '@/components/organisms/DeleteModal';
 import Banner from '@/components/molecules/Banner';
 
 function UserIcon() {

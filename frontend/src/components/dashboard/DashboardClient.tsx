@@ -11,8 +11,8 @@ import { Writing, Theme } from '@/types/generated/models';
 import StatCard from '@/components/molecules/card/StatCard';
 import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton';
 import LinkButton from '../atoms/LinkButton';
-import SearchInput from '../common/SearchInput';
-import CategoryFilter from '../common/CategoryFilter';
+import SearchInput from '../molecules/SearchInput';
+import CategoryFilter from '../organisms/CategoryFilter';
 import Tag from '../atoms/Tag';
 
 interface GroupedWriting {

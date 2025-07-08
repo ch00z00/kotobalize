@@ -5,8 +5,8 @@ import { Theme } from '@/types/generated/models';
 import Button from '@/components/atoms/Button';
 import CreateThemeModal from '@/components/themes/CreateThemeModal';
 import ThemeCard from '@/components/themes/ThemeCard';
-import SearchInput from '@/components/common/SearchInput';
-import CategoryFilter from '@/components/common/CategoryFilter';
+import SearchInput from '@/components/molecules/SearchInput';
+import CategoryFilter from '@/components/organisms/CategoryFilter';
 
 interface ThemeBrowserProps {
   initialThemes: Theme[];

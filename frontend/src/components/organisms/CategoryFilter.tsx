@@ -1,5 +1,5 @@
 import React from 'react';
-import CategoryButton from './CategoryButton';
+import CategoryButton from '../molecules/CategoryButton';
 
 interface CategoryFilterProps {
   categories: string[];
