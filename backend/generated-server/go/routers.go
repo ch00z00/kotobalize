@@ -111,10 +111,16 @@ func getRoutes(handleFunctions ApiHandleFunctions) []Route {
 			handleFunctions.ThemesAPI.ListThemes,
 		},
 		{
-			"GetAvatarUploadUrl",
+			"DeleteUserAvatar",
+			http.MethodDelete,
+			"/api/v1/users/me/avatar",
+			handleFunctions.UsersAPI.DeleteUserAvatar,
+		},
+		{
+			"GetAvatarUploadURL",
 			http.MethodPost,
 			"/api/v1/users/me/avatar/upload-url",
-			handleFunctions.UsersAPI.GetAvatarUploadUrl,
+			handleFunctions.UsersAPI.GetAvatarUploadURL,
 		},
 		{
 			"UpdateUserAvatar",

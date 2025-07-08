@@ -1,4 +1,3 @@
-Dockerfile
 api/openapi.yaml
 go/README.md
 go/api_auth.go

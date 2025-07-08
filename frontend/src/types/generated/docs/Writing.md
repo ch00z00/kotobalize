@@ -10,13 +10,8 @@ Name | Type | Description | Notes
 **themeId** | **number** |  | [default to undefined]
 **content** | **string** |  | [default to undefined]
 **durationSeconds** | **number** |  | [default to undefined]
-**aiScore** | **number** |  | [optional] [default to undefined]
-**aiFeedbackOverall** | **string** |  | [optional] [default to undefined]
-**aiFeedbackClarity** | **string** |  | [optional] [default to undefined]
-**aiFeedbackAccuracy** | **string** |  | [optional] [default to undefined]
-**aiFeedbackCompleteness** | **string** |  | [optional] [default to undefined]
-**aiFeedbackStructure** | **string** |  | [optional] [default to undefined]
-**aiFeedbackConciseness** | **string** |  | [optional] [default to undefined]
+**aiScore** | **number** | The total score from 0 to 100. | [optional] [default to undefined]
+**aiFeedback** | **string** | Detailed feedback from AI based on 5 viewpoints. This will be stored as a JSON string. | [optional] [default to undefined]
 **createdAt** | **string** |  | [readonly] [default to undefined]
 **updatedAt** | **string** |  | [readonly] [default to undefined]
 
@@ -32,12 +27,7 @@ const instance: Writing = {
     content,
     durationSeconds,
     aiScore,
-    aiFeedbackOverall,
-    aiFeedbackClarity,
-    aiFeedbackAccuracy,
-    aiFeedbackCompleteness,
-    aiFeedbackStructure,
-    aiFeedbackConciseness,
+    aiFeedback,
     createdAt,
     updatedAt,
 };

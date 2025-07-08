@@ -19,17 +19,7 @@ type Writing struct {
 
 	AiScore int32 `json:"aiScore,omitempty"`
 
-	AiFeedbackOverall string `json:"aiFeedbackOverall,omitempty"`
-
-	AiFeedbackClarity string `json:"aiFeedbackClarity,omitempty"`
-
-	AiFeedbackAccuracy string `json:"aiFeedbackAccuracy,omitempty"`
-
-	AiFeedbackCompleteness string `json:"aiFeedbackCompleteness,omitempty"`
-
-	AiFeedbackStructure string `json:"aiFeedbackStructure,omitempty"`
-
-	AiFeedbackConciseness string `json:"aiFeedbackConciseness,omitempty"`
+	AiFeedback string `json:"aiFeedback,omitempty"`
 
 	CreatedAt time.Time `json:"createdAt"`
 

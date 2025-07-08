@@ -423,24 +423,11 @@ components:
     aiScore:
      type: integer
      format: int32
-     nullable: true # AIレビューがまだの場合
-    aiFeedbackOverall:
-     type: string
+     description: "The total score from 0 to 100."
      nullable: true
-    aiFeedbackClarity:
+    aiFeedback:
      type: string
-     nullable: true
-    aiFeedbackAccuracy:
-     type: string
-     nullable: true
-    aiFeedbackCompleteness:
-     type: string
-     nullable: true
-    aiFeedbackStructure:
-     type: string
-     nullable: true
-    aiFeedbackConciseness:
-     type: string
+     description: "Detailed feedback from AI based on 5 viewpoints. This will be stored as a JSON string."
      nullable: true
     createdAt:
      type: string

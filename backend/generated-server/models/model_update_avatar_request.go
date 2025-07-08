@@ -2,5 +2,5 @@ package models
 
 // UpdateAvatarRequest model
 type UpdateAvatarRequest struct {
-	AvatarUrl string `json:"avatarUrl"`
+	AvatarURL string `json:"avatarUrl"`
 }

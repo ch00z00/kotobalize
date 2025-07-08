@@ -330,47 +330,17 @@ export interface Writing {
      */
     'durationSeconds': number;
     /**
-     * 
+     * The total score from 0 to 100.
      * @type {number}
      * @memberof Writing
      */
     'aiScore'?: number;
     /**
-     * 
+     * Detailed feedback from AI based on 5 viewpoints. This will be stored as a JSON string.
      * @type {string}
      * @memberof Writing
      */
-    'aiFeedbackOverall'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Writing
-     */
-    'aiFeedbackClarity'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Writing
-     */
-    'aiFeedbackAccuracy'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Writing
-     */
-    'aiFeedbackCompleteness'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Writing
-     */
-    'aiFeedbackStructure'?: string;
-    /**
-     * 
-     * @type {string}
-     * @memberof Writing
-     */
-    'aiFeedbackConciseness'?: string;
+    'aiFeedback'?: string;
     /**
      * 
      * @type {string}
@@ -901,14 +871,48 @@ export const UsersApiAxiosParamCreator = function (configuration?: Configuration
     return {
         /**
          * 
+         * @summary Delete user\'s avatar
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteUserAvatar: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/users/me/avatar`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get a presigned URL for avatar upload
          * @param {AvatarUploadRequest} avatarUploadRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAvatarUploadUrl: async (avatarUploadRequest: AvatarUploadRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        getAvatarUploadURL: async (avatarUploadRequest: AvatarUploadRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             // verify required parameter 'avatarUploadRequest' is not null or undefined
-            assertParamExists('getAvatarUploadUrl', 'avatarUploadRequest', avatarUploadRequest)
+            assertParamExists('getAvatarUploadURL', 'avatarUploadRequest', avatarUploadRequest)
             const localVarPath = `/users/me/avatar/upload-url`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -991,15 +995,27 @@ export const UsersApiFp = function(configuration?: Configuration) {
     return {
         /**
          * 
+         * @summary Delete user\'s avatar
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteUserAvatar(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteUserAvatar(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UsersApi.deleteUserAvatar']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary Get a presigned URL for avatar upload
          * @param {AvatarUploadRequest} avatarUploadRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getAvatarUploadUrl(avatarUploadRequest: AvatarUploadRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AvatarUploadResponse>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.getAvatarUploadUrl(avatarUploadRequest, options);
+        async getAvatarUploadURL(avatarUploadRequest: AvatarUploadRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<AvatarUploadResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getAvatarUploadURL(avatarUploadRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
-            const localVarOperationServerBasePath = operationServerMap['UsersApi.getAvatarUploadUrl']?.[localVarOperationServerIndex]?.url;
+            const localVarOperationServerBasePath = operationServerMap['UsersApi.getAvatarUploadURL']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -1027,13 +1043,22 @@ export const UsersApiFactory = function (configuration?: Configuration, basePath
     return {
         /**
          * 
+         * @summary Delete user\'s avatar
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteUserAvatar(options?: RawAxiosRequestConfig): AxiosPromise<User> {
+            return localVarFp.deleteUserAvatar(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get a presigned URL for avatar upload
          * @param {AvatarUploadRequest} avatarUploadRequest 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getAvatarUploadUrl(avatarUploadRequest: AvatarUploadRequest, options?: RawAxiosRequestConfig): AxiosPromise<AvatarUploadResponse> {
-            return localVarFp.getAvatarUploadUrl(avatarUploadRequest, options).then((request) => request(axios, basePath));
+        getAvatarUploadURL(avatarUploadRequest: AvatarUploadRequest, options?: RawAxiosRequestConfig): AxiosPromise<AvatarUploadResponse> {
+            return localVarFp.getAvatarUploadURL(avatarUploadRequest, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1057,14 +1082,25 @@ export const UsersApiFactory = function (configuration?: Configuration, basePath
 export class UsersApi extends BaseAPI {
     /**
      * 
+     * @summary Delete user\'s avatar
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsersApi
+     */
+    public deleteUserAvatar(options?: RawAxiosRequestConfig) {
+        return UsersApiFp(this.configuration).deleteUserAvatar(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Get a presigned URL for avatar upload
      * @param {AvatarUploadRequest} avatarUploadRequest 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof UsersApi
      */
-    public getAvatarUploadUrl(avatarUploadRequest: AvatarUploadRequest, options?: RawAxiosRequestConfig) {
-        return UsersApiFp(this.configuration).getAvatarUploadUrl(avatarUploadRequest, options).then((request) => request(this.axios, this.basePath));
+    public getAvatarUploadURL(avatarUploadRequest: AvatarUploadRequest, options?: RawAxiosRequestConfig) {
+        return UsersApiFp(this.configuration).getAvatarUploadURL(avatarUploadRequest, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

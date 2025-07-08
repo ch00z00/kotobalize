@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 	"strconv"
@@ -95,13 +96,15 @@ func (c *Container) ReviewWriting(ctx *gin.Context) {
 	}
 
 	// Update the writing record with the AI's feedback
-	gormWriting.AiScore = &aiResponse.Score
-	gormWriting.AiFeedbackOverall = &aiResponse.FeedbackOverall
-	gormWriting.AiFeedbackClarity = &aiResponse.FeedbackClarity
-	gormWriting.AiFeedbackAccuracy = &aiResponse.FeedbackAccuracy
-	gormWriting.AiFeedbackCompleteness = &aiResponse.FeedbackCompleteness
-	gormWriting.AiFeedbackStructure = &aiResponse.FeedbackStructure
-	gormWriting.AiFeedbackConciseness = &aiResponse.FeedbackConciseness
+	feedbackJSON, err := json.Marshal(aiResponse)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "INTERNAL_ERROR", Message: "Failed to serialize AI response"})
+		return
+	}
+
+	// Update the GORM model with the new score and the full JSON feedback
+	gormWriting.AIScore = &aiResponse.TotalScore
+	gormWriting.AIFeedback = feedbackJSON
 
 	// Save the updated writing record to the database
 	if err := c.DB.Save(&gormWriting).Error; err != nil {
@@ -185,26 +188,11 @@ func mapGormWritingToAPI(gormWriting models.GormWriting) models.Writing {
 	// Safely handle nullable fields. If the DB value is nil, the API model's
 	// value will be the zero value (0 for int32, "" for string), and `omitempty`
 	// will prevent it from being serialized into the JSON response.
-	if gormWriting.AiScore != nil {
-		apiWriting.AiScore = int32(*gormWriting.AiScore)
+	if gormWriting.AIScore != nil {
+		apiWriting.AiScore = int32(*gormWriting.AIScore)
 	}
-	if gormWriting.AiFeedbackOverall != nil {
-		apiWriting.AiFeedbackOverall = *gormWriting.AiFeedbackOverall
-	}
-	if gormWriting.AiFeedbackClarity != nil {
-		apiWriting.AiFeedbackClarity = *gormWriting.AiFeedbackClarity
-	}
-	if gormWriting.AiFeedbackAccuracy != nil {
-		apiWriting.AiFeedbackAccuracy = *gormWriting.AiFeedbackAccuracy
-	}
-	if gormWriting.AiFeedbackCompleteness != nil {
-		apiWriting.AiFeedbackCompleteness = *gormWriting.AiFeedbackCompleteness
-	}
-	if gormWriting.AiFeedbackStructure != nil {
-		apiWriting.AiFeedbackStructure = *gormWriting.AiFeedbackStructure
-	}
-	if gormWriting.AiFeedbackConciseness != nil {
-		apiWriting.AiFeedbackConciseness = *gormWriting.AiFeedbackConciseness
+	if gormWriting.AIFeedback != nil {
+		apiWriting.AiFeedback = string(gormWriting.AIFeedback)
 	}
 
 	return apiWriting

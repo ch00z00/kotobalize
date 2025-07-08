@@ -77,6 +77,22 @@ paths:
       tags:
       - Auth
   /users/me/avatar:
+    delete:
+      operationId: deleteUserAvatar
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: Avatar deleted successfully
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+      security:
+      - bearerAuth: []
+      summary: Delete user's avatar
+      tags:
+      - Users
     put:
       operationId: updateUserAvatar
       requestBody:
@@ -101,7 +117,7 @@ paths:
       - Users
   /users/me/avatar/upload-url:
     post:
-      operationId: getAvatarUploadUrl
+      operationId: getAvatarUploadURL
       requestBody:
         content:
           application/json:
@@ -399,19 +415,14 @@ components:
       - updatedAt
     Writing:
       example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
         aiScore: 5
-        aiFeedbackStructure: aiFeedbackStructure
         durationSeconds: 5
-        aiFeedbackOverall: aiFeedbackOverall
+        aiFeedback: aiFeedback
         themeId: 1
-        aiFeedbackCompleteness: aiFeedbackCompleteness
-        aiFeedbackAccuracy: aiFeedbackAccuracy
+        id: 0
         userId: 6
         content: content
-        aiFeedbackConciseness: aiFeedbackConciseness
-        createdAt: 2000-01-23T04:56:07.000+00:00
-        aiFeedbackClarity: aiFeedbackClarity
-        id: 0
         updatedAt: 2000-01-23T04:56:07.000+00:00
       properties:
         id:
@@ -431,25 +442,13 @@ components:
           format: int32
           type: integer
         aiScore:
+          description: The total score from 0 to 100.
           format: int32
           type: integer
           nullable: true
-        aiFeedbackOverall:
-          type: string
-          nullable: true
-        aiFeedbackClarity:
-          type: string
-          nullable: true
-        aiFeedbackAccuracy:
-          type: string
-          nullable: true
-        aiFeedbackCompleteness:
-          type: string
-          nullable: true
-        aiFeedbackStructure:
-          type: string
-          nullable: true
-        aiFeedbackConciseness:
+        aiFeedback:
+          description: Detailed feedback from AI based on 5 viewpoints. This will
+            be stored as a JSON string.
           type: string
           nullable: true
         createdAt:

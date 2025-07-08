@@ -16,9 +16,16 @@ import (
 type UsersAPI struct {
 }
 
+// Delete /api/v1/users/me/avatar
+// Delete user's avatar 
+func (api *UsersAPI) DeleteUserAvatar(c *gin.Context) {
+	// Your handler implementation
+	c.JSON(200, gin.H{"status": "OK"})
+}
+
 // Post /api/v1/users/me/avatar/upload-url
 // Get a presigned URL for avatar upload 
-func (api *UsersAPI) GetAvatarUploadUrl(c *gin.Context) {
+func (api *UsersAPI) GetAvatarUploadURL(c *gin.Context) {
 	// Your handler implementation
 	c.JSON(200, gin.H{"status": "OK"})
 }

@@ -25,19 +25,11 @@ type Writing struct {
 
 	DurationSeconds int32 `json:"durationSeconds"`
 
+	// The total score from 0 to 100.
 	AiScore int32 `json:"aiScore,omitempty"`
 
-	AiFeedbackOverall string `json:"aiFeedbackOverall,omitempty"`
-
-	AiFeedbackClarity string `json:"aiFeedbackClarity,omitempty"`
-
-	AiFeedbackAccuracy string `json:"aiFeedbackAccuracy,omitempty"`
-
-	AiFeedbackCompleteness string `json:"aiFeedbackCompleteness,omitempty"`
-
-	AiFeedbackStructure string `json:"aiFeedbackStructure,omitempty"`
-
-	AiFeedbackConciseness string `json:"aiFeedbackConciseness,omitempty"`
+	// Detailed feedback from AI based on 5 viewpoints. This will be stored as a JSON string.
+	AiFeedback string `json:"aiFeedback,omitempty"`
 
 	CreatedAt time.Time `json:"createdAt"`
 

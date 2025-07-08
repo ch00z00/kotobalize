@@ -9,7 +9,7 @@ require (
 	github.com/sashabaranov/go-openai v1.26.0
 	golang.org/x/crypto v0.39.0
 	gorm.io/driver/mysql v1.5.6
-	gorm.io/gorm v1.25.10
+	gorm.io/gorm v1.30.0
 )
 
 require (
@@ -33,6 +33,7 @@ require (
 	github.com/aws/smithy-go v1.22.4 // indirect
 	github.com/google/uuid v1.6.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
+	gorm.io/datatypes v1.2.6 // indirect
 )
 
 // Transitive dependencies

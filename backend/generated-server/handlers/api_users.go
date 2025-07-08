@@ -77,7 +77,7 @@ func (c *Container) UpdateUserAvatar(ctx *gin.Context) {
 	}
 
 	// Update the avatar URL
-	user.AvatarURL = &req.AvatarUrl
+	user.AvatarURL = &req.AvatarURL
 	if err := c.DB.Save(&user).Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to update avatar URL"})
 		return

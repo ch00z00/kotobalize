@@ -8,15 +8,19 @@ import (
 	openai "github.com/sashabaranov/go-openai"
 )
 
+// FeedbackDetail represents the feedback for a single viewpoint.
+type FeedbackDetail struct {
+	Viewpoint string `json:"viewpoint"`
+	Score     int    `json:"score"`
+	GoodPoint string `json:"goodPoint"`
+	BadPoint  string `json:"badPoint"`
+}
+
 // AIReviewResponse defines the structure for the JSON response from the AI.
 type AIReviewResponse struct {
-	Score                int    `json:"score"`
-	FeedbackOverall      string `json:"feedback_overall"`
-	FeedbackClarity      string `json:"feedback_clarity"`
-	FeedbackAccuracy     string `json:"feedback_accuracy"`
-	FeedbackCompleteness string `json:"feedback_completeness"`
-	FeedbackStructure    string `json:"feedback_structure"`
-	FeedbackConciseness  string `json:"feedback_conciseness"`
+	TotalScore int              `json:"totalScore"`
+	Scores     map[string]int   `json:"scores"`
+	Feedbacks  []FeedbackDetail `json:"feedbacks"`
 }
 
 // OpenAIService handles interactions with the OpenAI API.
@@ -27,18 +31,36 @@ type OpenAIService struct {
 // GetAIReview sends the user's writing to the OpenAI API and gets structured feedback.
 func (s *OpenAIService) GetAIReview(ctx context.Context, themeTitle, userContent string) (*AIReviewResponse, error) {
 	systemPrompt := `
-あなたは優秀なソフトウェアエンジニアの面接官です。
-ユーザーが入力した技術的な説明文をレビューし、以下の6つの観点で評価してください。
-評価結果は必ず下記のJSON形式で返却してください。
+あなたは、ユーザーが技術的な事柄を言語化する能力を向上させるための、世界クラスのソフトウェアエンジニアリングコーチです。
+ユーザーが入力した文章をレビューし、以下の5つの観点で評価してください。
+評価結果は必ず下記のJSON形式で返却してください。各観点のスコアと全体スコアは0-100の整数値です。フィードバックは具体的で、学習者が次何をすべきかわかるように記述してください。
 
+## 評価観点
+1. 観察・内省力：自身の経験や、その時の思考プロセスを深く掘り下げて語れているか？
+2. 具体⇄抽象力：技術的な概念と、それを説明するための具体的な実例のバランスは取れているか？
+3. 語彙・用語力：技術用語や比喩を正確かつ効果的に使えているか？
+4. 構造化力：PREP法やSDS法など、論理的で分かりやすい構造で文章が展開されているか？
+5. 他者視点力：読み手（例：面接官）が持つであろう疑問を予測し、それに答える形で説明できているか？
+
+## 出力形式 (JSON)
 {
-  "score": <0-100の整数値>,
-  "feedback_overall": "<全体的なフィードバック>",
-  "feedback_clarity": "<明確さに関するフィードバック>",
-  "feedback_accuracy": "<正確さに関するフィードバック>",
-  "feedback_completeness": "<網羅性に関するフィードバック>",
-  "feedback_structure": "<構造化に関するフィードバック>",
-  "feedback_conciseness": "<簡潔さに関するフィードバック>"
+  "totalScore": <0-100の全体スコア>,
+  "scores": {
+    "observation": <観察・内省力のスコア>,
+    "abstraction": <具体⇄抽象力のスコア>,
+    "vocabulary": <語彙・用語力のスコア>,
+    "structure": <構造化力のスコア>,
+    "perspective": <他者視点力のスコア>
+  },
+  "feedbacks": [
+    {
+      "viewpoint": "観察・内省力",
+      "score": <スコア>,
+      "goodPoint": "<良かった点>",
+      "badPoint": "<改善点>"
+    },
+    // ... 他の4観点も同様に記述
+  ]
 }
 `
 
