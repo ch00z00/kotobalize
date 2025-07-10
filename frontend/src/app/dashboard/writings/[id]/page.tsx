@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { getWritingById } from '@/lib/api/writings';
+import { getWritingById } from '@/lib/api/writings.server';
 import WritingDetailClient from './components/WritingDetailClient';
 import { notFound } from 'next/navigation';
 

@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import Link from 'next/link';
 
 import { useAuthStore } from '@/store/auth';
-import { getWritings } from '@/lib/api/writings';
+import { getWritings } from '@/lib/api/writings.client';
 import { getThemesForClient } from '@/lib/api/themes.client';
 import { Writing, Theme } from '@/types/generated/models';
 
