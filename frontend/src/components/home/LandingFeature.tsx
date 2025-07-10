@@ -29,6 +29,7 @@ export default function LandingFeature() {
                   name={feature.name}
                   description={feature.description}
                   iconName={feature.iconName}
+                  comingSoon={feature.name === 'AIの即時レビュー'}
                 />
               </ScrollReveal>
             ))}
