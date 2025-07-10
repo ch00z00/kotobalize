@@ -1,9 +1,7 @@
-// tailwind.config.js
-
+import type { Config } from 'tailwindcss';
 import typography from '@tailwindcss/typography';
 
-/** @type {import('tailwindcss').Config} */
-const config = {
+const config: Config = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',

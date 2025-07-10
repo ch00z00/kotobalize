@@ -157,10 +157,10 @@ export default function DashboardClient() {
         <h1 className="text-3xl font-bold text-gray-800">DASHBOARD</h1>
         <LinkButton href="/themes">新しい言語化に挑戦する</LinkButton>
       </div>
-      <dl className="grid grid-cols-1 gap-5 sm:grid-cols-3 mb-6">
+      <dl className="grid grid-cols-1 gap-5 sm:grid-cols-2 mb-6">
         <StatCard label="トライしたテーマ数" value={stats.themeCount} />
         <StatCard label="合計回答数" value={stats.writingCount} />
-        <StatCard label="平均スコア" value={stats.averageScore} unit="点" />
+        {/* <StatCard label="平均スコア" value={stats.averageScore} unit="点" /> */}
       </dl>
 
       {/* History Table */}

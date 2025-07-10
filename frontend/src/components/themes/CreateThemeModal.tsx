@@ -20,6 +20,7 @@ export default function CreateThemeModal({
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('');
+  const [timeLimitMinutes, setTimeLimitMinutes] = useState(5);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { token } = useAuthStore();
@@ -34,12 +35,18 @@ export default function CreateThemeModal({
     setIsLoading(true);
 
     try {
-      const themeData: NewThemeRequest = { title, description, category };
+      const themeData: NewThemeRequest = {
+        title,
+        description,
+        category,
+        timeLimitInSeconds: timeLimitMinutes * 60,
+      };
       const newTheme = await createTheme(themeData, token);
       onThemeCreated(newTheme);
       setTitle('');
       setDescription('');
       setCategory('');
+      setTimeLimitMinutes(5);
       onClose();
     } catch (err) {
       setError(
@@ -121,6 +128,24 @@ export default function CreateThemeModal({
                 onChange={(e) => setDescription(e.target.value)}
                 className="mt-1 block w-full py-2 px-3 rounded-lg border-2 border-gray-300 bg-gray-100 sm:text-md"
                 placeholder="例: ステートレス性、統一インターフェースなどの主要な原則を含めて説明してください。"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="timeLimit"
+                className="block text-sm font-medium text-gray-700"
+              >
+                制限時間 (分)
+              </label>
+              <input
+                id="timeLimit"
+                type="number"
+                required
+                min="1"
+                value={timeLimitMinutes}
+                onChange={(e) => setTimeLimitMinutes(Number(e.target.value))}
+                className="mt-1 block w-full py-2 px-3 rounded-lg border-2 border-gray-300 bg-gray-100 sm:text-md"
+                placeholder="例: 5"
               />
             </div>
           </div>
