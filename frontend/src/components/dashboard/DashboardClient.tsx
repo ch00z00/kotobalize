@@ -1,8 +1,6 @@
 'use client';
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
-import { ChevronDown } from 'lucide-react';
-import Link from 'next/link';
 
 import { useAuthStore } from '@/store/auth';
 import { getWritings } from '@/lib/api/writings.client';
@@ -14,8 +12,7 @@ import DashboardSkeleton from '@/components/dashboard/DashboardSkeleton';
 import LinkButton from '../atoms/LinkButton';
 import SearchInput from '../molecules/SearchInput';
 import CategoryFilter from '../organisms/CategoryFilter';
-import Tag from '../atoms/Tag';
-
+import ThemeAccordionItem from './ThemeAccordionItem';
 interface GroupedWriting {
   theme: Theme;
   writings: Writing[];
@@ -164,83 +161,14 @@ export default function DashboardClient() {
         {/* Table Body */}
         <div>
           {filteredGroupedWritings.length > 0 ? (
-            filteredGroupedWritings.map(({ theme, writings }, index) => (
-              <div
+            filteredGroupedWritings.map(({ theme, writings }) => (
+              <ThemeAccordionItem
                 key={theme.id}
-                className={`${index > 0 ? 'border-t border-gray-200' : ''}`}
-              >
-                <button
-                  onClick={() => handleToggle(theme.id)}
-                  className="flex w-full flex-col p-6 text-left transition-colors hover:bg-gray-50 focus:outline-none sm:flex-row sm:items-center sm:justify-between"
-                >
-                  <div className="w-full flex-1">
-                    <div className="flex flex-col items-start gap-y-2 sm:flex-row sm:items-center sm:gap-x-3">
-                      <h2 className="text-xl font-semibold text-gray-800">
-                        {theme.title}
-                      </h2>
-                      <Tag className="flex-shrink-0">{theme.category}</Tag>
-                    </div>
-                    <div className="mt-2 text-sm text-gray-500 sm:mt-1">
-                      回答回数: {writings.length}回
-                    </div>
-                  </div>
-                  <div className="mt-4 flex w-full items-center justify-end space-x-4 sm:mt-0 sm:w-auto sm:flex-shrink-0 sm:space-x-8">
-                    <LinkButton
-                      href={`/themes/${theme.id}`}
-                      variant="outline"
-                      onClick={(e: React.MouseEvent) => {
-                        e.stopPropagation();
-                      }}
-                    >
-                      リトライする
-                    </LinkButton>
-                    <ChevronDown
-                      className={`h-6 w-6 transform text-gray-500 transition-transform duration-200 ${
-                        openThemeId === theme.id ? 'rotate-180' : ''
-                      }`}
-                    />
-                  </div>
-                </button>
-                <div
-                  className={`overflow-hidden transition-all duration-500 ease-in-out ${
-                    openThemeId === theme.id ? 'max-h-[500px]' : 'max-h-0'
-                  }`}
-                >
-                  <div className="bg-gray-50/50 px-6 py-4">
-                    <div className="space-y-2">
-                      {writings.map((writing) => (
-                        <Link
-                          key={writing.id}
-                          href={`/dashboard/writings/${writing.id}`}
-                          className="block rounded-md p-3 transition-colors hover:bg-gray-200"
-                        >
-                          <div className="flex items-center justify-between">
-                            <p className="truncate pr-4 text-sm text-gray-700">
-                              {writing.content}
-                            </p>
-                            {writing.aiScore != null && (
-                              <div className="flex flex-shrink-0 items-center space-x-2">
-                                <span className="font-bold text-blue-600">
-                                  {writing.aiScore}
-                                </span>
-                                <span className="text-sm text-gray-500">
-                                  点
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                          <p className="mt-1 text-xs text-gray-400">
-                            作成日時:{' '}
-                            {new Date(writing.createdAt).toLocaleString(
-                              'ja-JP'
-                            )}
-                          </p>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
+                theme={theme}
+                writings={writings}
+                isOpen={openThemeId === theme.id}
+                onToggle={() => handleToggle(theme.id)}
+              />
             ))
           ) : (
             <div className="p-16 text-center text-gray-500">
