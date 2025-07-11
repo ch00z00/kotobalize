@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Theme } from '@/types/generated/models';
 import Button from '@/components/atoms/Button';
 import CreateThemeModal from '@/components/themes/CreateThemeModal';
 import ThemeCard from '@/components/themes/ThemeCard';
 import SearchInput from '@/components/molecules/SearchInput';
 import CategoryFilter from '@/components/organisms/CategoryFilter';
+import Banner from '@/components/molecules/Banner';
 
 interface ThemeBrowserProps {
   initialThemes: Theme[];
@@ -18,12 +19,29 @@ export default function ThemeBrowser({ initialThemes }: ThemeBrowserProps) {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('すべて');
+  const [notification, setNotification] = useState<{
+    message: string;
+    type: 'success' | 'error';
+  } | null>(null);
 
   // 新しいテーマが作成されたら、ページ全体を再読み込みする代わりに
   // ローカルのstateに追加して即時反映させる
   const handleThemeCreated = (newTheme: Theme) => {
     setThemes((prevThemes) => [newTheme, ...prevThemes]);
+    setNotification({
+      message: '新しいテーマが作成されました。',
+      type: 'success',
+    });
   };
+
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => {
+        setNotification(null);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   const categories = useMemo(() => {
     // 初期表示時やテーマが追加された時にカテゴリを動的に生成
@@ -45,6 +63,13 @@ export default function ThemeBrowser({ initialThemes }: ThemeBrowserProps) {
 
   return (
     <>
+      {notification && (
+        <Banner
+          message={notification.message}
+          type={notification.type}
+          onClose={() => setNotification(null)}
+        />
+      )}
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-800">THEMES</h1>
         <Button onClick={() => setIsModalOpen(true)}>新しいテーマを追加</Button>
