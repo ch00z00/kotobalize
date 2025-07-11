@@ -8,6 +8,7 @@ import ThemeCard from '@/components/themes/ThemeCard';
 import SearchInput from '@/components/molecules/SearchInput';
 import CategoryFilter from '@/components/organisms/CategoryFilter';
 import Banner from '@/components/molecules/Banner';
+import { THEME_CATEGORIES } from '@/constants/categories';
 
 interface ThemeBrowserProps {
   initialThemes: Theme[];
@@ -18,7 +19,7 @@ export default function ThemeBrowser({ initialThemes }: ThemeBrowserProps) {
   const [themes, setThemes] = useState<Theme[]>(initialThemes);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [selectedCategory, setSelectedCategory] = useState<string>('すべて');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [notification, setNotification] = useState<{
     message: string;
     type: 'success' | 'error';
@@ -43,23 +44,29 @@ export default function ThemeBrowser({ initialThemes }: ThemeBrowserProps) {
     }
   }, [notification]);
 
-  const categories = useMemo(() => {
-    // 初期表示時やテーマが追加された時にカテゴリを動的に生成
-    if (themes.length === 0) return ['すべて'];
-    const uniqueCategories = new Set(themes.map((theme) => theme.category));
-    return ['すべて', ...Array.from(uniqueCategories)];
-  }, [themes]);
+  const handleToggleCategory = (category: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(category)
+        ? prev.filter((c) => c !== category)
+        : [...prev, category]
+    );
+  };
+
+  const handleSelectAll = () => {
+    setSelectedCategories([]);
+  };
 
   const filteredThemes = useMemo(() => {
     return themes.filter((theme) => {
       const matchesCategory =
-        selectedCategory === 'すべて' || theme.category === selectedCategory;
+        selectedCategories.length === 0 ||
+        selectedCategories.includes(theme.category);
       const matchesSearch =
         theme.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         theme.description.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
     });
-  }, [themes, searchQuery, selectedCategory]);
+  }, [themes, searchQuery, selectedCategories]);
 
   return (
     <>
@@ -83,9 +90,10 @@ export default function ThemeBrowser({ initialThemes }: ThemeBrowserProps) {
             placeholder="テーマを検索..."
           />
           <CategoryFilter
-            categories={categories}
-            selectedCategory={selectedCategory}
-            onSelectCategory={setSelectedCategory}
+            categories={THEME_CATEGORIES}
+            selectedCategories={selectedCategories}
+            onToggleCategory={handleToggleCategory}
+            onSelectAll={handleSelectAll}
           />
         </div>
       </div>

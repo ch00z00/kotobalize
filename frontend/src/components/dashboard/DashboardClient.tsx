@@ -13,6 +13,8 @@ import LinkButton from '../atoms/LinkButton';
 import SearchInput from '../molecules/SearchInput';
 import CategoryFilter from '../organisms/CategoryFilter';
 import ThemeAccordionItem from './ThemeAccordionItem';
+import { THEME_CATEGORIES } from '@/constants/categories';
+
 interface GroupedWriting {
   theme: Theme;
   writings: Writing[];
@@ -25,7 +27,7 @@ export default function DashboardClient() {
   const [error, setError] = useState<string | null>(null);
   const [openThemeId, setOpenThemeId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('すべて');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [stats, setStats] = useState({
     themeCount: 0,
     writingCount: 0,
@@ -34,6 +36,18 @@ export default function DashboardClient() {
 
   const handleToggle = (themeId: number) => {
     setOpenThemeId((prevId) => (prevId === themeId ? null : themeId));
+  };
+
+  const handleToggleCategory = (category: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(category)
+        ? prev.filter((c) => c !== category)
+        : [...prev, category]
+    );
+  };
+
+  const handleSelectAll = () => {
+    setSelectedCategories([]);
   };
 
   const fetchData = useCallback(async () => {
@@ -96,24 +110,17 @@ export default function DashboardClient() {
     fetchData();
   }, [fetchData]);
 
-  const categories = useMemo(() => {
-    if (groupedWritings.length === 0) return ['すべて'];
-    const uniqueCategories = new Set(
-      groupedWritings.map(({ theme }) => theme.category)
-    );
-    return ['すべて', ...Array.from(uniqueCategories)];
-  }, [groupedWritings]);
-
   const filteredGroupedWritings = useMemo(() => {
     return groupedWritings.filter(({ theme }) => {
       const matchesCategory =
-        selectedCategory === 'すべて' || theme.category === selectedCategory;
+        selectedCategories.length === 0 ||
+        selectedCategories.includes(theme.category);
       const matchesSearch = theme.title
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
     });
-  }, [groupedWritings, searchQuery, selectedCategory]);
+  }, [groupedWritings, searchQuery, selectedCategories]);
 
   if (isLoading) {
     return <DashboardSkeleton />;
@@ -151,9 +158,10 @@ export default function DashboardClient() {
               placeholder="履歴をテーマ名で検索..."
             />
             <CategoryFilter
-              categories={categories}
-              selectedCategory={selectedCategory}
-              onSelectCategory={setSelectedCategory}
+              categories={THEME_CATEGORIES}
+              selectedCategories={selectedCategories}
+              onToggleCategory={handleToggleCategory}
+              onSelectAll={handleSelectAll}
             />
           </div>
         </div>

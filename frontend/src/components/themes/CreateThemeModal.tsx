@@ -5,6 +5,7 @@ import { useAuthStore } from '@/store/auth';
 import { createTheme, NewThemeRequest } from '@/lib/api/themes.client';
 import { Theme } from '@/types/generated/models';
 import Button from '../atoms/Button';
+import { THEME_CATEGORIES } from '@/constants/categories';
 
 interface CreateThemeModalProps {
   isOpen: boolean;
@@ -19,7 +20,7 @@ export default function CreateThemeModal({
 }: CreateThemeModalProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('');
+  const [category, setCategory] = useState<string>(THEME_CATEGORIES[0]);
   const [timeLimitMinutes, setTimeLimitMinutes] = useState(5);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -45,7 +46,7 @@ export default function CreateThemeModal({
       onThemeCreated(newTheme);
       setTitle('');
       setDescription('');
-      setCategory('');
+      setCategory(THEME_CATEGORIES[0]);
       setTimeLimitMinutes(5);
       onClose();
     } catch (err) {
@@ -103,15 +104,19 @@ export default function CreateThemeModal({
               >
                 カテゴリ
               </label>
-              <input
+              <select
                 id="category"
-                type="text"
                 required
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="mt-1 block w-full py-2 px-3 rounded-lg border-2 border-gray-300 bg-gray-100 sm:text-md"
-                placeholder="例: バックエンド"
-              />
+                className="mt-1 block w-full appearance-none rounded-lg border-2 border-gray-300 bg-gray-100 py-2 px-3 sm:text-md"
+              >
+                {THEME_CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label
