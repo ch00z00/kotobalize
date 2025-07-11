@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 
 import { useAuthStore } from '@/store/auth';
@@ -18,27 +19,6 @@ import Tag from '../atoms/Tag';
 interface GroupedWriting {
   theme: Theme;
   writings: Writing[];
-}
-
-function ChevronIcon({ open }: { open: boolean }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className={`h-6 w-6 transform text-gray-500 transition-transform duration-200 ${
-        open ? 'rotate-180' : ''
-      }`}
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={2}
-        d="M19 9l-7 7-7-7"
-      />
-    </svg>
-  );
 }
 
 export default function DashboardClient() {
@@ -214,7 +194,11 @@ export default function DashboardClient() {
                     >
                       リトライする
                     </LinkButton>
-                    <ChevronIcon open={openThemeId === theme.id} />
+                    <ChevronDown
+                      className={`h-6 w-6 transform text-gray-500 transition-transform duration-200 ${
+                        openThemeId === theme.id ? 'rotate-180' : ''
+                      }`}
+                    />
                   </div>
                 </button>
                 <div

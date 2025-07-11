@@ -1,14 +1,12 @@
 'use client';
 
 import React from 'react';
-import ChatIcon from '@/components/atoms/icons/ChatIcon';
-import SparkleIcon from '@/components/atoms/icons/SparkleIcon';
-import TrendingUpIcon from '@/components/atoms/icons/TrendingUpIcon';
+import { MessageSquare, Sparkles, TrendingUp } from 'lucide-react';
 
 const iconMap: { [key: string]: React.ElementType } = {
-  chat: ChatIcon,
-  sparkle: SparkleIcon,
-  trendingUp: TrendingUpIcon,
+  chat: MessageSquare,
+  sparkle: Sparkles,
+  trendingUp: TrendingUp,
 };
 
 interface FeatureCardProps {
