@@ -39,7 +39,7 @@ const ThemeAccordionItem = memo(function ThemeAccordionItem({
         </div>
         <div className="mt-4 flex w-full items-center justify-end space-x-4 sm:mt-0 sm:w-auto sm:flex-shrink-0 sm:space-x-8">
           <LinkButton
-            href={`/themes/${theme.id}`}
+            href={`/themes/${theme.id}/write`}
             variant="outline"
             onClick={(e: React.MouseEvent) => e.stopPropagation()}
           >

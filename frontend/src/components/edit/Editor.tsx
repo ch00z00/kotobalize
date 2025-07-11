@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/auth';
 import { createWriting } from '@/lib/api/writings.client';
+import { useTimer } from '@/hooks/useTimer';
+import { Pause, Play } from 'lucide-react';
 import Button from '../atoms/Button';
 
 interface EditorProps {
@@ -12,15 +14,6 @@ interface EditorProps {
   // A default value is used here for demonstration.
   timeLimitInSeconds: number;
 }
-
-const formatTime = (seconds: number) => {
-  const minutes = Math.floor(seconds / 60);
-  const remainingSecs = seconds % 60;
-  return `${String(minutes).padStart(2, '0')}:${String(remainingSecs).padStart(
-    2,
-    '0'
-  )}`;
-};
 
 export default function Editor({
   themeId,
@@ -31,10 +24,16 @@ export default function Editor({
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [timerState, setTimerState] = useState<
-    'idle' | 'running' | 'paused' | 'finished'
-  >('idle');
-  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const {
+    timerState,
+    elapsedSeconds,
+    remainingSeconds,
+    formattedTime,
+    start,
+    pause,
+    resume,
+    reset,
+  } = useTimer({ timeLimitInSeconds });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -68,65 +67,50 @@ export default function Editor({
     }
   };
 
-  // Timer effect
-  useEffect(() => {
-    let intervalId: NodeJS.Timeout | null = null;
-    if (timerState === 'running') {
-      intervalId = setInterval(() => {
-        setElapsedSeconds((prev) => {
-          const newElapsed = prev + 1;
-          if (newElapsed >= timeLimitInSeconds) {
-            setTimerState('finished');
-            return timeLimitInSeconds;
-          }
-          return newElapsed;
-        });
-      }, 1000);
-    }
-    return () => {
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, [timerState, timeLimitInSeconds]);
-
-  const remainingSeconds = timeLimitInSeconds - elapsedSeconds;
-
-  const handleStart = () => setTimerState('running');
-  const handlePause = () => setTimerState('paused');
-  const handleResume = () => setTimerState('running');
-  const handleReset = () => {
-    setTimerState('idle');
-    setElapsedSeconds(0);
-  };
-
   const renderTimerControls = () => {
     switch (timerState) {
       case 'running':
         return (
-          <Button onClick={handlePause} variant="secondary">
-            一時停止
+          <Button
+            onClick={pause}
+            variant="secondary"
+            className="rounded-full p-2"
+            aria-label="一時停止"
+          >
+            <Pause className="h-5 w-5" />
           </Button>
         );
       case 'paused':
         return (
           <div className="flex items-center space-x-2">
-            <Button onClick={handleResume} variant="primary">
-              再開
+            <Button
+              onClick={resume}
+              variant="primary"
+              className="rounded-full p-2"
+              aria-label="再開"
+            >
+              <Play className="h-5 w-5" />
             </Button>
-            <Button onClick={handleReset} variant="outline">
+            <Button onClick={reset} variant="outline">
               リセット
             </Button>
           </div>
         );
       case 'finished':
         return (
-          <Button onClick={handleReset} variant="outline">
+          <Button onClick={reset} variant="outline">
             リセット
           </Button>
         );
       default: // idle
         return (
-          <Button onClick={handleStart} variant="primary">
-            開始
+          <Button
+            onClick={start}
+            variant="primary"
+            className="rounded-full p-2"
+            aria-label="開始"
+          >
+            <Play className="h-5 w-5" />
           </Button>
         );
     }
@@ -149,7 +133,7 @@ export default function Editor({
                     : 'text-gray-700'
                 }`}
               >
-                {formatTime(remainingSeconds)}
+                {formattedTime}
               </span>
               {renderTimerControls()}
             </div>
