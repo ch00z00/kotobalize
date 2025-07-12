@@ -11,5 +11,5 @@ type GormTheme struct {
 	Description string `gorm:"type:text;not null"`
 	Category    string `gorm:"size:100;not null"`
 	TimeLimitInSeconds int `gorm:"not null"`
-	CreatorID   uint   // FK to the users table
+	CreatorID   *uint   // FK to the users table. nil for official themes.
 }
