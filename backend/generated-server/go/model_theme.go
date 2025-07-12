@@ -17,15 +17,18 @@ type Theme struct {
 
 	Id int64 `json:"id"`
 
+	Title string `json:"title"`
+
+	Description string `json:"description"`
+
+	Category string `json:"category"`
+
+	TimeLimitInSeconds int32 `json:"timeLimitInSeconds"`
+
 	CreatedAt time.Time `json:"createdAt"`
 
 	UpdatedAt time.Time `json:"updatedAt"`
 
-	Title string `json:"title,omitempty"`
-
-	Description string `json:"description,omitempty"`
-
-	Category string `json:"category,omitempty"`
-
-	TimeLimitInSeconds int32 `json:"timeLimitInSeconds,omitempty"`
+	// ID of the user who created the theme. Null for official themes.
+	CreatorId int64 `json:"creatorId,omitempty"`
 }

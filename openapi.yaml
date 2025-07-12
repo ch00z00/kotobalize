@@ -450,6 +450,12 @@ components:
      type: string
      format: date-time
      readOnly: true
+    creatorId:
+     type: integer
+     format: int64
+     nullable: true
+     readOnly: true
+     description: "ID of the user who created the theme. Null for official themes."
    required:
     - id
     - title

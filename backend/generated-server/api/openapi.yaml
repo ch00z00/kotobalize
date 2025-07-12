@@ -438,25 +438,50 @@ components:
       - id
       - updatedAt
     Theme:
-      allOf:
-      - $ref: '#/components/schemas/ThemeBase'
       example:
         createdAt: 2000-01-23T04:56:07.000+00:00
+        timeLimitInSeconds: 6
+        creatorId: 1
+        description: description
         id: 0
+        title: title
+        category: category
         updatedAt: 2000-01-23T04:56:07.000+00:00
       properties:
         id:
           format: int64
           readOnly: true
+          type: integer
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        timeLimitInSeconds:
+          format: int32
+          type: integer
         createdAt:
           format: date-time
           readOnly: true
+          type: string
         updatedAt:
           format: date-time
           readOnly: true
+          type: string
+        creatorId:
+          description: ID of the user who created the theme. Null for official themes.
+          format: int64
+          readOnly: true
+          type: integer
+          nullable: true
       required:
+      - category
       - createdAt
+      - description
       - id
+      - timeLimitInSeconds
+      - title
       - updatedAt
     Writing:
       example:
@@ -530,7 +555,12 @@ components:
       - content
       - durationSeconds
       - themeId
-    ThemeBase:
+    NewThemeRequest:
+      example:
+        timeLimitInSeconds: 0
+        description: description
+        title: title
+        category: category
       properties:
         title:
           type: string
@@ -541,27 +571,27 @@ components:
         timeLimitInSeconds:
           format: int32
           type: integer
-    NewThemeRequest:
-      allOf:
-      - $ref: '#/components/schemas/ThemeBase'
-      example:
-        timeLimitInSeconds: 0
-        description: description
-        title: title
-        category: category
       required:
       - category
       - description
       - timeLimitInSeconds
       - title
     UpdateThemeRequest:
-      allOf:
-      - $ref: '#/components/schemas/ThemeBase'
       example:
         timeLimitInSeconds: 0
         description: description
         title: title
         category: category
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        category:
+          type: string
+        timeLimitInSeconds:
+          format: int32
+          type: integer
     NewReviewRequest:
       example:
         writingId: 0

@@ -12,8 +12,19 @@ import (
 
 // ListThemes - Get a list of all available themes
 func (c *Container) ListThemes(ctx *gin.Context) {
+	// Get user ID from the context (set by the auth middleware)
+	userID, exists := ctx.Get("userId")
+	if !exists {
+		// This endpoint is protected, so a user should always exist.
+		// This is a safeguard.
+		ctx.JSON(http.StatusUnauthorized, models.APIError{Code: "UNAUTHORIZED", Message: "User ID not found in token"})
+		return
+	}
+
 	var gormThemes []models.GormTheme
-	if err := c.DB.Find(&gormThemes).Error; err != nil {
+	// Fetch all official themes (creator_id IS NULL) and themes created by the current user.
+	// Order by creator_id (NULLs first, showing official themes first) and then by creation date.
+	if err := c.DB.Where("creator_id IS NULL OR creator_id = ?", userID).Order("creator_id asc, created_at desc").Find(&gormThemes).Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to fetch themes"})
 		return
 	}
@@ -37,11 +48,19 @@ func (c *Container) GetThemeByID(ctx *gin.Context) {
 		return
 	}
 
+	// Get user ID from the context (set by the auth middleware)
+	userID, exists := ctx.Get("userId")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, models.APIError{Code: "UNAUTHORIZED", Message: "User ID not found in token"})
+		return
+	}
+
 	// Find the theme in the database
 	var gormTheme models.GormTheme
-	if err := c.DB.First(&gormTheme, themeID).Error; err != nil {
+	// A user can fetch a theme if it's official (creator_id IS NULL) or if they created it.
+	if err := c.DB.Where("id = ? AND (creator_id IS NULL OR creator_id = ?)", themeID, userID).First(&gormTheme).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			ctx.JSON(http.StatusNotFound, models.APIError{Code: "THEME_NOT_FOUND", Message: "Theme not found"})
+			ctx.JSON(http.StatusNotFound, models.APIError{Code: "THEME_NOT_FOUND", Message: "Theme not found or you don't have permission to view it"})
 			return
 		}
 		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to fetch theme"})
@@ -80,7 +99,7 @@ func (c *Container) CreateTheme(ctx *gin.Context) {
 		Description:        req.Description,
 		Category:           req.Category,
 		TimeLimitInSeconds: req.TimeLimitInSeconds,
-		CreatorID:          userID,
+		CreatorID:          &userID,
 	}
 
 	// Save the new theme to the database.
@@ -101,20 +120,17 @@ func (c *Container) UpdateTheme(ctx *gin.Context) {
 		ctx.JSON(http.StatusUnauthorized, models.APIError{Code: "UNAUTHORIZED", Message: "User not authenticated"})
 		return
 	}
-	userID, _ := userIDVal.(uint)
+	userID, ok := userIDVal.(uint)
+	if !ok {
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "INTERNAL_ERROR", Message: "Invalid user ID type in context"})
+		return
+	}
 
 	// Get themeId from path parameter
 	themeIDStr := ctx.Param("themeId")
 	themeID, err := strconv.ParseUint(themeIDStr, 10, 64)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, models.APIError{Code: "INVALID_INPUT", Message: "Invalid theme ID format"})
-		return
-	}
-
-	// Bind request body
-	var req models.UpdateThemeRequest
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, models.APIError{Code: "BAD_REQUEST", Message: "Invalid request body: " + err.Error()})
 		return
 	}
 
@@ -129,20 +145,27 @@ func (c *Container) UpdateTheme(ctx *gin.Context) {
 		return
 	}
 
-	// Authorization check: only the creator can update the theme
-	if gormTheme.CreatorID != userID {
+	// Authorization check:
+	// 1. Official themes (CreatorID is nil) cannot be updated.
+	if gormTheme.CreatorID == nil {
+		ctx.JSON(http.StatusForbidden, models.APIError{Code: "FORBIDDEN", Message: "Official themes cannot be updated."})
+		return
+	}
+	// 2. Only the creator can update their theme.
+	if *gormTheme.CreatorID != userID {
 		ctx.JSON(http.StatusForbidden, models.APIError{Code: "FORBIDDEN", Message: "You are not authorized to update this theme"})
 		return
 	}
 
-	// Update fields from request
-	gormTheme.Title = req.Title
-	gormTheme.Description = req.Description
-	gormTheme.Category = req.Category
-	gormTheme.TimeLimitInSeconds = req.TimeLimitInSeconds
+	// Bind request body
+	var req models.UpdateThemeRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, models.APIError{Code: "BAD_REQUEST", Message: "Invalid request body: " + err.Error()})
+		return
+	}
 
-	// Save updates
-	if err := c.DB.Save(&gormTheme).Error; err != nil {
+	// Use GORM's Updates to perform a partial update (only non-zero fields from req are updated)
+	if err := c.DB.Model(&gormTheme).Updates(req).Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to update theme"})
 		return
 	}
@@ -159,7 +182,11 @@ func (c *Container) DeleteTheme(ctx *gin.Context) {
 		ctx.JSON(http.StatusUnauthorized, models.APIError{Code: "UNAUTHORIZED", Message: "User not authenticated"})
 		return
 	}
-	userID, _ := userIDVal.(uint)
+	userID, ok := userIDVal.(uint)
+	if !ok {
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "INTERNAL_ERROR", Message: "Invalid user ID type in context"})
+		return
+	}
 
 	// Get themeId from path parameter
 	themeIDStr := ctx.Param("themeId")
@@ -181,8 +208,14 @@ func (c *Container) DeleteTheme(ctx *gin.Context) {
 		return
 	}
 
-	// Authorization check: only the creator can delete the theme
-	if gormTheme.CreatorID != userID {
+	// Authorization check:
+	// 1. Official themes (CreatorID is nil) cannot be deleted.
+	if gormTheme.CreatorID == nil {
+		ctx.JSON(http.StatusForbidden, models.APIError{Code: "FORBIDDEN", Message: "Official themes cannot be deleted."})
+		return
+	}
+	// 2. Only the creator can delete their theme.
+	if *gormTheme.CreatorID != userID {
 		ctx.JSON(http.StatusForbidden, models.APIError{Code: "FORBIDDEN", Message: "You are not authorized to delete this theme"})
 		return
 	}
@@ -207,5 +240,6 @@ func mapGormThemeToAPI(gormTheme models.GormTheme) models.Theme {
 		TimeLimitInSeconds: gormTheme.TimeLimitInSeconds,
 		CreatedAt:          gormTheme.CreatedAt,
 		UpdatedAt:          gormTheme.UpdatedAt,
+		CreatorID:          gormTheme.CreatorID,
 	}
 }

@@ -254,6 +254,12 @@ export interface Theme {
      * @memberof Theme
      */
     'updatedAt': string;
+    /**
+     * ID of the user who created the theme. Null for official themes.
+     * @type {number}
+     * @memberof Theme
+     */
+    'creatorId'?: number;
 }
 /**
  * 

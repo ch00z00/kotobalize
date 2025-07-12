@@ -12,6 +12,7 @@ Name | Type | Description | Notes
 **timeLimitInSeconds** | **number** |  | [default to undefined]
 **createdAt** | **string** |  | [readonly] [default to undefined]
 **updatedAt** | **string** |  | [readonly] [default to undefined]
+**creatorId** | **number** | ID of the user who created the theme. Null for official themes. | [optional] [readonly] [default to undefined]
 
 ## Example
 
@@ -26,6 +27,7 @@ const instance: Theme = {
     timeLimitInSeconds,
     createdAt,
     updatedAt,
+    creatorId,
 };
 ```
 

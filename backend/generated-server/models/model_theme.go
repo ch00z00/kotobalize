@@ -20,4 +20,6 @@ type Theme struct {
 	CreatedAt time.Time `json:"createdAt"`
 
 	UpdatedAt time.Time `json:"updatedAt"`
+
+	CreatorID *uint `json:"creatorId"`
 }
