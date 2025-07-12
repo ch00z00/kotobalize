@@ -1,24 +1,26 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/store/auth';
-import { Theme } from '@/types/generated/api';
-import { createTheme } from '@/lib/api/themes.client';
-import { NewThemeRequest } from '@/types/generated/api';
+import { updateTheme } from '@/lib/api/themes.client';
+import { Theme, UpdateThemeRequest } from '@/types/generated/api';
 import Button from '../atoms/Button';
 import { THEME_CATEGORIES } from '@/constants/categories';
+import Modal from '../common/Modal';
 
-interface CreateThemeModalProps {
+interface EditThemeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onThemeCreated: (newTheme: Theme) => void;
+  onThemeUpdated: (updatedTheme: Theme) => void;
+  themeToEdit: Theme | null;
 }
 
-export default function CreateThemeModal({
+export default function EditThemeModal({
   isOpen,
   onClose,
-  onThemeCreated,
-}: CreateThemeModalProps) {
+  onThemeUpdated,
+  themeToEdit,
+}: EditThemeModalProps) {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState<string>(THEME_CATEGORIES[0]);
@@ -27,28 +29,38 @@ export default function CreateThemeModal({
   const [isLoading, setIsLoading] = useState(false);
   const { token } = useAuthStore();
 
+  useEffect(() => {
+    if (themeToEdit) {
+      setTitle(themeToEdit.title);
+      setDescription(themeToEdit.description);
+      setCategory(themeToEdit.category);
+      // timeLimitInSeconds might be undefined for older themes.
+      // Provide a fallback to prevent NaN errors.
+      const minutes = themeToEdit.timeLimitInSeconds
+        ? themeToEdit.timeLimitInSeconds / 60
+        : 5; // Default to 5 minutes if not set
+      setTimeLimitMinutes(minutes);
+    }
+  }, [themeToEdit]);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!token) {
-      setError('認証が必要です。再度ログインしてください。');
+    if (!token || !themeToEdit) {
+      setError('認証エラーまたは編集対象のテーマが見つかりません。');
       return;
     }
     setError(null);
     setIsLoading(true);
 
     try {
-      const themeData: NewThemeRequest = {
+      const themeData: UpdateThemeRequest = {
         title,
         description,
         category,
         timeLimitInSeconds: timeLimitMinutes * 60,
       };
-      const newTheme = await createTheme(themeData, token);
-      onThemeCreated(newTheme);
-      setTitle('');
-      setDescription('');
-      setCategory(THEME_CATEGORIES[0]);
-      setTimeLimitMinutes(5);
+      const updatedTheme = await updateTheme(themeToEdit.id, themeData, token);
+      onThemeUpdated(updatedTheme);
       onClose();
     } catch (err) {
       setError(
@@ -60,25 +72,9 @@ export default function CreateThemeModal({
   };
 
   return (
-    <div
-      className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity duration-300 ease-in-out ${
-        isOpen ? 'bg-black/50 opacity-100' : 'pointer-events-none opacity-0'
-      }`}
-      // 背景のオーバーレイをクリックしたときにモーダルを閉じる
-      onClick={onClose}
-    >
-      <div
-        className={`w-full max-w-md rounded-lg bg-white p-8 shadow-xl transition-all duration-300 ease-in-out ${
-          isOpen
-            ? 'translate-y-0 scale-100 opacity-100'
-            : '-translate-y-4 scale-95 opacity-0'
-        }`}
-        // モーダル内部のクリックで閉じてしまわないようにする
-        onClick={(e) => e.stopPropagation()}
-      >
-        <h2 className="mb-6 text-2xl font-bold text-gray-900">
-          新しいテーマを作成
-        </h2>
+    <Modal isOpen={isOpen} onClose={onClose}>
+      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-xl">
+        <h2 className="mb-6 text-2xl font-bold text-gray-900">テーマを編集</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             <div>
@@ -95,7 +91,6 @@ export default function CreateThemeModal({
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 className="mt-1 block w-full py-2 px-3 rounded-lg border-2 border-gray-300 bg-gray-100 sm:text-md"
-                placeholder="例: RESTful APIの設計原則"
               />
             </div>
             <div>
@@ -133,7 +128,6 @@ export default function CreateThemeModal({
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 className="mt-1 block w-full py-2 px-3 rounded-lg border-2 border-gray-300 bg-gray-100 sm:text-md"
-                placeholder="例: ステートレス性、統一インターフェースなどの主要な原則を含めて説明してください。"
               />
             </div>
             <div>
@@ -151,7 +145,6 @@ export default function CreateThemeModal({
                 value={timeLimitMinutes}
                 onChange={(e) => setTimeLimitMinutes(Number(e.target.value))}
                 className="mt-1 block w-full py-2 px-3 rounded-lg border-2 border-gray-300 bg-gray-100 sm:text-md"
-                placeholder="例: 5"
               />
             </div>
           </div>
@@ -161,11 +154,11 @@ export default function CreateThemeModal({
               キャンセル
             </Button>
             <Button type="submit" disabled={isLoading} variant="primary">
-              {isLoading ? '作成中...' : '作成する'}
+              {isLoading ? '更新中...' : '更新する'}
             </Button>
           </div>
         </form>
       </div>
-    </div>
+    </Modal>
   );
 }

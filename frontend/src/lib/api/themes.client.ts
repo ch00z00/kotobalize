@@ -1,11 +1,10 @@
-import { Theme } from '@/types/generated/models';
+import {
+  ApiError,
+  NewThemeRequest,
+  Theme,
+  UpdateThemeRequest,
+} from '@/types/generated/api';
 import { PUBLIC_API_BASE_URL } from '@/lib/api/config';
-
-export interface NewThemeRequest {
-  title: string;
-  description: string;
-  category: string;
-}
 
 /**
  * Creates a new theme.
@@ -29,12 +28,13 @@ export async function createTheme(
   });
 
   if (!res.ok) {
-    const errorData = await res.json().catch(() => ({}));
+    const errorData = (await res.json().catch(() => ({}))) as ApiError;
     throw new Error(
       errorData.message || `Failed to create theme: ${res.statusText}`
     );
   }
 
+  // The 'Theme' interface from api.ts has string dates, so we return it directly.
   return res.json();
 }
 
@@ -56,6 +56,7 @@ export async function getThemesForClient(token: string): Promise<Theme[]> {
       throw new Error(`Failed to fetch themes: ${res.statusText}`);
     }
 
+    // The 'Theme' interface from api.ts has string dates, so we return it directly.
     return res.json();
   } catch (error) {
     console.error('API call failed:', error);
@@ -63,3 +64,48 @@ export async function getThemesForClient(token: string): Promise<Theme[]> {
     return [];
   }
 }
+
+export const updateTheme = async (
+  themeId: number,
+  themeData: UpdateThemeRequest,
+  token: string
+): Promise<Theme> => {
+  const res = await fetch(`${PUBLIC_API_BASE_URL}/themes/${themeId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(themeData),
+  });
+
+  if (!res.ok) {
+    const errorData = (await res.json().catch(() => ({}))) as ApiError;
+    throw new Error(
+      errorData.message || `Failed to update theme: ${res.statusText}`
+    );
+  }
+
+  // The 'Theme' interface from api.ts has string dates, so we return it directly.
+  return res.json();
+};
+
+export const deleteTheme = async (
+  themeId: number,
+  token: string
+): Promise<void> => {
+  const res = await fetch(`${PUBLIC_API_BASE_URL}/themes/${themeId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    // 204 No Contentはok=trueなのでここには来ない。4xx, 5xxエラーの場合。
+    const errorData = (await res.json().catch(() => ({}))) as ApiError;
+    throw new Error(
+      errorData.message || `Failed to delete theme: ${res.statusText}`
+    );
+  }
+};

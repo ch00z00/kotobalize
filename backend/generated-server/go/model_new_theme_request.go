@@ -16,4 +16,6 @@ type NewThemeRequest struct {
 	Description string `json:"description"`
 
 	Category string `json:"category"`
+
+	TimeLimitInSeconds int32 `json:"timeLimitInSeconds"`
 }

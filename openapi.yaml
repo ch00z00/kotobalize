@@ -217,6 +217,60 @@ paths:
      $ref: "#/components/responses/Unauthorized"
     "404":
      $ref: "#/components/responses/NotFound"
+  put:
+   summary: Update an existing theme
+   operationId: updateTheme
+   tags:
+    - Themes
+   security:
+    - bearerAuth: []
+   parameters:
+    - name: themeId
+      in: path
+      required: true
+      schema:
+       type: integer
+       format: int64
+   requestBody:
+    required: true
+    content:
+     application/json:
+      schema:
+       $ref: "#/components/schemas/UpdateThemeRequest"
+   responses:
+    "200":
+     description: Theme updated successfully
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/Theme"
+    "400":
+     $ref: "#/components/responses/BadRequest"
+    "401":
+     $ref: "#/components/responses/Unauthorized"
+    "404":
+     $ref: "#/components/responses/NotFound"
+  delete:
+   summary: Delete a theme
+   operationId: deleteTheme
+   tags:
+    - Themes
+   security:
+    - bearerAuth: []
+   parameters:
+    - name: themeId
+      in: path
+      required: true
+      schema:
+       type: integer
+       format: int64
+   responses:
+    "204":
+     description: Theme deleted successfully
+    "401":
+     $ref: "#/components/responses/Unauthorized"
+    "404":
+     $ref: "#/components/responses/NotFound"
 
  /writings:
   get:
@@ -385,6 +439,9 @@ components:
      type: string
     category:
      type: string
+    timeLimitInSeconds:
+     type: integer
+     format: int32
     createdAt:
      type: string
      format: date-time
@@ -398,6 +455,7 @@ components:
     - title
     - description
     - category
+    - timeLimitInSeconds
     - createdAt
     - updatedAt
 
@@ -471,10 +529,27 @@ components:
      type: string
     category:
      type: string
+    timeLimitInSeconds:
+     type: integer
+     format: int32
    required:
     - title
     - description
     - category
+    - timeLimitInSeconds
+
+  UpdateThemeRequest:
+   type: object
+   properties:
+    title:
+     type: string
+    description:
+     type: string
+    category:
+     type: string
+    timeLimitInSeconds:
+     type: integer
+     format: int32
 
   NewReviewRequest:
    type: object

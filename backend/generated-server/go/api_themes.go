@@ -23,6 +23,13 @@ func (api *ThemesAPI) CreateTheme(c *gin.Context) {
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
+// Delete /api/v1/themes/:themeId
+// Delete a theme 
+func (api *ThemesAPI) DeleteTheme(c *gin.Context) {
+	// Your handler implementation
+	c.JSON(200, gin.H{"status": "OK"})
+}
+
 // Get /api/v1/themes/:themeId
 // Get details of a specific theme by ID 
 func (api *ThemesAPI) GetThemeById(c *gin.Context) {
@@ -33,6 +40,13 @@ func (api *ThemesAPI) GetThemeById(c *gin.Context) {
 // Get /api/v1/themes
 // Get a list of all available themes 
 func (api *ThemesAPI) ListThemes(c *gin.Context) {
+	// Your handler implementation
+	c.JSON(200, gin.H{"status": "OK"})
+}
+
+// Put /api/v1/themes/:themeId
+// Update an existing theme 
+func (api *ThemesAPI) UpdateTheme(c *gin.Context) {
 	// Your handler implementation
 	c.JSON(200, gin.H{"status": "OK"})
 }

@@ -76,10 +76,11 @@ func (c *Container) CreateTheme(ctx *gin.Context) {
 
 	// Create a new GORM theme record (DB Model).
 	gormTheme := models.GormTheme{
-		Title:       req.Title,
-		Description: req.Description,
-		Category:    req.Category,
-		CreatorID:   userID,
+		Title:              req.Title,
+		Description:        req.Description,
+		Category:           req.Category,
+		TimeLimitInSeconds: req.TimeLimitInSeconds,
+		CreatorID:          userID,
 	}
 
 	// Save the new theme to the database.
@@ -92,14 +93,119 @@ func (c *Container) CreateTheme(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, mapGormThemeToAPI(gormTheme))
 }
 
+// UpdateTheme - Update an existing theme
+func (c *Container) UpdateTheme(ctx *gin.Context) {
+	// Get user ID from context
+	userIDVal, exists := ctx.Get("userId")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, models.APIError{Code: "UNAUTHORIZED", Message: "User not authenticated"})
+		return
+	}
+	userID, _ := userIDVal.(uint)
+
+	// Get themeId from path parameter
+	themeIDStr := ctx.Param("themeId")
+	themeID, err := strconv.ParseUint(themeIDStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, models.APIError{Code: "INVALID_INPUT", Message: "Invalid theme ID format"})
+		return
+	}
+
+	// Bind request body
+	var req models.UpdateThemeRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, models.APIError{Code: "BAD_REQUEST", Message: "Invalid request body: " + err.Error()})
+		return
+	}
+
+	// Find the theme
+	var gormTheme models.GormTheme
+	if err := c.DB.First(&gormTheme, themeID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, models.APIError{Code: "THEME_NOT_FOUND", Message: "Theme not found"})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to fetch theme"})
+		return
+	}
+
+	// Authorization check: only the creator can update the theme
+	if gormTheme.CreatorID != userID {
+		ctx.JSON(http.StatusForbidden, models.APIError{Code: "FORBIDDEN", Message: "You are not authorized to update this theme"})
+		return
+	}
+
+	// Update fields from request
+	gormTheme.Title = req.Title
+	gormTheme.Description = req.Description
+	gormTheme.Category = req.Category
+	gormTheme.TimeLimitInSeconds = req.TimeLimitInSeconds
+
+	// Save updates
+	if err := c.DB.Save(&gormTheme).Error; err != nil {
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to update theme"})
+		return
+	}
+
+	// Return updated theme
+	ctx.JSON(http.StatusOK, mapGormThemeToAPI(gormTheme))
+}
+
+// DeleteTheme - Delete a theme
+func (c *Container) DeleteTheme(ctx *gin.Context) {
+	// Get user ID from context
+	userIDVal, exists := ctx.Get("userId")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, models.APIError{Code: "UNAUTHORIZED", Message: "User not authenticated"})
+		return
+	}
+	userID, _ := userIDVal.(uint)
+
+	// Get themeId from path parameter
+	themeIDStr := ctx.Param("themeId")
+	themeID, err := strconv.ParseUint(themeIDStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, models.APIError{Code: "INVALID_INPUT", Message: "Invalid theme ID format"})
+		return
+	}
+
+	// Find the theme
+	var gormTheme models.GormTheme
+	if err := c.DB.First(&gormTheme, themeID).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// If the theme is already gone, we can consider the delete successful.
+			ctx.Status(http.StatusNoContent)
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to fetch theme for deletion"})
+		return
+	}
+
+	// Authorization check: only the creator can delete the theme
+	if gormTheme.CreatorID != userID {
+		ctx.JSON(http.StatusForbidden, models.APIError{Code: "FORBIDDEN", Message: "You are not authorized to delete this theme"})
+		return
+	}
+
+	// Delete the theme
+	if err := c.DB.Delete(&gormTheme).Error; err != nil {
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to delete theme"})
+		return
+	}
+
+	// Return success with no content
+	ctx.Status(http.StatusNoContent)
+}
+
 // mapGormThemeToAPI converts a GORM theme model to an API theme model.
 func mapGormThemeToAPI(gormTheme models.GormTheme) models.Theme {
 	return models.Theme{
-		ID:          int64(gormTheme.ID),
-		Title:       gormTheme.Title,
-		Description: gormTheme.Description,
-		Category:    gormTheme.Category,
-		CreatedAt:   gormTheme.CreatedAt,
-		UpdatedAt:   gormTheme.UpdatedAt,
+		ID:                 int64(gormTheme.ID),
+		Title:              gormTheme.Title,
+		Description:        gormTheme.Description,
+		Category:           gormTheme.Category,
+		TimeLimitInSeconds: gormTheme.TimeLimitInSeconds,
+		CreatedAt:          gormTheme.CreatedAt,
+		UpdatedAt:          gormTheme.UpdatedAt,
 	}
 }

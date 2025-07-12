@@ -1,31 +1,25 @@
-# Theme
+# ThemeBase
 
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**id** | **number** |  | [readonly] [default to undefined]
 **title** | **string** |  | [default to undefined]
 **description** | **string** |  | [default to undefined]
 **category** | **string** |  | [default to undefined]
 **timeLimitInSeconds** | **number** |  | [default to undefined]
-**createdAt** | **string** |  | [readonly] [default to undefined]
-**updatedAt** | **string** |  | [readonly] [default to undefined]
 
 ## Example
 
 ```typescript
-import { Theme } from './api';
+import { ThemeBase } from './api';
 
-const instance: Theme = {
-    id,
+const instance: ThemeBase = {
     title,
     description,
     category,
     timeLimitInSeconds,
-    createdAt,
-    updatedAt,
 };
 ```
 

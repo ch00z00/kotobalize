@@ -155,6 +155,12 @@ export interface NewThemeRequest {
      * @memberof NewThemeRequest
      */
     'category': string;
+    /**
+     * 
+     * @type {number}
+     * @memberof NewThemeRequest
+     */
+    'timeLimitInSeconds': number;
 }
 /**
  * 
@@ -232,6 +238,12 @@ export interface Theme {
     'category': string;
     /**
      * 
+     * @type {number}
+     * @memberof Theme
+     */
+    'timeLimitInSeconds': number;
+    /**
+     * 
      * @type {string}
      * @memberof Theme
      */
@@ -255,6 +267,37 @@ export interface UpdateAvatarRequest {
      * @memberof UpdateAvatarRequest
      */
     'avatarUrl': string;
+}
+/**
+ * 
+ * @export
+ * @interface UpdateThemeRequest
+ */
+export interface UpdateThemeRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateThemeRequest
+     */
+    'title'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateThemeRequest
+     */
+    'description'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof UpdateThemeRequest
+     */
+    'category'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof UpdateThemeRequest
+     */
+    'timeLimitInSeconds'?: number;
 }
 /**
  * 
@@ -658,6 +701,44 @@ export const ThemesApiAxiosParamCreator = function (configuration?: Configuratio
         },
         /**
          * 
+         * @summary Delete a theme
+         * @param {number} themeId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteTheme: async (themeId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'themeId' is not null or undefined
+            assertParamExists('deleteTheme', 'themeId', themeId)
+            const localVarPath = `/themes/{themeId}`
+                .replace(`{${"themeId"}}`, encodeURIComponent(String(themeId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get details of a specific theme by ID
          * @param {number} themeId 
          * @param {*} [options] Override http request option.
@@ -728,6 +809,50 @@ export const ThemesApiAxiosParamCreator = function (configuration?: Configuratio
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @summary Update an existing theme
+         * @param {number} themeId 
+         * @param {UpdateThemeRequest} updateThemeRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateTheme: async (themeId: number, updateThemeRequest: UpdateThemeRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'themeId' is not null or undefined
+            assertParamExists('updateTheme', 'themeId', themeId)
+            // verify required parameter 'updateThemeRequest' is not null or undefined
+            assertParamExists('updateTheme', 'updateThemeRequest', updateThemeRequest)
+            const localVarPath = `/themes/{themeId}`
+                .replace(`{${"themeId"}}`, encodeURIComponent(String(themeId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateThemeRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -749,6 +874,19 @@ export const ThemesApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.createTheme(newThemeRequest, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ThemesApi.createTheme']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Delete a theme
+         * @param {number} themeId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async deleteTheme(themeId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.deleteTheme(themeId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ThemesApi.deleteTheme']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -776,6 +914,20 @@ export const ThemesApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['ThemesApi.listThemes']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * 
+         * @summary Update an existing theme
+         * @param {number} themeId 
+         * @param {UpdateThemeRequest} updateThemeRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateTheme(themeId: number, updateThemeRequest: UpdateThemeRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Theme>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateTheme(themeId, updateThemeRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ThemesApi.updateTheme']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -798,6 +950,16 @@ export const ThemesApiFactory = function (configuration?: Configuration, basePat
         },
         /**
          * 
+         * @summary Delete a theme
+         * @param {number} themeId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        deleteTheme(themeId: number, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.deleteTheme(themeId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get details of a specific theme by ID
          * @param {number} themeId 
          * @param {*} [options] Override http request option.
@@ -814,6 +976,17 @@ export const ThemesApiFactory = function (configuration?: Configuration, basePat
          */
         listThemes(options?: RawAxiosRequestConfig): AxiosPromise<Array<Theme>> {
             return localVarFp.listThemes(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Update an existing theme
+         * @param {number} themeId 
+         * @param {UpdateThemeRequest} updateThemeRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateTheme(themeId: number, updateThemeRequest: UpdateThemeRequest, options?: RawAxiosRequestConfig): AxiosPromise<Theme> {
+            return localVarFp.updateTheme(themeId, updateThemeRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -839,6 +1012,18 @@ export class ThemesApi extends BaseAPI {
 
     /**
      * 
+     * @summary Delete a theme
+     * @param {number} themeId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ThemesApi
+     */
+    public deleteTheme(themeId: number, options?: RawAxiosRequestConfig) {
+        return ThemesApiFp(this.configuration).deleteTheme(themeId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Get details of a specific theme by ID
      * @param {number} themeId 
      * @param {*} [options] Override http request option.
@@ -858,6 +1043,19 @@ export class ThemesApi extends BaseAPI {
      */
     public listThemes(options?: RawAxiosRequestConfig) {
         return ThemesApiFp(this.configuration).listThemes(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Update an existing theme
+     * @param {number} themeId 
+     * @param {UpdateThemeRequest} updateThemeRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ThemesApi
+     */
+    public updateTheme(themeId: number, updateThemeRequest: UpdateThemeRequest, options?: RawAxiosRequestConfig) {
+        return ThemesApiFp(this.configuration).updateTheme(themeId, updateThemeRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 

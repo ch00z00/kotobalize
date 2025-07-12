@@ -1,21 +1,21 @@
-# NewThemeRequest
+# UpdateThemeRequest
 
 
 ## Properties
 
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**title** | **string** |  | [default to undefined]
-**description** | **string** |  | [default to undefined]
-**category** | **string** |  | [default to undefined]
-**timeLimitInSeconds** | **number** |  | [default to undefined]
+**title** | **string** |  | [optional] [default to undefined]
+**description** | **string** |  | [optional] [default to undefined]
+**category** | **string** |  | [optional] [default to undefined]
+**timeLimitInSeconds** | **number** |  | [optional] [default to undefined]
 
 ## Example
 
 ```typescript
-import { NewThemeRequest } from './api';
+import { UpdateThemeRequest } from './api';
 
-const instance: NewThemeRequest = {
+const instance: UpdateThemeRequest = {
     title,
     description,
     category,

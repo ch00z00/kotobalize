@@ -65,6 +65,8 @@ func main() {
 			protected.GET("/themes", c.ListThemes)
 			protected.GET("/themes/:themeId", c.GetThemeByID)
 			protected.POST("/themes", c.CreateTheme)
+			protected.PUT("/themes/:themeId", c.UpdateTheme)
+			protected.DELETE("/themes/:themeId", c.DeleteTheme)
 
 			protected.GET("/writings", c.ListUserWritings)
 			protected.POST("/writings", c.CreateWriting)

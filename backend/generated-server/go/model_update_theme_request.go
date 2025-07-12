@@ -9,17 +9,7 @@
 
 package openapi
 
-import (
-	"time"
-)
-
-type Theme struct {
-
-	Id int64 `json:"id"`
-
-	CreatedAt time.Time `json:"createdAt"`
-
-	UpdatedAt time.Time `json:"updatedAt"`
+type UpdateThemeRequest struct {
 
 	Title string `json:"title,omitempty"`
 

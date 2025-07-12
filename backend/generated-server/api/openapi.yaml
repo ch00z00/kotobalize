@@ -182,6 +182,29 @@ paths:
       tags:
       - Themes
   /themes/{themeId}:
+    delete:
+      operationId: deleteTheme
+      parameters:
+      - explode: false
+        in: path
+        name: themeId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "204":
+          description: Theme deleted successfully
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+      security:
+      - bearerAuth: []
+      summary: Delete a theme
+      tags:
+      - Themes
     get:
       operationId: getThemeById
       parameters:
@@ -207,6 +230,41 @@ paths:
       security:
       - bearerAuth: []
       summary: Get details of a specific theme by ID
+      tags:
+      - Themes
+    put:
+      operationId: updateTheme
+      parameters:
+      - explode: false
+        in: path
+        name: themeId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateThemeRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Theme'
+          description: Theme updated successfully
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+      security:
+      - bearerAuth: []
+      summary: Update an existing theme
       tags:
       - Themes
   /writings:
@@ -380,38 +438,25 @@ components:
       - id
       - updatedAt
     Theme:
+      allOf:
+      - $ref: '#/components/schemas/ThemeBase'
       example:
         createdAt: 2000-01-23T04:56:07.000+00:00
-        description: description
         id: 0
-        title: title
-        category: category
         updatedAt: 2000-01-23T04:56:07.000+00:00
       properties:
         id:
           format: int64
           readOnly: true
-          type: integer
-        title:
-          type: string
-        description:
-          type: string
-        category:
-          type: string
         createdAt:
           format: date-time
           readOnly: true
-          type: string
         updatedAt:
           format: date-time
           readOnly: true
-          type: string
       required:
-      - category
       - createdAt
-      - description
       - id
-      - title
       - updatedAt
     Writing:
       example:
@@ -485,11 +530,7 @@ components:
       - content
       - durationSeconds
       - themeId
-    NewThemeRequest:
-      example:
-        description: description
-        title: title
-        category: category
+    ThemeBase:
       properties:
         title:
           type: string
@@ -497,10 +538,30 @@ components:
           type: string
         category:
           type: string
+        timeLimitInSeconds:
+          format: int32
+          type: integer
+    NewThemeRequest:
+      allOf:
+      - $ref: '#/components/schemas/ThemeBase'
+      example:
+        timeLimitInSeconds: 0
+        description: description
+        title: title
+        category: category
       required:
       - category
       - description
+      - timeLimitInSeconds
       - title
+    UpdateThemeRequest:
+      allOf:
+      - $ref: '#/components/schemas/ThemeBase'
+      example:
+        timeLimitInSeconds: 0
+        description: description
+        title: title
+        category: category
     NewReviewRequest:
       example:
         writingId: 0

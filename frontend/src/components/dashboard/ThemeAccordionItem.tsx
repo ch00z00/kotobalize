@@ -2,7 +2,7 @@
 import React, { memo } from 'react';
 import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
-import { Writing, Theme } from '@/types/generated/models';
+import { Writing, Theme } from '@/types/generated/api';
 import LinkButton from '../atoms/LinkButton';
 import Tag from '../atoms/Tag';
 

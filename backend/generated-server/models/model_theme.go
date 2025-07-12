@@ -15,6 +15,8 @@ type Theme struct {
 
 	Category string `json:"category"`
 
+	TimeLimitInSeconds int `json:"timeLimitInSeconds"`
+
 	CreatedAt time.Time `json:"createdAt"`
 
 	UpdatedAt time.Time `json:"updatedAt"`

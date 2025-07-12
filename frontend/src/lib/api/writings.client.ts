@@ -2,9 +2,8 @@ import {
   NewReviewRequest,
   NewWritingRequest,
   Writing,
-} from '@/types/generated/models';
-import { PUBLIC_API_BASE_URL } from '@/lib/api/config';
-
+} from '@/types/generated/api';
+import { PUBLIC_API_BASE_URL } from './config';
 /**
  * Submits a new writing to the backend.
  * This function is designed to be called from the client-side and requires authentication.
@@ -29,10 +28,12 @@ export async function createWriting(
 
   if (!res.ok) {
     // The backend provides a structured error message, which we can throw.
-    throw new Error(data.message || 'Failed to create writing');
+    throw new Error(
+      (data as { message: string }).message || 'Failed to create writing'
+    );
   }
 
-  return data;
+  return data as Writing;
 }
 
 /**
@@ -51,10 +52,33 @@ export async function getWritings(token: string): Promise<Writing[]> {
   const data = await res.json();
 
   if (!res.ok) {
-    throw new Error(data.message || 'Failed to fetch writings');
+    throw new Error(
+      (data as { message: string }).message || 'Failed to fetch writings'
+    );
   }
 
-  return data;
+  return data as Writing[];
+}
+
+export async function getWritingById(
+  writingId: number,
+  token: string
+): Promise<Writing> {
+  const res = await fetch(`${PUBLIC_API_BASE_URL}/writings/${writingId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await res.json();
+
+  if (!res.ok) {
+    throw new Error(
+      (data as { message: string }).message || 'Failed to fetch writing'
+    );
+  }
+
+  return data as Writing;
 }
 
 /**
@@ -80,8 +104,10 @@ export async function requestAiReview(
   const data = await res.json();
 
   if (!res.ok) {
-    throw new Error(data.message || 'Failed to request AI review');
+    throw new Error(
+      (data as { message: string }).message || 'Failed to request AI review'
+    );
   }
 
-  return data;
+  return data as Writing;
 }
