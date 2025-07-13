@@ -681,6 +681,7 @@ components:
     LoginRequest:
       example:
         password: password
+        rememberMe: true
         email: email
       properties:
         email:
@@ -689,6 +690,9 @@ components:
         password:
           format: password
           type: string
+        rememberMe:
+          description: "If true, the token will have a longer expiration time."
+          type: boolean
       required:
       - email
       - password

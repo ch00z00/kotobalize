@@ -7,7 +7,7 @@ interface AuthState {
   token: string | null;
   user: User | null;
   isLoggedIn: () => boolean;
-  login: (token: string, user: User) => void;
+  login: (token: string, user: User, rememberMe: boolean) => void;
   logout: () => void;
   updateAvatar: (avatarUrl: string) => void;
 }
@@ -22,12 +22,16 @@ export const useAuthStore = create<AuthState>()(
       token: null,
       user: null,
       isLoggedIn: () => !!get().token,
-      login: (token, user) => {
+      login: (token, user, rememberMe) => {
         // 1. Update Zustand state
         set({ token, user });
         // 2. Set Cookie for server component authentication
         // path: '/' for site-wide validity
-        Cookies.set('token', token, { path: '/', expires: 7 }); // 7 days
+        const cookieOptions: { path: string; expires?: number } = { path: '/' };
+        if (rememberMe) {
+          cookieOptions.expires = 30; // 30 days
+        }
+        Cookies.set('token', token, cookieOptions);
       },
       logout: () => {
         // 1. Clear Zustand state

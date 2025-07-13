@@ -117,6 +117,12 @@ export interface LoginRequest {
      * @memberof LoginRequest
      */
     'password': string;
+    /**
+     * If true, the token will have a longer expiration time.
+     * @type {boolean}
+     * @memberof LoginRequest
+     */
+    'rememberMe'?: boolean;
 }
 /**
  * 

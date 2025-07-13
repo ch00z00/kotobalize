@@ -14,6 +14,9 @@ interface AuthFormProps {
   bottomLinkText: string;
   bottomLinkPrompt: string;
   error?: string | null;
+  showRememberMe?: boolean;
+  rememberMe?: boolean;
+  onRememberMeChange?: (checked: boolean) => void;
 }
 
 export default function AuthForm({
@@ -26,6 +29,9 @@ export default function AuthForm({
   bottomLinkText,
   bottomLinkPrompt,
   error,
+  showRememberMe = false,
+  rememberMe = false,
+  onRememberMeChange = () => {},
 }: AuthFormProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -90,6 +96,24 @@ export default function AuthForm({
               />
             </div>
           </div>
+          {showRememberMe && (
+            <div className="flex items-center">
+              <input
+                id="remember-me"
+                name="remember-me"
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => onRememberMeChange(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+              />
+              <label
+                htmlFor="remember-me"
+                className="ml-2 block text-sm text-gray-900"
+              >
+                ログイン状態を保持する
+              </label>
+            </div>
+          )}
           {error && (
             <p className="text-sm text-center text-red-600 mt-2">{error}</p>
           )}

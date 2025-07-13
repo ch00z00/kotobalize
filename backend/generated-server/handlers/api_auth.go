@@ -66,8 +66,14 @@ func (c *Container) LoginUser(ctx *gin.Context) {
 		return
 	}
 
+	// Set token expiration
+	expirationTime := time.Now().Add(time.Hour * 24) // デフォルトは24時間
+	if req.RememberMe {
+		expirationTime = time.Now().Add(time.Hour * 24 * 30) // rememberMeがtrueなら30日間
+	}
+
 	// Generate JWT
-	token, err := generateJWT(user, c.JWTSecret)
+	token, err := generateJWT(user, c.JWTSecret, expirationTime)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "INTERNAL_ERROR", Message: "Failed to generate token"})
 		return
@@ -130,8 +136,10 @@ func (c *Container) SignupUser(ctx *gin.Context) {
 		return
 	}
 
+	// For signup, the token is valid for the default session duration (24 hours).
+	expirationTime := time.Now().Add(time.Hour * 24)
 	// Generate JWT
-	token, err := generateJWT(newUser, c.JWTSecret)
+	token, err := generateJWT(newUser, c.JWTSecret, expirationTime)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "INTERNAL_ERROR", Message: "Failed to generate token"})
 		return
@@ -156,13 +164,13 @@ func (c *Container) SignupUser(ctx *gin.Context) {
 }
 
 // generateJWT creates a new JWT for a given user.
-func generateJWT(user models.GormUser, secret string) (string, error) {
+func generateJWT(user models.GormUser, secret string, expirationTime time.Time) (string, error) {
 	// Create the claims
 	claims := jwt.MapClaims{
 		"sub":   user.ID,
 		"email": user.Email,
 		"iat":   time.Now().Unix(),
-		"exp":   time.Now().Add(time.Hour * 24 * 7).Unix(), // Token expires in 7 days
+		"exp":   expirationTime.Unix(),
 	}
 
 	// Create token

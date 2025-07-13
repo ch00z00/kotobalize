@@ -640,6 +640,9 @@ components:
     password:
      type: string
      format: password
+    rememberMe:
+     type: boolean
+     description: "If true, the token will have a longer expiration time."
    required:
     - email
     - password

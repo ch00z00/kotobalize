@@ -7,6 +7,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **email** | **string** |  | [default to undefined]
 **password** | **string** |  | [default to undefined]
+**rememberMe** | **boolean** | If true, the token will have a longer expiration time. | [optional] [default to undefined]
 
 ## Example
 
@@ -16,6 +17,7 @@ import { LoginRequest } from './api';
 const instance: LoginRequest = {
     email,
     password,
+    rememberMe,
 };
 ```
 
