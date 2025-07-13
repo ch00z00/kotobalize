@@ -13,9 +13,8 @@ export default function SignupPage() {
     setError(null);
     try {
       await signupUser({ email, password });
-      // On successful signup, redirect to the login page to have the user log in.
-      alert('新規登録が完了しました。ログインしてください。');
-      router.push('/login');
+      // On successful signup, redirect to the login page with a success message.
+      router.push('/login?from=signup');
     } catch (err) {
       setError(err instanceof Error ? err.message : '新規登録に失敗しました。');
     }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, ChangeEvent, useEffect } from 'react';
+import { User } from 'lucide-react';
 import Image from 'next/image';
 import { useAuthStore } from '@/store/auth';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
@@ -12,23 +13,6 @@ import {
 } from '@/lib/api/users.client';
 import DeleteModal from '@/components/organisms/DeleteModal';
 import Banner from '@/components/molecules/Banner';
-
-function UserIcon() {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      className="h-full w-full text-gray-400"
-    >
-      <path
-        fillRule="evenodd"
-        d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
-}
 
 export default function ProfilePage() {
   const { user, token, updateAvatar } = useAuthStore();
@@ -159,7 +143,7 @@ export default function ProfilePage() {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <UserIcon />
+                  <User className="h-full w-full p-5 text-gray-400" />
                 )}
               </div>
             </div>
