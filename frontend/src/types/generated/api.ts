@@ -260,6 +260,12 @@ export interface Theme {
      * @memberof Theme
      */
     'creatorId'?: number;
+    /**
+     * Indicates if the current user has favorited this theme.
+     * @type {boolean}
+     * @memberof Theme
+     */
+    'isFavorited'?: boolean;
 }
 /**
  * 
@@ -745,6 +751,44 @@ export const ThemesApiAxiosParamCreator = function (configuration?: Configuratio
         },
         /**
          * 
+         * @summary Favorite a theme
+         * @param {number} themeId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        favoriteTheme: async (themeId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'themeId' is not null or undefined
+            assertParamExists('favoriteTheme', 'themeId', themeId)
+            const localVarPath = `/themes/{themeId}/favorite`
+                .replace(`{${"themeId"}}`, encodeURIComponent(String(themeId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get details of a specific theme by ID
          * @param {number} themeId 
          * @param {*} [options] Override http request option.
@@ -797,6 +841,44 @@ export const ThemesApiAxiosParamCreator = function (configuration?: Configuratio
             }
 
             const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
+         * @summary Unfavorite a theme
+         * @param {number} themeId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        unfavoriteTheme: async (themeId: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'themeId' is not null or undefined
+            assertParamExists('unfavoriteTheme', 'themeId', themeId)
+            const localVarPath = `/themes/{themeId}/favorite`
+                .replace(`{${"themeId"}}`, encodeURIComponent(String(themeId)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'DELETE', ...baseOptions, ...options};
             const localVarHeaderParameter = {} as any;
             const localVarQueryParameter = {} as any;
 
@@ -897,6 +979,19 @@ export const ThemesApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Favorite a theme
+         * @param {number} themeId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async favoriteTheme(themeId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.favoriteTheme(themeId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ThemesApi.favoriteTheme']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary Get details of a specific theme by ID
          * @param {number} themeId 
          * @param {*} [options] Override http request option.
@@ -918,6 +1013,19 @@ export const ThemesApiFp = function(configuration?: Configuration) {
             const localVarAxiosArgs = await localVarAxiosParamCreator.listThemes(options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ThemesApi.listThemes']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
+         * @summary Unfavorite a theme
+         * @param {number} themeId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async unfavoriteTheme(themeId: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<void>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.unfavoriteTheme(themeId, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['ThemesApi.unfavoriteTheme']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
@@ -966,6 +1074,16 @@ export const ThemesApiFactory = function (configuration?: Configuration, basePat
         },
         /**
          * 
+         * @summary Favorite a theme
+         * @param {number} themeId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        favoriteTheme(themeId: number, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.favoriteTheme(themeId, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get details of a specific theme by ID
          * @param {number} themeId 
          * @param {*} [options] Override http request option.
@@ -982,6 +1100,16 @@ export const ThemesApiFactory = function (configuration?: Configuration, basePat
          */
         listThemes(options?: RawAxiosRequestConfig): AxiosPromise<Array<Theme>> {
             return localVarFp.listThemes(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Unfavorite a theme
+         * @param {number} themeId 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        unfavoriteTheme(themeId: number, options?: RawAxiosRequestConfig): AxiosPromise<void> {
+            return localVarFp.unfavoriteTheme(themeId, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1030,6 +1158,18 @@ export class ThemesApi extends BaseAPI {
 
     /**
      * 
+     * @summary Favorite a theme
+     * @param {number} themeId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ThemesApi
+     */
+    public favoriteTheme(themeId: number, options?: RawAxiosRequestConfig) {
+        return ThemesApiFp(this.configuration).favoriteTheme(themeId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
      * @summary Get details of a specific theme by ID
      * @param {number} themeId 
      * @param {*} [options] Override http request option.
@@ -1049,6 +1189,18 @@ export class ThemesApi extends BaseAPI {
      */
     public listThemes(options?: RawAxiosRequestConfig) {
         return ThemesApiFp(this.configuration).listThemes(options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Unfavorite a theme
+     * @param {number} themeId 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof ThemesApi
+     */
+    public unfavoriteTheme(themeId: number, options?: RawAxiosRequestConfig) {
+        return ThemesApiFp(this.configuration).unfavoriteTheme(themeId, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

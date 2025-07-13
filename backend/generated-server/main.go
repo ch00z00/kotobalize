@@ -1,10 +1,12 @@
 package main
 
 import (
+	"flag"
 	"log"
 
 	"github.com/ch00z00/kotobalize/handlers"
 	"github.com/ch00z00/kotobalize/middleware"
+	"github.com/ch00z00/kotobalize/models"
 	"github.com/ch00z00/kotobalize/seeder"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -20,10 +22,37 @@ import (
  */
 
 func main() {
+	// --reset-db フラグを定義します。このフラグが指定されると、DBがリセットされます。
+	resetDB := flag.Bool("reset-db", false, "Reset the database by dropping all tables before migrating.")
+	flag.Parse()
+
 	// Initialize container with DB connection
 	c, err := handlers.NewContainer()
 	if err != nil {
 		log.Fatalf("failed to create container: %v", err)
+	}
+
+	// --reset-db フラグが true の場合、既存のテーブルをすべて削除します。
+	// 注意: この操作は元に戻せません。
+	if *resetDB {
+		log.Println("WARNING: --reset-db flag is set. Dropping all tables...")
+		err := c.DB.Migrator().DropTable(
+			&models.GormUser{},
+			&models.GormTheme{},
+			&models.GormWriting{},
+			&models.UserFavoriteTheme{}, // 新しいお気に入りモデルも対象に含めます
+		)
+		if err != nil {
+			log.Fatalf("failed to drop tables: %v", err)
+		}
+		log.Println("All tables dropped successfully.")
+	}
+
+	// データベースのマイグレーションを実行します。
+	// 必要なテーブルやカラムが自動で作成されます。
+	log.Println("Running database migrations...")
+	if err := c.DB.AutoMigrate(&models.GormUser{}, &models.GormTheme{}, &models.GormWriting{}, &models.UserFavoriteTheme{}); err != nil {
+		log.Fatalf("failed to migrate database: %v", err)
 	}
 
 	// Seed the database with initial data
@@ -67,6 +96,8 @@ func main() {
 			protected.POST("/themes", c.CreateTheme)
 			protected.PUT("/themes/:themeId", c.UpdateTheme)
 			protected.DELETE("/themes/:themeId", c.DeleteTheme)
+			protected.POST("/themes/:themeId/favorite", c.FavoriteTheme)
+			protected.DELETE("/themes/:themeId/favorite", c.UnfavoriteTheme)
 
 			protected.GET("/writings", c.ListUserWritings)
 			protected.POST("/writings", c.CreateWriting)

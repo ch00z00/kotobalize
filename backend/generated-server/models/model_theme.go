@@ -17,6 +17,8 @@ type Theme struct {
 
 	TimeLimitInSeconds int `json:"timeLimitInSeconds"`
 
+	IsFavorited bool `json:"isFavorited"`
+
 	CreatedAt time.Time `json:"createdAt"`
 
 	UpdatedAt time.Time `json:"updatedAt"`

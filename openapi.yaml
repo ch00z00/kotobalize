@@ -272,6 +272,52 @@ paths:
     "404":
      $ref: "#/components/responses/NotFound"
 
+ /themes/{themeId}/favorite:
+  post:
+   summary: Favorite a theme
+   operationId: favoriteTheme
+   tags:
+    - Themes
+   security:
+    - bearerAuth: []
+   parameters:
+    - name: themeId
+      in: path
+      required: true
+      schema:
+       type: integer
+       format: int64
+   responses:
+    "204":
+     description: Theme favorited successfully
+    "401":
+     $ref: "#/components/responses/Unauthorized"
+    "404":
+     $ref: "#/components/responses/NotFound"
+    "409":
+     $ref: "#/components/responses/Conflict"
+  delete:
+   summary: Unfavorite a theme
+   operationId: unfavoriteTheme
+   tags:
+    - Themes
+   security:
+    - bearerAuth: []
+   parameters:
+    - name: themeId
+      in: path
+      required: true
+      schema:
+       type: integer
+       format: int66
+   responses:
+    "204":
+     description: Theme unfavorited successfully
+    "401":
+     $ref: "#/components/responses/Unauthorized"
+    "404":
+     $ref: "#/components/responses/NotFound"
+
  /writings:
   get:
    summary: Get a list of all writings for the authenticated user
@@ -456,6 +502,10 @@ components:
      nullable: true
      readOnly: true
      description: "ID of the user who created the theme. Null for official themes."
+    isFavorited:
+     type: boolean
+     readOnly: true
+     description: "Indicates if the current user has favorited this theme."
    required:
     - id
     - title
@@ -660,6 +710,13 @@ components:
       $ref: "#/components/schemas/ApiError"
   NotFound:
    description: Not Found - Resource not found
+   content:
+    application/json:
+     schema:
+      $ref: "#/components/schemas/ApiError"
+
+  Conflict:
+   description: Conflict - The request could not be completed due to a conflict with the current state of the resource.
    content:
     application/json:
      schema:

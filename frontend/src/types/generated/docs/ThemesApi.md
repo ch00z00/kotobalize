@@ -6,8 +6,10 @@ All URIs are relative to *http://localhost:8080/api/v1*
 |------------- | ------------- | -------------|
 |[**createTheme**](#createtheme) | **POST** /themes | Create a new theme|
 |[**deleteTheme**](#deletetheme) | **DELETE** /themes/{themeId} | Delete a theme|
+|[**favoriteTheme**](#favoritetheme) | **POST** /themes/{themeId}/favorite | Favorite a theme|
 |[**getThemeById**](#getthemebyid) | **GET** /themes/{themeId} | Get details of a specific theme by ID|
 |[**listThemes**](#listthemes) | **GET** /themes | Get a list of all available themes|
+|[**unfavoriteTheme**](#unfavoritetheme) | **DELETE** /themes/{themeId}/favorite | Unfavorite a theme|
 |[**updateTheme**](#updatetheme) | **PUT** /themes/{themeId} | Update an existing theme|
 
 # **createTheme**
@@ -115,6 +117,59 @@ void (empty response body)
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **favoriteTheme**
+> favoriteTheme()
+
+
+### Example
+
+```typescript
+import {
+    ThemesApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new ThemesApi(configuration);
+
+let themeId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.favoriteTheme(
+    themeId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **themeId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**204** | Theme favorited successfully |  -  |
+|**401** | Unauthorized - Authentication required or invalid credentials |  -  |
+|**404** | Not Found - Resource not found |  -  |
+|**409** | Conflict - The request could not be completed due to a conflict with the current state of the resource. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **getThemeById**
 > Theme getThemeById()
 
@@ -208,6 +263,58 @@ This endpoint does not have any parameters.
 |-------------|-------------|------------------|
 |**200** | A list of themes |  -  |
 |**401** | Unauthorized - Authentication required or invalid credentials |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **unfavoriteTheme**
+> unfavoriteTheme()
+
+
+### Example
+
+```typescript
+import {
+    ThemesApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new ThemesApi(configuration);
+
+let themeId: number; // (default to undefined)
+
+const { status, data } = await apiInstance.unfavoriteTheme(
+    themeId
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **themeId** | [**number**] |  | defaults to undefined|
+
+
+### Return type
+
+void (empty response body)
+
+### Authorization
+
+[bearerAuth](../README.md#bearerAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**204** | Theme unfavorited successfully |  -  |
+|**401** | Unauthorized - Authentication required or invalid credentials |  -  |
+|**404** | Not Found - Resource not found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

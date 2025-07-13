@@ -105,6 +105,12 @@ func getRoutes(handleFunctions ApiHandleFunctions) []Route {
 			handleFunctions.ThemesAPI.DeleteTheme,
 		},
 		{
+			"FavoriteTheme",
+			http.MethodPost,
+			"/api/v1/themes/:themeId/favorite",
+			handleFunctions.ThemesAPI.FavoriteTheme,
+		},
+		{
 			"GetThemeById",
 			http.MethodGet,
 			"/api/v1/themes/:themeId",
@@ -115,6 +121,12 @@ func getRoutes(handleFunctions ApiHandleFunctions) []Route {
 			http.MethodGet,
 			"/api/v1/themes",
 			handleFunctions.ThemesAPI.ListThemes,
+		},
+		{
+			"UnfavoriteTheme",
+			http.MethodDelete,
+			"/api/v1/themes/:themeId/favorite",
+			handleFunctions.ThemesAPI.UnfavoriteTheme,
 		},
 		{
 			"UpdateTheme",

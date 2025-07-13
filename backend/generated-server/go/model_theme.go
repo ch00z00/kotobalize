@@ -31,4 +31,7 @@ type Theme struct {
 
 	// ID of the user who created the theme. Null for official themes.
 	CreatorId int64 `json:"creatorId,omitempty"`
+
+	// Indicates if the current user has favorited this theme.
+	IsFavorited bool `json:"isFavorited,omitempty"`
 }

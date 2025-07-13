@@ -267,6 +267,55 @@ paths:
       summary: Update an existing theme
       tags:
       - Themes
+  /themes/{themeId}/favorite:
+    delete:
+      operationId: unfavoriteTheme
+      parameters:
+      - explode: false
+        in: path
+        name: themeId
+        required: true
+        schema:
+          format: int66
+          type: integer
+        style: simple
+      responses:
+        "204":
+          description: Theme unfavorited successfully
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+      security:
+      - bearerAuth: []
+      summary: Unfavorite a theme
+      tags:
+      - Themes
+    post:
+      operationId: favoriteTheme
+      parameters:
+      - explode: false
+        in: path
+        name: themeId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "204":
+          description: Theme favorited successfully
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+        "404":
+          $ref: '#/components/responses/NotFound'
+        "409":
+          $ref: '#/components/responses/Conflict'
+      security:
+      - bearerAuth: []
+      summary: Favorite a theme
+      tags:
+      - Themes
   /writings:
     get:
       operationId: listUserWritings
@@ -403,6 +452,13 @@ components:
           schema:
             $ref: '#/components/schemas/ApiError'
       description: Not Found - Resource not found
+    Conflict:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+      description: Conflict - The request could not be completed due to a conflict
+        with the current state of the resource.
   schemas:
     User:
       example:
@@ -443,6 +499,7 @@ components:
         timeLimitInSeconds: 6
         creatorId: 1
         description: description
+        isFavorited: true
         id: 0
         title: title
         category: category
@@ -475,6 +532,10 @@ components:
           readOnly: true
           type: integer
           nullable: true
+        isFavorited:
+          description: Indicates if the current user has favorited this theme.
+          readOnly: true
+          type: boolean
       required:
       - category
       - createdAt

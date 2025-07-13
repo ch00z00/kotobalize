@@ -10,6 +10,12 @@ import (
 	"gorm.io/gorm"
 )
 
+// ThemeWithFavorite is a struct that holds theme information and its favorite status.
+type ThemeWithFavorite struct {
+	models.GormTheme
+	IsFavorited bool `gorm:"column:is_favorited"`
+}
+
 // ListThemes - Get a list of all available themes
 func (c *Container) ListThemes(ctx *gin.Context) {
 	// Get user ID from the context (set by the auth middleware)
@@ -21,18 +27,22 @@ func (c *Container) ListThemes(ctx *gin.Context) {
 		return
 	}
 
-	var gormThemes []models.GormTheme
-	// Fetch all official themes (creator_id IS NULL) and themes created by the current user.
-	// Order by creator_id (NULLs first, showing official themes first) and then by creation date.
-	if err := c.DB.Where("creator_id IS NULL OR creator_id = ?", userID).Order("creator_id asc, created_at desc").Find(&gormThemes).Error; err != nil {
+	var results []ThemeWithFavorite
+	// LEFT JOIN を使って、各テーマがお気に入り登録されているかどうかの情報を一度に取得します。
+	if err := c.DB.Table("gorm_themes").
+		Select("gorm_themes.*, user_favorite_themes.user_id IS NOT NULL as is_favorited").
+		Joins("LEFT JOIN user_favorite_themes ON gorm_themes.id = user_favorite_themes.theme_id AND user_favorite_themes.user_id = ?", userID).
+		Where("gorm_themes.creator_id IS NULL OR gorm_themes.creator_id = ?", userID).
+		Order("gorm_themes.creator_id asc, gorm_themes.created_at desc").
+		Find(&results).Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to fetch themes"})
 		return
 	}
 
 	// Map GORM themes to API themes
-	apiThemes := make([]models.Theme, len(gormThemes))
-	for i, t := range gormThemes {
-		apiThemes[i] = mapGormThemeToAPI(t)
+	apiThemes := make([]models.Theme, len(results))
+	for i, r := range results {
+		apiThemes[i] = mapGormThemeToAPI(r.GormTheme, r.IsFavorited)
 	}
 
 	ctx.JSON(http.StatusOK, apiThemes)
@@ -56,9 +66,13 @@ func (c *Container) GetThemeByID(ctx *gin.Context) {
 	}
 
 	// Find the theme in the database
-	var gormTheme models.GormTheme
-	// A user can fetch a theme if it's official (creator_id IS NULL) or if they created it.
-	if err := c.DB.Where("id = ? AND (creator_id IS NULL OR creator_id = ?)", themeID, userID).First(&gormTheme).Error; err != nil {
+	var result ThemeWithFavorite
+	// LEFT JOIN を使って、テーマ情報とお気に入り状態を一度に取得します。
+	if err := c.DB.Table("gorm_themes").
+		Select("gorm_themes.*, user_favorite_themes.user_id IS NOT NULL as is_favorited").
+		Joins("LEFT JOIN user_favorite_themes ON gorm_themes.id = user_favorite_themes.theme_id AND user_favorite_themes.user_id = ?", userID).
+		Where("gorm_themes.id = ? AND (gorm_themes.creator_id IS NULL OR gorm_themes.creator_id = ?)", themeID, userID).
+		First(&result).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			ctx.JSON(http.StatusNotFound, models.APIError{Code: "THEME_NOT_FOUND", Message: "Theme not found or you don't have permission to view it"})
 			return
@@ -68,7 +82,7 @@ func (c *Container) GetThemeByID(ctx *gin.Context) {
 	}
 
 	// Map GORM model to API model for the response and return it
-	ctx.JSON(http.StatusOK, mapGormThemeToAPI(gormTheme))
+	ctx.JSON(http.StatusOK, mapGormThemeToAPI(result.GormTheme, result.IsFavorited))
 }
 
 // CreateTheme - Create a new theme record
@@ -109,7 +123,8 @@ func (c *Container) CreateTheme(ctx *gin.Context) {
 	}
 
 	// Return the newly created theme, converting it to the API model for the response.
-	ctx.JSON(http.StatusCreated, mapGormThemeToAPI(gormTheme))
+	// 新規作成したテーマは、デフォルトではお気に入り状態ではない (false)
+	ctx.JSON(http.StatusCreated, mapGormThemeToAPI(gormTheme, false))
 }
 
 // UpdateTheme - Update an existing theme
@@ -170,8 +185,12 @@ func (c *Container) UpdateTheme(ctx *gin.Context) {
 		return
 	}
 
+	// 更新後のテーマのお気に入り状態を確認します
+	var favorite models.UserFavoriteTheme
+	isFavorited := c.DB.Where("user_id = ? AND theme_id = ?", userID, themeID).First(&favorite).Error == nil
+
 	// Return updated theme
-	ctx.JSON(http.StatusOK, mapGormThemeToAPI(gormTheme))
+	ctx.JSON(http.StatusOK, mapGormThemeToAPI(gormTheme, isFavorited))
 }
 
 // DeleteTheme - Delete a theme
@@ -230,14 +249,84 @@ func (c *Container) DeleteTheme(ctx *gin.Context) {
 	ctx.Status(http.StatusNoContent)
 }
 
-// mapGormThemeToAPI converts a GORM theme model to an API theme model.
-func mapGormThemeToAPI(gormTheme models.GormTheme) models.Theme {
+// FavoriteTheme - Favorite a theme for the current user
+func (c *Container) FavoriteTheme(ctx *gin.Context) {
+	userID, exists := ctx.Get("userId")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, models.APIError{Code: "UNAUTHORIZED", Message: "User not authenticated"})
+		return
+	}
+
+	themeIDStr := ctx.Param("themeId")
+	themeID, err := strconv.ParseUint(themeIDStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, models.APIError{Code: "INVALID_INPUT", Message: "Invalid theme ID format"})
+		return
+	}
+
+	// Check if the theme exists
+	var theme models.GormTheme
+	if err := c.DB.First(&theme, themeID).Error; err != nil {
+		ctx.JSON(http.StatusNotFound, models.APIError{Code: "THEME_NOT_FOUND", Message: "Theme not found"})
+		return
+	}
+
+	// Create the favorite relationship
+	favorite := models.UserFavoriteTheme{
+		UserID:  userID.(uint),
+		ThemeID: uint(themeID),
+	}
+
+	// Use FirstOrCreate to avoid duplicate entries. If it already exists, do nothing.
+	// If you need to return a 409 Conflict, you'd check for existence first.
+	// For simplicity and idempotency, FirstOrCreate is often a good choice.
+	if err := c.DB.FirstOrCreate(&favorite).Error; err != nil {
+		// A real conflict error (e.g., from a race condition if not using FirstOrCreate)
+		if errors.Is(err, gorm.ErrDuplicatedKey) {
+			ctx.JSON(http.StatusConflict, models.APIError{Code: "ALREADY_FAVORITED", Message: "Theme is already favorited"})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to favorite theme"})
+		return
+	}
+
+	ctx.Status(http.StatusNoContent)
+}
+
+// UnfavoriteTheme - Unfavorite a theme for the current user
+func (c *Container) UnfavoriteTheme(ctx *gin.Context) {
+	userID, exists := ctx.Get("userId")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, models.APIError{Code: "UNAUTHORIZED", Message: "User not authenticated"})
+		return
+	}
+
+	themeIDStr := ctx.Param("themeId")
+	themeID, err := strconv.ParseUint(themeIDStr, 10, 64)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, models.APIError{Code: "INVALID_INPUT", Message: "Invalid theme ID format"})
+		return
+	}
+
+	// Delete the favorite relationship
+	favorite := models.UserFavoriteTheme{
+		UserID:  userID.(uint),
+		ThemeID: uint(themeID),
+	}
+	c.DB.Delete(&favorite) // GORM deletes based on primary key fields
+
+	ctx.Status(http.StatusNoContent)
+}
+
+// mapGormThemeToAPI converts a GORM theme model and its favorite status to an API theme model.
+func mapGormThemeToAPI(gormTheme models.GormTheme, isFavorited bool) models.Theme {
 	return models.Theme{
 		ID:                 int64(gormTheme.ID),
 		Title:              gormTheme.Title,
 		Description:        gormTheme.Description,
 		Category:           gormTheme.Category,
 		TimeLimitInSeconds: gormTheme.TimeLimitInSeconds,
+		IsFavorited:        isFavorited,
 		CreatedAt:          gormTheme.CreatedAt,
 		UpdatedAt:          gormTheme.UpdatedAt,
 		CreatorID:          gormTheme.CreatorID,
