@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, Fragment } from 'react';
 import { useAuthStore } from '@/store/auth';
 import { Theme } from '@/types/generated/api';
 import { deleteTheme } from '@/lib/api/themes.client';
@@ -18,6 +18,8 @@ interface ThemeBrowserProps {
   initialThemes: Theme[];
 }
 
+type Tab = 'official' | 'my';
+
 export default function ThemeBrowser({ initialThemes }: ThemeBrowserProps) {
   // サーバーから渡された初期テーマをstateとして保持
   const [themes, setThemes] = useState<Theme[]>(initialThemes);
@@ -28,6 +30,7 @@ export default function ThemeBrowser({ initialThemes }: ThemeBrowserProps) {
   const [deletingThemeId, setDeletingThemeId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState<Tab>('official');
   const [isLoading, setIsLoading] = useState(false);
   const [notification, setNotification] = useState<{
     message: string;
@@ -119,6 +122,39 @@ export default function ThemeBrowser({ initialThemes }: ThemeBrowserProps) {
     });
   }, [themes, searchQuery, selectedCategories]);
 
+  // Divide themes into official and my themes
+  const { officialThemes, myThemes } = useMemo(() => {
+    const official: Theme[] = [];
+    const my: Theme[] = [];
+    filteredThemes.forEach((theme) => {
+      if (theme.creatorId) {
+        my.push(theme);
+      } else {
+        official.push(theme);
+      }
+    });
+    return { officialThemes: official, myThemes: my };
+  }, [filteredThemes]);
+
+  // フィルタリング前のマイテーマの総数を計算
+  const totalMyThemesCount = useMemo(
+    () => themes.filter((theme) => !!theme.creatorId).length,
+    [themes]
+  );
+
+  const EmptyState = ({
+    title,
+    message,
+  }: {
+    title: string;
+    message: string;
+  }) => (
+    <div className="mt-16 text-center text-gray-500">
+      <p className="text-lg font-semibold">{title}</p>
+      <p className="mt-2">{message}</p>
+    </div>
+  );
+
   return (
     <>
       {notification && (
@@ -151,29 +187,79 @@ export default function ThemeBrowser({ initialThemes }: ThemeBrowserProps) {
         </div>
       </div>
 
-      {filteredThemes.length > 0 ? (
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredThemes.map((theme) => (
-            <ThemeCard
-              key={theme.id}
-              theme={theme}
-              onEdit={() => handleEditClick(theme)}
-              onDelete={() => handleDeleteClick(theme.id)}
-            />
-          ))}
-        </div>
-      ) : themes.length > 0 ? (
-        <div className="mt-16 text-center text-gray-500">
-          <p className="text-lg">該当するテーマが見つかりませんでした。</p>
-          <p className="mt-2">検索条件を変更してお試しください。</p>
-        </div>
+      {themes.length > 0 ? (
+        <>
+          {/* Tabs */}
+          <div className="mb-6 border-b border-gray-200">
+            <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+              <button
+                onClick={() => setActiveTab('official')}
+                className={`whitespace-nowrap border-b-2 py-4 px-1 text-md font-semibold duration-150 ease-in-out transition-colors ${
+                  activeTab === 'official'
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-gray-500 hover:border-gray-300'
+                }`}
+              >
+                公式テーマ
+              </button>
+              <button
+                onClick={() => setActiveTab('my')}
+                className={`whitespace-nowrap border-b-2 py-4 px-1 text-md font-semibold duration-150 ease-in-out transition-colors ${
+                  activeTab === 'my'
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-gray-500 hover:border-gray-300'
+                }`}
+              >
+                マイテーマ
+              </button>
+            </nav>
+          </div>
+
+          {/* Tab Content */}
+          <div>
+            {activeTab === 'official' &&
+              (officialThemes.length > 0 ? (
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {officialThemes.map((theme) => (
+                    <ThemeCard key={theme.id} theme={theme} />
+                  ))}
+                </div>
+              ) : (
+                <EmptyState
+                  title="該当する公式テーマがありません"
+                  message="検索条件を変更するか、フィルターをクリアしてください。"
+                />
+              ))}
+            {activeTab === 'my' &&
+              (myThemes.length > 0 ? (
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {myThemes.map((theme) => (
+                    <ThemeCard
+                      key={theme.id}
+                      theme={theme}
+                      onEdit={() => handleEditClick(theme)}
+                      onDelete={() => handleDeleteClick(theme.id)}
+                    />
+                  ))}
+                </div>
+              ) : totalMyThemesCount > 0 ? (
+                <EmptyState
+                  title="該当するマイテーマがありません"
+                  message="検索条件を変更するか、フィルターをクリアしてください。"
+                />
+              ) : (
+                <EmptyState
+                  title="マイテーマはまだありません"
+                  message="右上の「新しいテーマを追加」ボタンから最初のテーマを作成しましょう！"
+                />
+              ))}
+          </div>
+        </>
       ) : (
-        <div className="mt-16 text-center text-gray-500">
-          <p className="text-lg">テーマがまだありません。</p>
-          <p className="mt-2">
-            右上の「新しいテーマを追加」ボタンから最初のテーマを作成しましょう！
-          </p>
-        </div>
+        <EmptyState
+          title="テーマがまだありません"
+          message="右上の「新しいテーマを追加」ボタンから最初のテーマを作成しましょう！"
+        />
       )}
       <CreateThemeModal
         isOpen={isCreateModalOpen}
