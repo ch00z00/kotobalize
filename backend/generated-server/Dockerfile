@@ -1,3 +1,4 @@
+# Builder stage
 FROM golang:1.24-alpine AS build
 
 WORKDIR /app
@@ -12,6 +13,7 @@ COPY . .
 ENV CGO_ENABLED=0
 RUN go build -o /app/main .
 
+# Runtime stage
 FROM alpine:3.18
 ENV GIN_MODE=release
 WORKDIR /app

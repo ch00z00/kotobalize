@@ -12,8 +12,8 @@ Name | Type | Description | Notes
 **timeLimitInSeconds** | **number** |  | [default to undefined]
 **createdAt** | **string** |  | [readonly] [default to undefined]
 **updatedAt** | **string** |  | [readonly] [default to undefined]
-**creatorId** | **number** | ID of the user who created the theme. Null for official themes. | [optional] [readonly] [default to undefined]
-**isFavorited** | **boolean** | Indicates if the current user has favorited this theme. | [optional] [readonly] [default to undefined]
+**creatorId** | **number** | ID of the user who created the theme. Null for official themes. | [readonly] [default to undefined]
+**isFavorited** | **boolean** | Indicates if the current user has favorited this theme. | [readonly] [default to undefined]
 
 ## Example
 

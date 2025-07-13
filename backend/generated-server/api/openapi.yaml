@@ -539,8 +539,10 @@ components:
       required:
       - category
       - createdAt
+      - creatorId
       - description
       - id
+      - isFavorited
       - timeLimitInSeconds
       - title
       - updatedAt

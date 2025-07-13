@@ -3,7 +3,11 @@
 import { useState, useMemo, useEffect, Fragment } from 'react';
 import { useAuthStore } from '@/store/auth';
 import { Theme } from '@/types/generated/api';
-import { deleteTheme } from '@/lib/api/themes.client';
+import {
+  deleteTheme,
+  favoriteTheme,
+  unfavoriteTheme,
+} from '@/lib/api/themes.client';
 import Button from '@/components/atoms/Button';
 import CreateThemeModal from '@/components/themes/CreateThemeModal';
 import EditThemeModal from '@/components/themes/EditThemeModal';
@@ -18,7 +22,7 @@ interface ThemeBrowserProps {
   initialThemes: Theme[];
 }
 
-type Tab = 'official' | 'my';
+type Tab = 'official' | 'my' | 'favorites';
 
 export default function ThemeBrowser({ initialThemes }: ThemeBrowserProps) {
   // サーバーから渡された初期テーマをstateとして保持
@@ -66,6 +70,45 @@ export default function ThemeBrowser({ initialThemes }: ThemeBrowserProps) {
   }, [notification]);
 
   const { token } = useAuthStore();
+
+  const handleToggleFavorite = async (
+    themeId: number,
+    isFavorited: boolean
+  ) => {
+    if (!token) {
+      setNotification({ message: 'ログインしてください。', type: 'error' });
+      return;
+    }
+
+    // Optimistic UI update for instant feedback
+    setThemes((prevThemes) =>
+      prevThemes.map((t) =>
+        t.id === themeId ? { ...t, isFavorited: !t.isFavorited } : t
+      )
+    );
+
+    try {
+      if (isFavorited) {
+        await unfavoriteTheme(themeId, token);
+      } else {
+        await favoriteTheme(themeId, token);
+      }
+    } catch (err) {
+      // Revert on error
+      setThemes((prevThemes) =>
+        prevThemes.map((t) =>
+          t.id === themeId ? { ...t, isFavorited: !t.isFavorited } : t
+        )
+      );
+      setNotification({
+        message:
+          err instanceof Error
+            ? err.message
+            : 'お気に入りの更新に失敗しました。',
+        type: 'error',
+      });
+    }
+  };
 
   const handleEditClick = (theme: Theme) => {
     setEditingTheme(theme);
@@ -123,22 +166,34 @@ export default function ThemeBrowser({ initialThemes }: ThemeBrowserProps) {
   }, [themes, searchQuery, selectedCategories]);
 
   // Divide themes into official and my themes
-  const { officialThemes, myThemes } = useMemo(() => {
+  const { officialThemes, myThemes, favoritedThemes } = useMemo(() => {
     const official: Theme[] = [];
     const my: Theme[] = [];
+    const favorited: Theme[] = [];
     filteredThemes.forEach((theme) => {
+      if (theme.isFavorited) {
+        favorited.push(theme);
+      }
       if (theme.creatorId) {
         my.push(theme);
       } else {
         official.push(theme);
       }
     });
-    return { officialThemes: official, myThemes: my };
+    return {
+      officialThemes: official,
+      myThemes: my,
+      favoritedThemes: favorited,
+    };
   }, [filteredThemes]);
 
   // フィルタリング前のマイテーマの総数を計算
   const totalMyThemesCount = useMemo(
     () => themes.filter((theme) => !!theme.creatorId).length,
+    [themes]
+  );
+  const totalFavoritedThemesCount = useMemo(
+    () => themes.filter((theme) => theme.isFavorited).length,
     [themes]
   );
 
@@ -167,7 +222,7 @@ export default function ThemeBrowser({ initialThemes }: ThemeBrowserProps) {
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-800">THEMES</h1>
         <Button onClick={() => setCreateModalOpen(true)}>
-          新しいテーマを追加
+          マイテーマを追加
         </Button>
       </div>
 
@@ -212,6 +267,16 @@ export default function ThemeBrowser({ initialThemes }: ThemeBrowserProps) {
               >
                 マイテーマ
               </button>
+              <button
+                onClick={() => setActiveTab('favorites')}
+                className={`whitespace-nowrap border-b-2 py-4 px-1 text-md font-semibold duration-150 ease-in-out transition-colors ${
+                  activeTab === 'favorites'
+                    ? 'border-primary text-primary'
+                    : 'border-transparent text-gray-500 hover:border-gray-300'
+                }`}
+              >
+                お気に入り
+              </button>
             </nav>
           </div>
 
@@ -221,7 +286,13 @@ export default function ThemeBrowser({ initialThemes }: ThemeBrowserProps) {
               (officialThemes.length > 0 ? (
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {officialThemes.map((theme) => (
-                    <ThemeCard key={theme.id} theme={theme} />
+                    <ThemeCard
+                      key={theme.id}
+                      theme={theme}
+                      onToggleFavorite={() =>
+                        handleToggleFavorite(theme.id, !!theme.isFavorited)
+                      }
+                    />
                   ))}
                 </div>
               ) : (
@@ -239,6 +310,9 @@ export default function ThemeBrowser({ initialThemes }: ThemeBrowserProps) {
                       theme={theme}
                       onEdit={() => handleEditClick(theme)}
                       onDelete={() => handleDeleteClick(theme.id)}
+                      onToggleFavorite={() =>
+                        handleToggleFavorite(theme.id, !!theme.isFavorited)
+                      }
                     />
                   ))}
                 </div>
@@ -250,7 +324,41 @@ export default function ThemeBrowser({ initialThemes }: ThemeBrowserProps) {
               ) : (
                 <EmptyState
                   title="マイテーマはまだありません"
-                  message="右上の「新しいテーマを追加」ボタンから最初のテーマを作成しましょう！"
+                  message="右上の「マイテーマを追加」ボタンから自作のテーマを作成しましょう！"
+                />
+              ))}
+            {activeTab === 'favorites' &&
+              (favoritedThemes.length > 0 ? (
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {favoritedThemes.map((theme) => (
+                    <ThemeCard
+                      key={theme.id}
+                      theme={theme}
+                      onEdit={
+                        theme.creatorId
+                          ? () => handleEditClick(theme)
+                          : undefined
+                      }
+                      onDelete={
+                        theme.creatorId
+                          ? () => handleDeleteClick(theme.id)
+                          : undefined
+                      }
+                      onToggleFavorite={() =>
+                        handleToggleFavorite(theme.id, !!theme.isFavorited)
+                      }
+                    />
+                  ))}
+                </div>
+              ) : totalFavoritedThemesCount > 0 ? (
+                <EmptyState
+                  title="該当するお気に入りテーマがありません"
+                  message="検索条件を変更するか、フィルターをクリアしてください。"
+                />
+              ) : (
+                <EmptyState
+                  title="お気に入りのテーマはありません"
+                  message="テーマカードの星マークを押してお気に入りに追加しましょう。"
                 />
               ))}
           </div>

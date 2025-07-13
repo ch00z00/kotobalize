@@ -259,13 +259,13 @@ export interface Theme {
      * @type {number}
      * @memberof Theme
      */
-    'creatorId'?: number;
+    'creatorId': number;
     /**
      * Indicates if the current user has favorited this theme.
      * @type {boolean}
      * @memberof Theme
      */
-    'isFavorited'?: boolean;
+    'isFavorited': boolean;
 }
 /**
  * 

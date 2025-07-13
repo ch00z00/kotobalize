@@ -514,6 +514,8 @@ components:
     - timeLimitInSeconds
     - createdAt
     - updatedAt
+    - creatorId
+    - isFavorited
 
   Writing:
    type: object

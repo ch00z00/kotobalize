@@ -109,3 +109,51 @@ export const deleteTheme = async (
     );
   }
 };
+
+/**
+ * Add a theme to favorites.
+ * @param themeId The ID of the theme to favorite.
+ * @param token The user's JWT.
+ */
+export const favoriteTheme = async (
+  themeId: number,
+  token: string
+): Promise<void> => {
+  const res = await fetch(`${PUBLIC_API_BASE_URL}/themes/${themeId}/favorite`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    const errorData = (await res.json().catch(() => ({}))) as ApiError;
+    throw new Error(
+      errorData.message || `Failed to favorite theme: ${res.statusText}`
+    );
+  }
+};
+
+/**
+ * Remove a theme from favorites.
+ * @param themeId The ID of the theme to unfavorite.
+ * @param token The user's JWT.
+ */
+export const unfavoriteTheme = async (
+  themeId: number,
+  token: string
+): Promise<void> => {
+  const res = await fetch(`${PUBLIC_API_BASE_URL}/themes/${themeId}/favorite`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    const errorData = (await res.json().catch(() => ({}))) as ApiError;
+    throw new Error(
+      errorData.message || `Failed to unfavorite theme: ${res.statusText}`
+    );
+  }
+};

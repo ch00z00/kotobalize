@@ -30,8 +30,8 @@ type Theme struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 
 	// ID of the user who created the theme. Null for official themes.
-	CreatorId int64 `json:"creatorId,omitempty"`
+	CreatorId int64 `json:"creatorId"`
 
 	// Indicates if the current user has favorited this theme.
-	IsFavorited bool `json:"isFavorited,omitempty"`
+	IsFavorited bool `json:"isFavorited"`
 }
