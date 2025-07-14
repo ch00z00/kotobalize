@@ -23,10 +23,10 @@ export default function DeleteModal({
 }: DeleteModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+      <div className="w-[400px] max-w-md rounded-lg bg-white p-6 shadow-xl">
         <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
         <div className="mt-2">
-          <p className="text-sm text-gray-500">{message}</p>
+          <p className="text-sm text-gray-500 whitespace-pre-line">{message}</p>
         </div>
         <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
           <Button

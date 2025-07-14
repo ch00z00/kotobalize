@@ -73,7 +73,7 @@ export default function EditThemeModal({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="w-full max-w-md rounded-lg bg-white p-8 shadow-xl">
+      <div className="w-[600px] max-w-md rounded-lg bg-white p-8 shadow-xl">
         <h2 className="mb-6 text-2xl font-bold text-gray-900">テーマを編集</h2>
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">

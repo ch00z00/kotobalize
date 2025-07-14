@@ -363,7 +363,7 @@ export default function ProfilePage() {
         onClose={() => setIsDeleteModalOpen(false)}
         onConfirm={handleDeleteAvatar}
         title="アバターの削除"
-        message="本当にアバターを削除しますか？この操作は元に戻せません。"
+        message={'本当にアバターを削除しますか？\nこの操作は元に戻せません。'}
         isLoading={isLoading}
       />
       <Modal

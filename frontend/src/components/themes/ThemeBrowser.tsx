@@ -17,6 +17,7 @@ import SearchInput from '@/components/molecules/SearchInput';
 import CategoryFilter from '@/components/organisms/CategoryFilter';
 import Banner from '@/components/molecules/Banner';
 import { THEME_CATEGORIES } from '@/constants/categories';
+import SortDropdown from '@/components/molecules/SortDropdown';
 import DeleteModal from '../organisms/DeleteModal';
 
 interface ThemeBrowserProps {
@@ -256,28 +257,14 @@ export default function ThemeBrowser({ initialThemes }: ThemeBrowserProps) {
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="テーマを検索..."
           />
-          <CategoryFilter
-            categories={THEME_CATEGORIES}
-            selectedCategories={selectedCategories}
-            onToggleCategory={handleToggleCategory}
-            onSelectAll={handleSelectAll}
-          />
-          <div className="flex items-center justify-end space-x-2">
-            <label
-              htmlFor="sort-by"
-              className="text-sm font-medium text-gray-600"
-            >
-              並び替え:
-            </label>
-            <select
-              id="sort-by"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as ListThemesSortEnum)}
-              className="rounded-md border-gray-300 py-1.5 pl-2 pr-8 text-sm focus:border-primary focus:ring-primary"
-            >
-              <option value="newest">新着順</option>
-              <option value="popular">人気順</option>
-            </select>
+          <div className="flex items-center justify-between">
+            <CategoryFilter
+              categories={THEME_CATEGORIES}
+              selectedCategories={selectedCategories}
+              onToggleCategory={handleToggleCategory}
+              onSelectAll={handleSelectAll}
+            />
+            <SortDropdown value={sortBy} onChange={setSortBy} />
           </div>
         </div>
       </div>
@@ -427,7 +414,7 @@ export default function ThemeBrowser({ initialThemes }: ThemeBrowserProps) {
         onClose={() => setDeleteModalOpen(false)}
         onConfirm={handleConfirmDelete}
         title="テーマの削除"
-        message="このテーマを本当に削除しますか？この操作は元に戻せません。"
+        message={'このテーマを本当に削除しますか？\nこの操作は元に戻せません。'}
         isLoading={isLoading}
       />
     </>
