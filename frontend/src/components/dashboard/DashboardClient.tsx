@@ -4,7 +4,7 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 
 import { useAuthStore } from '@/store/auth';
 import { getWritings } from '@/lib/api/writings.client';
-import { getThemesForClient } from '@/lib/api/themes.client';
+import { listThemes } from '@/lib/api/themes.client';
 import { Writing, Theme } from '@/types/generated/api';
 
 import StatCard from '@/components/molecules/card/StatCard';
@@ -57,7 +57,7 @@ export default function DashboardClient() {
       // Fetch both writings and themes concurrently
       const [writingsData, themesData] = await Promise.all([
         getWritings(token),
-        getThemesForClient(token),
+        listThemes(token),
       ]);
 
       // Create a map for quick theme lookup
