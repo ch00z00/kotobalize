@@ -10,6 +10,7 @@ interface AuthState {
   login: (token: string, user: User, rememberMe: boolean) => void;
   logout: () => void;
   updateAvatar: (avatarUrl: string) => void;
+  updateUser: (user: User) => void;
 }
 
 /**
@@ -43,6 +44,9 @@ export const useAuthStore = create<AuthState>()(
         set((state) => ({
           user: state.user ? { ...state.user, avatarUrl } : null,
         }));
+      },
+      updateUser: (user) => {
+        set({ user });
       },
     }),
     {
