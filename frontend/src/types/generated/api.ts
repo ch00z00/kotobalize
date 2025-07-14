@@ -26,6 +26,31 @@ import { BASE_PATH, COLLECTION_FORMATS, BaseAPI, RequiredError, operationServerM
 /**
  * 
  * @export
+ * @interface Activity
+ */
+export interface Activity {
+    /**
+     * The date of the activity in YYYY-MM-DD format.
+     * @type {string}
+     * @memberof Activity
+     */
+    'date': string;
+    /**
+     * The number of writings on that day.
+     * @type {number}
+     * @memberof Activity
+     */
+    'count': number;
+    /**
+     * The contribution level from 0 to 4.
+     * @type {number}
+     * @memberof Activity
+     */
+    'level': number;
+}
+/**
+ * 
+ * @export
  * @interface ApiError
  */
 export interface ApiError {
@@ -1367,6 +1392,40 @@ export const UsersApiAxiosParamCreator = function (configuration?: Configuration
         },
         /**
          * 
+         * @summary Get user\'s activity data for contribution graph
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserActivity: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/users/me/activity`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Update user\'s avatar URL
          * @param {UpdateAvatarRequest} updateAvatarRequest 
          * @param {*} [options] Override http request option.
@@ -1522,6 +1581,18 @@ export const UsersApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Get user\'s activity data for contribution graph
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getUserActivity(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Activity>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getUserActivity(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UsersApi.getUserActivity']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary Update user\'s avatar URL
          * @param {UpdateAvatarRequest} updateAvatarRequest 
          * @param {*} [options] Override http request option.
@@ -1590,6 +1661,15 @@ export const UsersApiFactory = function (configuration?: Configuration, basePath
         },
         /**
          * 
+         * @summary Get user\'s activity data for contribution graph
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getUserActivity(options?: RawAxiosRequestConfig): AxiosPromise<Array<Activity>> {
+            return localVarFp.getUserActivity(options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Update user\'s avatar URL
          * @param {UpdateAvatarRequest} updateAvatarRequest 
          * @param {*} [options] Override http request option.
@@ -1649,6 +1729,17 @@ export class UsersApi extends BaseAPI {
      */
     public getAvatarUploadURL(avatarUploadRequest: AvatarUploadRequest, options?: RawAxiosRequestConfig) {
         return UsersApiFp(this.configuration).getAvatarUploadURL(avatarUploadRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get user\'s activity data for contribution graph
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsersApi
+     */
+    public getUserActivity(options?: RawAxiosRequestConfig) {
+        return UsersApiFp(this.configuration).getUserActivity(options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

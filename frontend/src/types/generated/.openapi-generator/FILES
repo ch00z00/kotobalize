@@ -4,6 +4,7 @@ api.ts
 base.ts
 common.ts
 configuration.ts
+docs/Activity.md
 docs/ApiError.md
 docs/AuthApi.md
 docs/AuthResponse.md

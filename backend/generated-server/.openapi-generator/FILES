@@ -4,6 +4,7 @@ go/api_auth.go
 go/api_themes.go
 go/api_users.go
 go/api_writings.go
+go/model_activity.go
 go/model_api_error.go
 go/model_auth_response.go
 go/model_avatar_upload_request.go

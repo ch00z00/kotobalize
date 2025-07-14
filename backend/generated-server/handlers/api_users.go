@@ -201,6 +201,53 @@ func (c *Container) UpdateUserProfile(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, apiUser)
 }
 
+type dailyActivity struct {
+	Date  time.Time `gorm:"column:date"`
+	Count int       `gorm:"column:count"`
+}
+
+// GetUserActivity retrieves the user's writing activity for the contribution graph.
+func (c *Container) GetUserActivity(ctx *gin.Context) {
+	userID, exists := ctx.Get("userId")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, models.APIError{Code: "UNAUTHORIZED", Message: "User not authenticated"})
+		return
+	}
+
+	var activities []dailyActivity
+	if err := c.DB.Model(&models.GormWriting{}).
+		Select("DATE(created_at) as date, COUNT(*) as count").
+		Where("user_id = ? AND deleted_at IS NULL", userID).
+		Group("DATE(created_at)").
+		Find(&activities).Error; err != nil {
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to fetch activity data"})
+		return
+	}
+
+	apiActivities := make([]models.Activity, len(activities))
+	for i, activity := range activities {
+		level := 0
+		switch {
+		case activity.Count >= 7:
+			level = 4
+		case activity.Count >= 5:
+			level = 3
+		case activity.Count >= 3:
+			level = 2
+		case activity.Count >= 1:
+			level = 1
+		}
+
+		apiActivities[i] = models.Activity{
+			Date:  activity.Date.Format("2006-01-02"),
+			Count: activity.Count,
+			Level: level,
+		}
+	}
+
+	ctx.JSON(http.StatusOK, apiActivities)
+}
+
 // DeleteUserAvatar deletes the user's avatar from S3 and the database.
 func (c *Container) DeleteUserAvatar(ctx *gin.Context) {
 	userID, exists := ctx.Get("userId")

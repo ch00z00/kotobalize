@@ -30,6 +30,13 @@ func (api *UsersAPI) GetAvatarUploadURL(c *gin.Context) {
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
+// Get /api/v1/users/me/activity
+// Get user's activity data for contribution graph 
+func (api *UsersAPI) GetUserActivity(c *gin.Context) {
+	// Your handler implementation
+	c.JSON(200, gin.H{"status": "OK"})
+}
+
 // Put /api/v1/users/me/avatar
 // Update user's avatar URL 
 func (api *UsersAPI) UpdateUserAvatar(c *gin.Context) {

@@ -107,6 +107,26 @@ paths:
     "401":
      $ref: "#/components/responses/Unauthorized"
 
+ /users/me/activity:
+  get:
+   summary: Get user's activity data for contribution graph
+   operationId: getUserActivity
+   tags:
+    - Users
+   security:
+    - bearerAuth: []
+   responses:
+    "200":
+     description: A list of user's daily activity counts.
+     content:
+      application/json:
+       schema:
+        type: array
+        items:
+         $ref: "#/components/schemas/Activity"
+    "401":
+     $ref: "#/components/responses/Unauthorized"
+
  /users/me/password:
   put:
    summary: Update current user's password
@@ -549,6 +569,24 @@ components:
      maxLength: 50
    required:
     - name
+
+  Activity:
+   type: object
+   properties:
+    date:
+     type: string
+     format: date
+     description: "The date of the activity in YYYY-MM-DD format."
+    count:
+     type: integer
+     description: "The number of writings on that day."
+    level:
+     type: integer
+     description: "The contribution level from 0 to 4."
+   required:
+    - date
+    - count
+    - level
 
   Theme:
    type: object

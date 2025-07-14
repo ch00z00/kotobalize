@@ -147,6 +147,12 @@ func getRoutes(handleFunctions ApiHandleFunctions) []Route {
 			handleFunctions.UsersAPI.GetAvatarUploadURL,
 		},
 		{
+			"GetUserActivity",
+			http.MethodGet,
+			"/api/v1/users/me/activity",
+			handleFunctions.UsersAPI.GetUserActivity,
+		},
+		{
 			"UpdateUserAvatar",
 			http.MethodPut,
 			"/api/v1/users/me/avatar",

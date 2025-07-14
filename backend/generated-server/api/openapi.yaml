@@ -101,6 +101,25 @@ paths:
       summary: Update current user's profile
       tags:
       - Users
+  /users/me/activity:
+    get:
+      operationId: getUserActivity
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Activity'
+                type: array
+          description: A list of user's daily activity counts.
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+      security:
+      - bearerAuth: []
+      summary: Get user's activity data for contribution graph
+      tags:
+      - Users
   /users/me/password:
     put:
       operationId: updateUserPassword
@@ -574,6 +593,26 @@ components:
           type: string
       required:
       - name
+    Activity:
+      example:
+        date: 2000-01-23
+        level: 6
+        count: 0
+      properties:
+        date:
+          description: The date of the activity in YYYY-MM-DD format.
+          format: date
+          type: string
+        count:
+          description: The number of writings on that day.
+          type: integer
+        level:
+          description: The contribution level from 0 to 4.
+          type: integer
+      required:
+      - count
+      - date
+      - level
     Theme:
       example:
         createdAt: 2000-01-23T04:56:07.000+00:00
