@@ -11,6 +11,8 @@ interface DeleteModalProps {
   title: string;
   message: string;
   isLoading: boolean;
+  confirmText?: string;
+  loadingText?: string;
 }
 
 export default function DeleteModal({
@@ -20,6 +22,8 @@ export default function DeleteModal({
   title,
   message,
   isLoading,
+  confirmText = '削除',
+  loadingText = '削除中...',
 }: DeleteModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -35,7 +39,7 @@ export default function DeleteModal({
             variant="danger"
             className="w-full sm:ml-3 sm:w-auto"
           >
-            {isLoading ? '削除中...' : '削除'}
+            {isLoading ? loadingText : confirmText}
           </Button>
           <Button
             type="button"

@@ -1,19 +1,13 @@
 'use client';
 
 import React from 'react';
-import Icon, { IconName } from '@/components/atoms/Icon';
-
-// Mapping from the string in features.json to the actual IconName
-const iconNameMap: { [key: string]: IconName } = {
-  chat: 'MessageSquare',
-  sparkle: 'Sparkles',
-  trendingUp: 'TrendingUp',
-};
+import Icon from '@/components/atoms/Icon';
+import { type IconName } from '@/types/icon';
 
 interface FeatureCardProps {
   name: string;
   description: string;
-  iconName: string;
+  iconName: IconName;
   comingSoon?: boolean;
 }
 
@@ -23,7 +17,6 @@ export default function FeatureCard({
   iconName,
   comingSoon,
 }: FeatureCardProps) {
-  const mappedIconName = iconNameMap[iconName];
   return (
     <div
       className={`relative rounded-xl bg-white p-8 border border-gray-200 shadow-md transition-shadow duration-300 ${
@@ -38,9 +31,9 @@ export default function FeatureCard({
       <div className="relative pl-16">
         <dt className="text-base font-semibold leading-7 text-gray-900">
           <div className="absolute left-0 top-0 flex h-10 w-10 items-center justify-center rounded-lg bg-primary">
-            {mappedIconName && (
+            {iconName && (
               <Icon
-                name={mappedIconName}
+                name={iconName}
                 className="h-6 w-6 text-white"
                 aria-hidden="true"
               />

@@ -1,137 +1,149 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
-import { useAuthStore } from '@/store/auth'; // Corrected import path
-import { getWritingById, requestAiReview } from '@/lib/api/writings';
+import { useState } from 'react';
+import LinkButton from '@/components/atoms/LinkButton';
+// import { useAuthStore } from '@/store/auth';
+// import { requestAiReview } from '@/lib/api/writings.client';
 import { Writing } from '@/types/generated/models';
-import ScoreCircle from '../molecules/ScoreCircle';
-import FeedbackCard from '../molecules/card/FeedbackCard';
-import WritingDetailSkeleton from './WritingDetailSkeleton';
-import Button from '../atoms/Button';
+// import Button from '@/components/atoms/Button';
+// import ScoreCircle from '@/components/molecules/ScoreCircle';
+
+// Define the structure of the parsed AI feedback
+// interface FeedbackDetail {
+//   viewpoint: string;
+//   score: number;
+//   goodPoint: string;
+//   badPoint: string;
+// }
+// interface ParsedFeedback {
+//   totalScore: number;
+//   scores: Record<string, number>;
+//   feedbacks: FeedbackDetail[];
+// }
 
 interface WritingDetailClientProps {
-  writingId: string;
+  initialWriting: Writing;
 }
 
 export default function WritingDetailClient({
-  writingId,
+  initialWriting,
 }: WritingDetailClientProps) {
-  const { token } = useAuthStore();
-  const [writing, setWriting] = useState<Writing | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isReviewing, setIsReviewing] = useState(false);
+  // const { token } = useAuthStore();
+  const [writing] = useState<Writing>(initialWriting);
+  // const [parsedFeedback, setParsedFeedback] = useState<ParsedFeedback | null>(
+  //   null
+  // );
+  // const [error, setError] = useState<string | null>(null);
+  // const [isReviewing, setIsReviewing] = useState(false);
 
-  const fetchWriting = useCallback(async () => {
-    if (!token) return;
-    setIsLoading(true);
-    try {
-      const data = await getWritingById(writingId, token);
-      setWriting(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load writing.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [writingId, token]);
+  // useEffect(() => {
+  //   if (writing.aiFeedback) {
+  //     try {
+  //       const feedbackData = JSON.parse(writing.aiFeedback);
+  //       setParsedFeedback(feedbackData);
+  //     } catch {
+  //       setError('AIからのフィードバックの解析に失敗しました。');
+  //       setParsedFeedback(null);
+  //     }
+  //   }
+  // }, [writing.aiFeedback]);
 
-  useEffect(() => {
-    fetchWriting();
-  }, [fetchWriting]);
+  // const handleRequestReview = async () => {
+  //   if (!token || !writing) return;
 
-  const handleRequestReview = async () => {
-    if (!token || !writing) return;
-
-    setIsReviewing(true);
-    setError(null);
-    try {
-      const updatedWriting = await requestAiReview(
-        { writingId: writing.id },
-        token
-      );
-      setWriting(updatedWriting);
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : 'Failed to request AI review.'
-      );
-    } finally {
-      setIsReviewing(false);
-    }
-  };
-
-  if (isLoading) {
-    return <WritingDetailSkeleton />;
-  }
-
-  if (error) {
-    return (
-      <div className="container mx-auto p-8 text-center text-red-600">
-        {error}
-      </div>
-    );
-  }
-
-  if (!writing) {
-    return (
-      <div className="container mx-auto p-8 text-center">
-        Writing not found.
-      </div>
-    );
-  }
+  //   setIsReviewing(true);
+  //   setError(null);
+  //   try {
+  //     const updatedWriting = await requestAiReview(
+  //       { writingId: writing.id },
+  //       token
+  //     );
+  //     setWriting(updatedWriting);
+  //   } catch (err) {
+  //     setError(
+  //       err instanceof Error ? err.message : 'Failed to request AI review.'
+  //     );
+  //   } finally {
+  //     setIsReviewing(false);
+  //   }
+  // };
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 lg:p-8">
-      <div className="mb-8 rounded-lg bg-white text-gray-900 p-6 shadow-md">
-        <h1 className="mb-4 text-3xl font-bold">あなたの記録</h1>
-        <div className="prose max-w-none rounded-md border border-gray-200 bg-gray-50 p-4">
-          <p>{writing.content}</p>
+    <div className="container h-[calc(100vh-168px)] mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <div className="mb-8 rounded-xl bg-white p-8 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="text-2xl font-bold text-gray-800">あなたの記録</h1>
+          <LinkButton href="/themes" variant="primary">
+            テーマ一覧に戻る
+          </LinkButton>
+        </div>
+        <div className="prose max-w-none rounded-lg border bg-gray-50 p-6">
+          <p className="text-gray-700">{writing.content}</p>
         </div>
       </div>
 
-      <div className="rounded-lg bg-white p-6 shadow-md">
-        <h2 className="mb-4 text-2xl font-semibold text-gray-800">
-          AIレビュー結果
-        </h2>
-        {writing.aiScore != null ? (
-          <div className="space-y-8">
-            <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
-              <ScoreCircle score={writing.aiScore} />
-              <div className="flex-1">
-                <FeedbackCard title="全体的なフィードバック">
-                  <p>{writing.aiFeedbackOverall}</p>
-                </FeedbackCard>
+      {/*
+        TODO: AIレビュー機能
+        MVPではリリースしないため、以下のブロックはコメントアウトしています。
+        AIレビュー機能を実装する際に、このコメントアウトを解除してください。
+      */}
+      {/*
+        <div className="rounded-xl bg-white p-8 shadow-sm">
+          <h2 className="mb-6 text-2xl font-bold text-gray-800">
+            AIレビュー結果
+          </h2>
+          {error && <p className="mb-4 text-center text-red-500">{error}</p>}
+
+          {parsedFeedback ? (
+            <>
+              <div className="mb-12 text-center">
+                <h3 className="text-lg font-semibold text-gray-600">
+                  言語化力スコア
+                </h3>
+                <ScoreCircle score={parsedFeedback.totalScore} />
               </div>
+
+              <div className="space-y-6">
+                {parsedFeedback.feedbacks.map((fb) => (
+                  <div key={fb.viewpoint} className="rounded-lg border p-4">
+                    <h4 className="text-xl font-semibold text-gray-800">
+                      {fb.viewpoint}
+                      <span className="ml-3 text-lg font-bold text-primary">
+                        {fb.score}点
+                      </span>
+                    </h4>
+                    <div className="mt-4 space-y-3">
+                      <div>
+                        <h5 className="font-semibold text-green-600">GOOD</h5>
+                        <p className="text-gray-600">{fb.goodPoint}</p>
+                      </div>
+                      <div>
+                        <h5 className="font-semibold text-red-600">
+                          IMPROVEMENT
+                        </h5>
+                        <p className="text-gray-600">{fb.badPoint}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
+              <p className="mb-4 text-gray-600">
+                まだAIレビューが実行されていません。
+              </p>
+              <Button
+                onClick={handleRequestReview}
+                disabled={isReviewing}
+                variant="primary"
+              >
+                {isReviewing ? 'レビュー中...' : 'AIレビューを実行する'}
+              </Button>
             </div>
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <FeedbackCard title="明確さ">
-                <p>{writing.aiFeedbackClarity}</p>
-              </FeedbackCard>
-              <FeedbackCard title="正確さ">
-                <p>{writing.aiFeedbackAccuracy}</p>
-              </FeedbackCard>
-              <FeedbackCard title="網羅性">
-                <p>{writing.aiFeedbackCompleteness}</p>
-              </FeedbackCard>
-              <FeedbackCard title="構造化">
-                <p>{writing.aiFeedbackStructure}</p>
-              </FeedbackCard>
-            </div>
-          </div>
-        ) : (
-          <div className="text-center">
-            <p className="mb-4 text-gray-600">
-              まだAIレビューが実行されていません。
-            </p>
-            <Button
-              onClick={handleRequestReview}
-              disabled={isReviewing}
-              className="rounded-md bg-green-600 px-6 py-3 font-semibold text-white shadow-sm hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-green-400"
-            >
-              {isReviewing ? 'レビュー中...' : 'AIレビューを実行する'}
-            </Button>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      */}
     </div>
   );
 }

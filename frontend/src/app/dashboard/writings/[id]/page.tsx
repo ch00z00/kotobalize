@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { getWritingById } from '@/lib/api/writings.server';
-import WritingDetailClient from './components/WritingDetailClient';
+import WritingDetailClient from '@/components/write/WritingDetailClient';
 import { notFound } from 'next/navigation';
 
 interface WritingDetailPageProps {

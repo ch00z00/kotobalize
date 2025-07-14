@@ -1,6 +1,6 @@
 'use client';
 
-import features from '@/constants/features.json';
+import { FEATURES } from '@/constants/features';
 import FeatureCard from '@/components/molecules/card/FeatureCard';
 import ScrollReveal from '@/components/common/ScrollReveal';
 
@@ -23,7 +23,7 @@ export default function LandingFeature() {
         </div>
         <div className="mx-auto mt-16 max-w-2xl sm:mt-20 lg:mt-24 lg:max-w-4xl">
           <dl className="grid max-w-xl grid-cols-1 gap-x-8 gap-y-10 lg:max-w-none lg:grid-cols-3 lg:gap-y-16">
-            {features.map((feature, index) => (
+            {FEATURES.map((feature, index) => (
               <ScrollReveal key={feature.name} delay={index * 0.2}>
                 <FeatureCard
                   name={feature.name}
