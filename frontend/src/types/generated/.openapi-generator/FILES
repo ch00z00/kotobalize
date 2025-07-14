@@ -17,6 +17,7 @@ docs/RegisterRequest.md
 docs/Theme.md
 docs/ThemesApi.md
 docs/UpdateAvatarRequest.md
+docs/UpdatePasswordRequest.md
 docs/UpdateThemeRequest.md
 docs/User.md
 docs/UsersApi.md

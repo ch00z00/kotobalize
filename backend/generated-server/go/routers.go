@@ -153,6 +153,12 @@ func getRoutes(handleFunctions ApiHandleFunctions) []Route {
 			handleFunctions.UsersAPI.UpdateUserAvatar,
 		},
 		{
+			"UpdateUserPassword",
+			http.MethodPut,
+			"/api/v1/users/me/password",
+			handleFunctions.UsersAPI.UpdateUserPassword,
+		},
+		{
 			"CreateWriting",
 			http.MethodPost,
 			"/api/v1/writings",

@@ -15,6 +15,7 @@ go/model_new_writing_request.go
 go/model_register_request.go
 go/model_theme.go
 go/model_update_avatar_request.go
+go/model_update_password_request.go
 go/model_update_theme_request.go
 go/model_user.go
 go/model_writing.go

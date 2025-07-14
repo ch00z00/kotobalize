@@ -1,5 +1,11 @@
 import { PUBLIC_API_BASE_URL } from './config';
-import { User } from '@/types/generated/models';
+import {
+  User,
+  ApiError,
+  UpdatePasswordRequest,
+  UpdateAvatarRequest,
+  AvatarUploadRequest,
+} from '@/types/generated/api';
 
 /**
  * Requests a presigned URL from the backend for uploading an avatar image.
@@ -13,13 +19,14 @@ export async function getAvatarUploadUrl(
   fileType: string,
   token: string
 ): Promise<{ uploadUrl: string; key: string }> {
+  // This could be AvatarUploadResponse
   const res = await fetch(`${PUBLIC_API_BASE_URL}/users/me/avatar/upload-url`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ fileName, fileType }),
+    body: JSON.stringify({ fileName, fileType } as AvatarUploadRequest),
   });
 
   if (!res.ok) {
@@ -44,7 +51,7 @@ export async function updateUserAvatar(
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({ avatarUrl }),
+    body: JSON.stringify({ avatarUrl } as UpdateAvatarRequest),
   });
 
   if (!res.ok) {
@@ -71,3 +78,30 @@ export async function deleteUserAvatar(token: string): Promise<User> {
   }
   return res.json();
 }
+
+/**
+ * Updates the user's password in the backend.
+ * @param passwordData - The new password data.
+ * @param token - The user's JWT.
+ * @returns A promise that resolves to void.
+ */
+export const updateUserPassword = async (
+  passwordData: UpdatePasswordRequest,
+  token: string
+): Promise<void> => {
+  const res = await fetch(`${PUBLIC_API_BASE_URL}/users/me/password`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(passwordData),
+  });
+
+  if (!res.ok) {
+    const errorData = (await res.json().catch(() => ({}))) as ApiError;
+    throw new Error(
+      errorData.message || `Failed to update password: ${res.statusText}`
+    );
+  }
+};

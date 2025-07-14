@@ -14,6 +14,7 @@ import (
 	"github.com/ch00z00/kotobalize/models"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"golang.org/x/crypto/bcrypt"
 )
 
 // GetAvatarUploadURL generates a presigned URL for uploading a file to S3.
@@ -94,6 +95,58 @@ func (c *Container) UpdateUserAvatar(ctx *gin.Context) {
 		apiUser.AvatarURL = *user.AvatarURL
 	}
 	ctx.JSON(http.StatusOK, apiUser)
+}
+
+// UpdateUserPassword updates the authenticated user's password.
+func (c *Container) UpdateUserPassword(ctx *gin.Context) {
+	// Get user ID from context
+	userID, exists := ctx.Get("userId")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, models.APIError{Code: "UNAUTHORIZED", Message: "User not authenticated"})
+		return
+	}
+
+	// Bind request body
+	var req models.UpdatePasswordRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, models.APIError{Code: "INVALID_INPUT", Message: "Invalid request body: " + err.Error()})
+		return
+	}
+
+	// Basic validation for new password
+	if len(req.NewPassword) < 8 {
+		ctx.JSON(http.StatusBadRequest, models.APIError{Code: "INVALID_INPUT", Message: "New password must be at least 8 characters long"})
+		return
+	}
+
+	// Find the user
+	var user models.GormUser
+	if err := c.DB.First(&user, userID).Error; err != nil {
+		ctx.JSON(http.StatusNotFound, models.APIError{Code: "USER_NOT_FOUND", Message: "User not found"})
+		return
+	}
+
+	// Verify current password
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.CurrentPassword)); err != nil {
+		ctx.JSON(http.StatusUnauthorized, models.APIError{Code: "INVALID_CREDENTIALS", Message: "Incorrect current password"})
+		return
+	}
+
+	// Hash the new password
+	hashedNewPassword, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "INTERNAL_ERROR", Message: "Failed to hash new password"})
+		return
+	}
+
+	// Update the password
+	if err := c.DB.Model(&user).Update("password", string(hashedNewPassword)).Error; err != nil {
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to update password"})
+		return
+	}
+
+	// Return success
+	ctx.Status(http.StatusNoContent)
 }
 
 // DeleteUserAvatar deletes the user's avatar from S3 and the database.

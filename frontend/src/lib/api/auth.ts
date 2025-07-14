@@ -2,7 +2,8 @@ import {
   AuthResponse,
   LoginRequest,
   RegisterRequest,
-} from '@/types/generated/models';
+  ApiError,
+} from '@/types/generated/api';
 import { PUBLIC_API_BASE_URL } from '@/lib/api/config';
 
 /**
@@ -22,14 +23,13 @@ export async function loginUser(
     body: JSON.stringify(credentials),
   });
 
-  const data = await res.json();
-
   if (!res.ok) {
-    // The backend provides a structured error message, which we can throw.
-    throw new Error(data.message || 'Failed to login');
+    const errorData = (await res.json().catch(() => ({}))) as ApiError;
+    throw new Error(
+      errorData.message || `ログインに失敗しました: ${res.statusText}`
+    );
   }
-
-  return data;
+  return res.json();
 }
 
 /**
@@ -49,11 +49,11 @@ export async function signupUser(
     body: JSON.stringify(credentials),
   });
 
-  const data = await res.json();
-
   if (!res.ok) {
-    throw new Error(data.message || 'Failed to sign up');
+    const errorData = (await res.json().catch(() => ({}))) as ApiError;
+    throw new Error(
+      errorData.message || `新規登録に失敗しました: ${res.statusText}`
+    );
   }
-
-  return data;
+  return res.json();
 }

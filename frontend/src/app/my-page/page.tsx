@@ -9,6 +9,7 @@ import Button from '@/components/atoms/Button';
 import {
   getAvatarUploadUrl,
   updateUserAvatar,
+  updateUserPassword,
   deleteUserAvatar,
 } from '@/lib/api/users.client';
 import DeleteModal from '@/components/organisms/DeleteModal';
@@ -20,6 +21,9 @@ export default function ProfilePage() {
   const [preview, setPreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [isPasswordLoading, setIsPasswordLoading] = useState(false);
   const [notification, setNotification] = useState<{
     message: string;
     type: 'success' | 'error';
@@ -102,6 +106,41 @@ export default function ProfilePage() {
     }
   };
 
+  const handlePasswordChange = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!token) return;
+    if (newPassword.length < 8) {
+      setNotification({
+        message: '新しいパスワードは8文字以上で入力してください。',
+        type: 'error',
+      });
+      return;
+    }
+
+    setIsPasswordLoading(true);
+    setNotification(null);
+
+    try {
+      await updateUserPassword({ currentPassword, newPassword }, token);
+      setNotification({
+        message: 'パスワードを更新しました。',
+        type: 'success',
+      });
+      setCurrentPassword('');
+      setNewPassword('');
+    } catch (err) {
+      setNotification({
+        message:
+          err instanceof Error
+            ? err.message
+            : 'パスワードの変更に失敗しました。',
+        type: 'error',
+      });
+    } finally {
+      setIsPasswordLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (notification) {
       const timer = setTimeout(() => {
@@ -120,7 +159,7 @@ export default function ProfilePage() {
           onClose={() => setNotification(null)}
         />
       )}
-      <div className="container mx-auto min-h-[calc(100vh-168px)] py-12 px-4">
+      <div className="container mx-auto min-h-[calc(100vh-168px)] px-4 sm:px-6 lg:px-8 py-12 sm:py-12 lg:py-14">
         <h1 className="mb-8 text-3xl font-bold text-gray-800">PROFILE</h1>
         <div className="max-w-md rounded-xl bg-white p-8 shadow-md">
           <div className="flex flex-col items-center space-y-6">
@@ -171,6 +210,50 @@ export default function ProfilePage() {
               </Button>
             </div>
           </div>
+        </div>
+        <div className="mt-10 max-w-md rounded-xl bg-white p-8 shadow-md">
+          <h2 className="mb-6 text-xl font-bold text-gray-800">
+            パスワード変更
+          </h2>
+          <form onSubmit={handlePasswordChange} className="space-y-6">
+            <div>
+              <label
+                htmlFor="current-password"
+                className="block text-sm font-medium text-gray-700"
+              >
+                現在のパスワード
+              </label>
+              <input
+                id="current-password"
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                required
+                className="mt-1 block w-full rounded-lg border-2 border-gray-300 bg-gray-100 py-2 px-3 sm:text-md"
+                autoComplete="current-password"
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="new-password"
+                className="block text-sm font-medium text-gray-700"
+              >
+                新しいパスワード (8文字以上)
+              </label>
+              <input
+                id="new-password"
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+                className="mt-1 block w-full rounded-lg border-2 border-gray-300 bg-gray-100 py-2 px-3 sm:text-md"
+                autoComplete="new-password"
+              />
+            </div>
+            <Button type="submit" disabled={isPasswordLoading}>
+              {isPasswordLoading ? '変更中...' : 'パスワードを変更'}
+            </Button>
+          </form>
         </div>
       </div>
       <DeleteModal

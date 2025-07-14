@@ -37,3 +37,10 @@ func (api *UsersAPI) UpdateUserAvatar(c *gin.Context) {
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
+// Put /api/v1/users/me/password
+// Update current user's password 
+func (api *UsersAPI) UpdateUserPassword(c *gin.Context) {
+	// Your handler implementation
+	c.JSON(200, gin.H{"status": "OK"})
+}
+

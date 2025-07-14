@@ -139,7 +139,7 @@ export default function DashboardClient() {
       {/* Top Section: Title and Stats */}
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-800">DASHBOARD</h1>
-        <LinkButton href="/themes">新しい言語化に挑戦する</LinkButton>
+        <LinkButton href="/themes">言語化に挑戦する</LinkButton>
       </div>
       <dl className="grid grid-cols-1 gap-5 sm:grid-cols-2 mb-6">
         <StatCard label="トライしたテーマ数" value={stats.themeCount} />
@@ -188,7 +188,7 @@ export default function DashboardClient() {
               <p className="mt-2">
                 {groupedWritings.length > 0
                   ? '検索条件を変更してお試しください。'
-                  : '右上の「新しい言語化に挑戦する」ボタンから最初のテーマに挑戦しましょう！'}
+                  : '右上の「言語化に挑戦する」ボタンから最初のテーマに挑戦しましょう！'}
               </p>
             </div>
           )}

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { User } from '@/types/generated/models';
+import { User } from '@/types/generated/api';
 import Cookies from 'js-cookie';
 
 interface AuthState {

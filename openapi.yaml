@@ -81,6 +81,32 @@ paths:
     "401":
      $ref: "#/components/responses/Unauthorized"
 
+ /users/me/password:
+  put:
+   summary: Update current user's password
+   operationId: updateUserPassword
+   tags:
+    - Users
+   security:
+    - bearerAuth: []
+   requestBody:
+    required: true
+    content:
+     application/json:
+      schema:
+       $ref: "#/components/schemas/UpdatePasswordRequest"
+   responses:
+    "204":
+     description: Password updated successfully
+    "400":
+     $ref: "#/components/responses/BadRequest"
+    "401":
+     description: Unauthorized - Incorrect current password
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/ApiError"
+
  /users/me/avatar:
   put:
    summary: Update user's avatar URL
@@ -646,6 +672,19 @@ components:
    required:
     - email
     - password
+
+  UpdatePasswordRequest:
+   type: object
+   properties:
+    currentPassword:
+     type: string
+     format: password
+    newPassword:
+     type: string
+     format: password
+   required:
+    - currentPassword
+    - newPassword
 
   UpdateAvatarRequest:
    type: object
