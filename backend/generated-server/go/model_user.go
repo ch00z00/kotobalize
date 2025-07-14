@@ -19,6 +19,9 @@ type User struct {
 
 	Email string `json:"email"`
 
+	// The user's display name.
+	Name string `json:"name"`
+
 	// URL of the user's avatar image.
 	AvatarUrl string `json:"avatarUrl,omitempty"`
 

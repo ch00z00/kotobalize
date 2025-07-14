@@ -6,6 +6,7 @@ import "time"
 // It includes the password hash, which is not exposed in the API model.
 type GormUser struct {
 	ID        uint   `gorm:"primarykey"`
+	Name      *string `gorm:"size:50;unique"`
 	Email     string `gorm:"unique"`
 	AvatarURL *string
 	Password  string

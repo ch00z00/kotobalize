@@ -76,6 +76,31 @@ paths:
       summary: Get current authenticated user's information
       tags:
       - Auth
+  /users/me:
+    put:
+      operationId: updateUserProfile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: Profile updated successfully
+        "400":
+          $ref: '#/components/responses/BadRequest'
+        "401":
+          $ref: '#/components/responses/Unauthorized'
+      security:
+      - bearerAuth: []
+      summary: Update current user's profile
+      tags:
+      - Users
   /users/me/password:
     put:
       operationId: updateUserPassword
@@ -502,6 +527,7 @@ components:
       example:
         createdAt: 2000-01-23T04:56:07.000+00:00
         avatarUrl: avatarUrl
+        name: name
         id: 0
         email: email
         updatedAt: 2000-01-23T04:56:07.000+00:00
@@ -514,6 +540,11 @@ components:
           format: email
           readOnly: true
           type: string
+        name:
+          description: The user's display name.
+          readOnly: true
+          type: string
+          nullable: true
         avatarUrl:
           description: URL of the user's avatar image.
           type: string
@@ -530,7 +561,19 @@ components:
       - createdAt
       - email
       - id
+      - name
       - updatedAt
+    UpdateProfileRequest:
+      example:
+        name: name
+      properties:
+        name:
+          description: The new display name for the user.
+          maxLength: 50
+          minLength: 1
+          type: string
+      required:
+      - name
     Theme:
       example:
         createdAt: 2000-01-23T04:56:07.000+00:00
@@ -793,6 +836,7 @@ components:
         user:
           createdAt: 2000-01-23T04:56:07.000+00:00
           avatarUrl: avatarUrl
+          name: name
           id: 0
           email: email
           updatedAt: 2000-01-23T04:56:07.000+00:00

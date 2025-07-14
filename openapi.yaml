@@ -81,6 +81,32 @@ paths:
     "401":
      $ref: "#/components/responses/Unauthorized"
 
+ /users/me:
+  put:
+   summary: Update current user's profile
+   operationId: updateUserProfile
+   tags:
+    - Users
+   security:
+    - bearerAuth: []
+   requestBody:
+    required: true
+    content:
+     application/json:
+      schema:
+       $ref: "#/components/schemas/UpdateProfileRequest"
+   responses:
+    "200":
+     description: Profile updated successfully
+     content:
+      application/json:
+       schema:
+        $ref: "#/components/schemas/User"
+    "400":
+     $ref: "#/components/responses/BadRequest"
+    "401":
+     $ref: "#/components/responses/Unauthorized"
+
  /users/me/password:
   put:
    summary: Update current user's password
@@ -489,6 +515,11 @@ components:
      type: string
      format: email
      readOnly: true
+    name:
+     type: string
+     nullable: true
+     readOnly: true
+     description: "The user's display name."
     avatarUrl:
      type: string
      nullable: true
@@ -504,8 +535,20 @@ components:
    required:
     - id
     - email
+    - name
     - createdAt
     - updatedAt
+
+  UpdateProfileRequest:
+   type: object
+   properties:
+    name:
+     type: string
+     description: "The new display name for the user."
+     minLength: 1
+     maxLength: 50
+   required:
+    - name
 
   Theme:
    type: object

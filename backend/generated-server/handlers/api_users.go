@@ -91,6 +91,9 @@ func (c *Container) UpdateUserAvatar(ctx *gin.Context) {
 		CreatedAt: user.CreatedAt,
 		UpdatedAt: user.UpdatedAt,
 	}
+	if user.Name != nil {
+		apiUser.Name = user.Name
+	}
 	if user.AvatarURL != nil {
 		apiUser.AvatarURL = *user.AvatarURL
 	}
@@ -147,6 +150,55 @@ func (c *Container) UpdateUserPassword(ctx *gin.Context) {
 
 	// Return success
 	ctx.Status(http.StatusNoContent)
+}
+
+// UpdateUserProfile updates the authenticated user's profile information (e.g., name).
+func (c *Container) UpdateUserProfile(ctx *gin.Context) {
+	userID, exists := ctx.Get("userId")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, models.APIError{Code: "UNAUTHORIZED", Message: "User not authenticated"})
+		return
+	}
+
+	var req models.UpdateProfileRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, models.APIError{Code: "INVALID_INPUT", Message: "Invalid request body: " + err.Error()})
+		return
+	}
+
+	// Find the user
+	var user models.GormUser
+	if err := c.DB.First(&user, userID).Error; err != nil {
+		ctx.JSON(http.StatusNotFound, models.APIError{Code: "USER_NOT_FOUND", Message: "User not found"})
+		return
+	}
+
+	// Update the user's name
+	user.Name = &req.Name
+	if err := c.DB.Save(&user).Error; err != nil {
+		// Handle potential unique constraint violation for the name
+		if strings.Contains(err.Error(), "Duplicate entry") {
+			ctx.JSON(http.StatusConflict, models.APIError{Code: "NAME_TAKEN", Message: "このユーザー名は既に使用されています。"})
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to update profile"})
+		return
+	}
+
+	// Return the updated user object
+	apiUser := models.User{
+		ID:        int64(user.ID),
+		Email:     user.Email,
+		CreatedAt: user.CreatedAt,
+		UpdatedAt: user.UpdatedAt,
+	}
+	if user.Name != nil {
+		apiUser.Name = user.Name
+	}
+	if user.AvatarURL != nil {
+		apiUser.AvatarURL = *user.AvatarURL
+	}
+	ctx.JSON(http.StatusOK, apiUser)
 }
 
 // DeleteUserAvatar deletes the user's avatar from S3 and the database.

@@ -314,6 +314,19 @@ export interface UpdatePasswordRequest {
 /**
  * 
  * @export
+ * @interface UpdateProfileRequest
+ */
+export interface UpdateProfileRequest {
+    /**
+     * The new display name for the user.
+     * @type {string}
+     * @memberof UpdateProfileRequest
+     */
+    'name': string;
+}
+/**
+ * 
+ * @export
  * @interface UpdateThemeRequest
  */
 export interface UpdateThemeRequest {
@@ -360,6 +373,12 @@ export interface User {
      * @memberof User
      */
     'email': string;
+    /**
+     * The user\'s display name.
+     * @type {string}
+     * @memberof User
+     */
+    'name': string;
     /**
      * URL of the user\'s avatar image.
      * @type {string}
@@ -1426,6 +1445,46 @@ export const UsersApiAxiosParamCreator = function (configuration?: Configuration
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @summary Update current user\'s profile
+         * @param {UpdateProfileRequest} updateProfileRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateUserProfile: async (updateProfileRequest: UpdateProfileRequest, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'updateProfileRequest' is not null or undefined
+            assertParamExists('updateUserProfile', 'updateProfileRequest', updateProfileRequest)
+            const localVarPath = `/users/me`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'PUT', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication bearerAuth required
+            // http bearer authentication required
+            await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+
+    
+            localVarHeaderParameter['Content-Type'] = 'application/json';
+
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+            localVarRequestOptions.data = serializeDataIfNeeded(updateProfileRequest, localVarRequestOptions, configuration)
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -1487,6 +1546,19 @@ export const UsersApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['UsersApi.updateUserPassword']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * 
+         * @summary Update current user\'s profile
+         * @param {UpdateProfileRequest} updateProfileRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async updateUserProfile(updateProfileRequest: UpdateProfileRequest, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<User>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.updateUserProfile(updateProfileRequest, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['UsersApi.updateUserProfile']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -1535,6 +1607,16 @@ export const UsersApiFactory = function (configuration?: Configuration, basePath
          */
         updateUserPassword(updatePasswordRequest: UpdatePasswordRequest, options?: RawAxiosRequestConfig): AxiosPromise<void> {
             return localVarFp.updateUserPassword(updatePasswordRequest, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary Update current user\'s profile
+         * @param {UpdateProfileRequest} updateProfileRequest 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        updateUserProfile(updateProfileRequest: UpdateProfileRequest, options?: RawAxiosRequestConfig): AxiosPromise<User> {
+            return localVarFp.updateUserProfile(updateProfileRequest, options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -1591,6 +1673,18 @@ export class UsersApi extends BaseAPI {
      */
     public updateUserPassword(updatePasswordRequest: UpdatePasswordRequest, options?: RawAxiosRequestConfig) {
         return UsersApiFp(this.configuration).updateUserPassword(updatePasswordRequest, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Update current user\'s profile
+     * @param {UpdateProfileRequest} updateProfileRequest 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof UsersApi
+     */
+    public updateUserProfile(updateProfileRequest: UpdateProfileRequest, options?: RawAxiosRequestConfig) {
+        return UsersApiFp(this.configuration).updateUserProfile(updateProfileRequest, options).then((request) => request(this.axios, this.basePath));
     }
 }
 
