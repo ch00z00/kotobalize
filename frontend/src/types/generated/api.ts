@@ -272,6 +272,12 @@ export interface Theme {
      * @memberof Theme
      */
     'isFavorited': boolean;
+    /**
+     * The number of users who have favorited this theme.
+     * @type {number}
+     * @memberof Theme
+     */
+    'favoritesCount': number;
 }
 /**
  * 
@@ -853,10 +859,11 @@ export const ThemesApiAxiosParamCreator = function (configuration?: Configuratio
         /**
          * 
          * @summary Get a list of all available themes
+         * @param {ListThemesSortEnum} [sort] Sort order for the themes.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listThemes: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+        listThemes: async (sort?: ListThemesSortEnum, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/themes`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -872,6 +879,10 @@ export const ThemesApiAxiosParamCreator = function (configuration?: Configuratio
             // authentication bearerAuth required
             // http bearer authentication required
             await setBearerAuthToObject(localVarHeaderParameter, configuration)
+
+            if (sort !== undefined) {
+                localVarQueryParameter['sort'] = sort;
+            }
 
 
     
@@ -1031,11 +1042,12 @@ export const ThemesApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary Get a list of all available themes
+         * @param {ListThemesSortEnum} [sort] Sort order for the themes.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async listThemes(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Theme>>> {
-            const localVarAxiosArgs = await localVarAxiosParamCreator.listThemes(options);
+        async listThemes(sort?: ListThemesSortEnum, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Theme>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.listThemes(sort, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['ThemesApi.listThemes']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
@@ -1120,11 +1132,12 @@ export const ThemesApiFactory = function (configuration?: Configuration, basePat
         /**
          * 
          * @summary Get a list of all available themes
+         * @param {ListThemesSortEnum} [sort] Sort order for the themes.
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        listThemes(options?: RawAxiosRequestConfig): AxiosPromise<Array<Theme>> {
-            return localVarFp.listThemes(options).then((request) => request(axios, basePath));
+        listThemes(sort?: ListThemesSortEnum, options?: RawAxiosRequestConfig): AxiosPromise<Array<Theme>> {
+            return localVarFp.listThemes(sort, options).then((request) => request(axios, basePath));
         },
         /**
          * 
@@ -1208,12 +1221,13 @@ export class ThemesApi extends BaseAPI {
     /**
      * 
      * @summary Get a list of all available themes
+     * @param {ListThemesSortEnum} [sort] Sort order for the themes.
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof ThemesApi
      */
-    public listThemes(options?: RawAxiosRequestConfig) {
-        return ThemesApiFp(this.configuration).listThemes(options).then((request) => request(this.axios, this.basePath));
+    public listThemes(sort?: ListThemesSortEnum, options?: RawAxiosRequestConfig) {
+        return ThemesApiFp(this.configuration).listThemes(sort, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**
@@ -1242,6 +1256,14 @@ export class ThemesApi extends BaseAPI {
     }
 }
 
+/**
+ * @export
+ */
+export const ListThemesSortEnum = {
+    Newest: 'newest',
+    Popular: 'popular'
+} as const;
+export type ListThemesSortEnum = typeof ListThemesSortEnum[keyof typeof ListThemesSortEnum];
 
 
 /**

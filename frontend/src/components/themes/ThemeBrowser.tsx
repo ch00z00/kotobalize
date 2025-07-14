@@ -2,10 +2,11 @@
 
 import { useState, useMemo, useEffect, Fragment } from 'react';
 import { useAuthStore } from '@/store/auth';
-import { Theme } from '@/types/generated/api';
+import { ListThemesSortEnum, Theme } from '@/types/generated/api';
 import {
   deleteTheme,
   favoriteTheme,
+  listThemes,
   unfavoriteTheme,
 } from '@/lib/api/themes.client';
 import Button from '@/components/atoms/Button';
@@ -35,14 +36,38 @@ export default function ThemeBrowser({ initialThemes }: ThemeBrowserProps) {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<Tab>('official');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [sortBy, setSortBy] = useState<ListThemesSortEnum>('newest');
   const [notification, setNotification] = useState<{
     message: string;
     type: 'success' | 'error';
   } | null>(null);
 
-  // 新しいテーマが作成されたら、ページ全体を再読み込みする代わりに
-  // ローカルのstateに追加して即時反映させる
+  const { token } = useAuthStore();
+
+  useEffect(() => {
+    const fetchThemes = async () => {
+      if (!token) {
+        setIsLoading(false);
+        return;
+      }
+      setIsLoading(true);
+      try {
+        const fetchedThemes = await listThemes(token, sortBy);
+        setThemes(fetchedThemes);
+      } catch (err) {
+        setNotification({
+          message:
+            err instanceof Error ? err.message : 'テーマの取得に失敗しました。',
+          type: 'error',
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchThemes();
+  }, [sortBy, token]);
+
   const handleThemeCreated = (newTheme: Theme) => {
     setThemes((prevThemes) => [newTheme, ...prevThemes]);
     setNotification({
@@ -68,8 +93,6 @@ export default function ThemeBrowser({ initialThemes }: ThemeBrowserProps) {
       return () => clearTimeout(timer);
     }
   }, [notification]);
-
-  const { token } = useAuthStore();
 
   const handleToggleFavorite = async (
     themeId: number,
@@ -239,10 +262,29 @@ export default function ThemeBrowser({ initialThemes }: ThemeBrowserProps) {
             onToggleCategory={handleToggleCategory}
             onSelectAll={handleSelectAll}
           />
+          <div className="flex items-center justify-end space-x-2">
+            <label
+              htmlFor="sort-by"
+              className="text-sm font-medium text-gray-600"
+            >
+              並び替え:
+            </label>
+            <select
+              id="sort-by"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as ListThemesSortEnum)}
+              className="rounded-md border-gray-300 py-1.5 pl-2 pr-8 text-sm focus:border-primary focus:ring-primary"
+            >
+              <option value="newest">新着順</option>
+              <option value="popular">人気順</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      {themes.length > 0 ? (
+      {isLoading ? (
+        <EmptyState title="読み込み中..." message="テーマを取得しています。" />
+      ) : themes.length > 0 ? (
         <>
           {/* Tabs */}
           <div className="mb-6 border-b border-gray-200">

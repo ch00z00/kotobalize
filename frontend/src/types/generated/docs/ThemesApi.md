@@ -237,11 +237,18 @@ import {
 const configuration = new Configuration();
 const apiInstance = new ThemesApi(configuration);
 
-const { status, data } = await apiInstance.listThemes();
+let sort: 'newest' | 'popular'; //Sort order for the themes. (optional) (default to 'newest')
+
+const { status, data } = await apiInstance.listThemes(
+    sort
+);
 ```
 
 ### Parameters
-This endpoint does not have any parameters.
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **sort** | [**&#39;newest&#39; | &#39;popular&#39;**]**Array<&#39;newest&#39; &#124; &#39;popular&#39;>** | Sort order for the themes. | (optional) defaults to 'newest'|
 
 
 ### Return type

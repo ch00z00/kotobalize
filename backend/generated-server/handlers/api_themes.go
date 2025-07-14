@@ -19,12 +19,23 @@ type ThemeWithFavorite struct {
 // ListThemes - Get a list of all available themes
 func (c *Container) ListThemes(ctx *gin.Context) {
 	// Get user ID from the context (set by the auth middleware)
-	userID, exists := ctx.Get("userId")
+	userIDVal, exists := ctx.Get("userId")
 	if !exists {
 		// This endpoint is protected, so a user should always exist.
 		// This is a safeguard.
 		ctx.JSON(http.StatusUnauthorized, models.APIError{Code: "UNAUTHORIZED", Message: "User ID not found in token"})
 		return
+	}
+	userID := userIDVal.(uint)
+
+	sortOrder := ctx.DefaultQuery("sort", "newest")
+	orderClause := "gorm_themes.creator_id asc, "
+
+	switch sortOrder {
+	case "popular":
+		orderClause += "gorm_themes.favorites_count desc, gorm_themes.created_at desc"
+	default: // "newest"
+		orderClause += "gorm_themes.created_at desc"
 	}
 
 	var results []ThemeWithFavorite
@@ -32,8 +43,8 @@ func (c *Container) ListThemes(ctx *gin.Context) {
 	if err := c.DB.Table("gorm_themes").
 		Select("gorm_themes.*, user_favorite_themes.user_id IS NOT NULL as is_favorited").
 		Joins("LEFT JOIN user_favorite_themes ON gorm_themes.id = user_favorite_themes.theme_id AND user_favorite_themes.user_id = ?", userID).
-		Where("gorm_themes.creator_id IS NULL OR gorm_themes.creator_id = ?", userID).
-		Order("gorm_themes.creator_id asc, gorm_themes.created_at desc").
+		Where("gorm_themes.deleted_at IS NULL AND (gorm_themes.creator_id IS NULL OR gorm_themes.creator_id = ?)", userID).
+		Order(orderClause).
 		Find(&results).Error; err != nil {
 		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to fetch themes"})
 		return
@@ -271,22 +282,31 @@ func (c *Container) FavoriteTheme(ctx *gin.Context) {
 		return
 	}
 
-	// Create the favorite relationship
-	favorite := models.UserFavoriteTheme{
-		UserID:  userID.(uint),
-		ThemeID: uint(themeID),
-	}
-
-	// Use FirstOrCreate to avoid duplicate entries. If it already exists, do nothing.
-	// If you need to return a 409 Conflict, you'd check for existence first.
-	// For simplicity and idempotency, FirstOrCreate is often a good choice.
-	if err := c.DB.FirstOrCreate(&favorite).Error; err != nil {
-		// A real conflict error (e.g., from a race condition if not using FirstOrCreate)
-		if errors.Is(err, gorm.ErrDuplicatedKey) {
-			ctx.JSON(http.StatusConflict, models.APIError{Code: "ALREADY_FAVORITED", Message: "Theme is already favorited"})
-			return
+	// Use a transaction to ensure atomicity
+	err = c.DB.Transaction(func(tx *gorm.DB) error {
+		favorite := models.UserFavoriteTheme{
+			UserID:  userID.(uint),
+			ThemeID: uint(themeID),
 		}
-		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to favorite theme"})
+
+		// Use FirstOrCreate to avoid duplicate entries.
+		result := tx.FirstOrCreate(&favorite)
+		if result.Error != nil {
+			return result.Error
+		}
+
+		// Only increment if a new record was created
+		if result.RowsAffected > 0 {
+			if err := tx.Model(&models.GormTheme{}).Where("id = ?", themeID).UpdateColumn("favorites_count", gorm.Expr("favorites_count + 1")).Error; err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to update favorite status"})
 		return
 	}
 
@@ -308,12 +328,24 @@ func (c *Container) UnfavoriteTheme(ctx *gin.Context) {
 		return
 	}
 
-	// Delete the favorite relationship
-	favorite := models.UserFavoriteTheme{
-		UserID:  userID.(uint),
-		ThemeID: uint(themeID),
+	err = c.DB.Transaction(func(tx *gorm.DB) error {
+		favorite := models.UserFavoriteTheme{
+			UserID:  userID.(uint),
+			ThemeID: uint(themeID),
+		}
+		result := tx.Delete(&favorite)
+		if result.RowsAffected > 0 {
+			if err := tx.Model(&models.GormTheme{}).Where("id = ? AND favorites_count > 0", themeID).UpdateColumn("favorites_count", gorm.Expr("favorites_count - 1")).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, models.APIError{Code: "DATABASE_ERROR", Message: "Failed to update favorite status"})
+		return
 	}
-	c.DB.Delete(&favorite) // GORM deletes based on primary key fields
 
 	ctx.Status(http.StatusNoContent)
 }
@@ -326,6 +358,7 @@ func mapGormThemeToAPI(gormTheme models.GormTheme, isFavorited bool) models.Them
 		Description:        gormTheme.Description,
 		Category:           gormTheme.Category,
 		TimeLimitInSeconds: gormTheme.TimeLimitInSeconds,
+		FavoritesCount:     gormTheme.FavoritesCount,
 		IsFavorited:        isFavorited,
 		CreatedAt:          gormTheme.CreatedAt,
 		UpdatedAt:          gormTheme.UpdatedAt,

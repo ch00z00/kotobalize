@@ -1,5 +1,6 @@
 import {
   ApiError,
+  ListThemesSortEnum,
   NewThemeRequest,
   Theme,
   UpdateThemeRequest,
@@ -44,9 +45,14 @@ export async function createTheme(
  * @param token - The user's JWT for authorization.
  * @returns A promise that resolves to an array of themes.
  */
-export async function getThemesForClient(token: string): Promise<Theme[]> {
+export async function listThemes(
+  token: string,
+  sort: ListThemesSortEnum = 'newest'
+): Promise<Theme[]> {
   try {
-    const res = await fetch(`${PUBLIC_API_BASE_URL}/themes`, {
+    const url = new URL(`${PUBLIC_API_BASE_URL}/themes`);
+    url.searchParams.append('sort', sort);
+    const res = await fetch(url.toString(), {
       headers: {
         Authorization: `Bearer ${token}`,
       },

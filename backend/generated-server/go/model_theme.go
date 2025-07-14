@@ -34,4 +34,7 @@ type Theme struct {
 
 	// Indicates if the current user has favorited this theme.
 	IsFavorited bool `json:"isFavorited"`
+
+	// The number of users who have favorited this theme.
+	FavoritesCount int32 `json:"favoritesCount"`
 }

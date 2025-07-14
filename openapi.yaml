@@ -180,6 +180,15 @@ paths:
     - Themes
    security:
     - bearerAuth: []
+   parameters:
+    - name: sort
+      in: query
+      required: false
+      schema:
+       type: string
+       enum: [newest, popular]
+       default: newest
+      description: "Sort order for the themes."
    responses:
     "200":
      description: A list of themes
@@ -532,6 +541,11 @@ components:
      type: boolean
      readOnly: true
      description: "Indicates if the current user has favorited this theme."
+    favoritesCount:
+     type: integer
+     format: int32
+     readOnly: true
+     description: "The number of users who have favorited this theme."
    required:
     - id
     - title
@@ -542,6 +556,7 @@ components:
     - updatedAt
     - creatorId
     - isFavorited
+    - favoritesCount
 
   Writing:
    type: object

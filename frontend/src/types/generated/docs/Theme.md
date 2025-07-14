@@ -14,6 +14,7 @@ Name | Type | Description | Notes
 **updatedAt** | **string** |  | [readonly] [default to undefined]
 **creatorId** | **number** | ID of the user who created the theme. Null for official themes. | [readonly] [default to undefined]
 **isFavorited** | **boolean** | Indicates if the current user has favorited this theme. | [readonly] [default to undefined]
+**favoritesCount** | **number** | The number of users who have favorited this theme. | [readonly] [default to undefined]
 
 ## Example
 
@@ -30,6 +31,7 @@ const instance: Theme = {
     updatedAt,
     creatorId,
     isFavorited,
+    favoritesCount,
 };
 ```
 
