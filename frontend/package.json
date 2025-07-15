@@ -10,7 +10,9 @@
     "lint:fix": "next lint --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "gen:types": "openapi-generator generate -i ../openapi.yaml -g typescript -o src/types/generated --additional-properties=modelPropertyNaming=original,enumPropertyNaming=original"
+    "gen:types": "openapi-generator generate -i ../openapi.yaml -g typescript -o src/types/generated --additional-properties=modelPropertyNaming=original,enumPropertyNaming=original",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "framer-motion": "^12.23.3",
@@ -26,7 +28,11 @@
     "zustand": "^4.5.7"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "^4.0.1",
     "@eslint/eslintrc": "^3",
+    "@storybook/addon-a11y": "^9.0.16",
+    "@storybook/addon-docs": "^9.0.16",
+    "@storybook/addon-vitest": "^9.0.16",
     "@tailwindcss/postcss": "^4",
     "@tailwindcss/typography": "^0.5.16",
     "@types/js-cookie": "^3.0.6",
@@ -37,8 +43,15 @@
     "eslint-config-next": "15.3.4",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.5.1",
+    "eslint-plugin-storybook": "^9.0.16",
     "prettier": "^3.6.2",
+    "storybook": "^9.0.16",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "@storybook/nextjs-vite": "^9.0.16",
+    "vitest": "^3.2.4",
+    "@vitest/browser": "^3.2.4",
+    "playwright": "^1.54.1",
+    "@vitest/coverage-v8": "^3.2.4"
   }
 }
