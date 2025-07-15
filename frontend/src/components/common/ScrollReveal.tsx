@@ -11,6 +11,11 @@ interface ScrollRevealProps {
   once?: boolean;
 }
 
+/**
+ * ScrollReveal is a component that animates its children when they enter the viewport.
+ * @param param0
+ * @returns
+ */
 export default function ScrollReveal({
   children,
   delay = 0,
