@@ -48,7 +48,7 @@ export default function Banner({ message, type, onClose }: BannerProps) {
           <XCircle className="h-5 w-5" />
         )}
       </div>
-      <div className="ml-3 text-md font-medium">{message}</div>
+      <div className="ml-3 text-md font-medium message">{message}</div>
       <button
         type="button"
         className="ml-auto -my-1.5 inline-flex h-8 w-8 items-center justify-center rounded-lg p-1.5 focus:ring-2"
