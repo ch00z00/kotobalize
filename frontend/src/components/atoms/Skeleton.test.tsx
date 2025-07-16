@@ -19,6 +19,13 @@ describe('Skeleton Component', () => {
       <Skeleton className="h-24 w-24 rounded-full" data-testid="skeleton" />
     );
     const skeletonElement = screen.getByTestId('skeleton');
-    expect(skeletonElement).toHaveClass('h-24', 'w-24', 'rounded-full');
+    expect(skeletonElement).toHaveClass(
+      'animate-pulse',
+      'rounded-md',
+      'bg-gray-200',
+      'h-24',
+      'w-24',
+      'rounded-full'
+    );
   });
 });
