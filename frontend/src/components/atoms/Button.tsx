@@ -1,8 +1,9 @@
-import { ReactNode, ButtonHTMLAttributes } from 'react';
+import { ReactNode, ButtonHTMLAttributes, useCallback } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
   onClick?: () => void;
+  onKeyDown?: (event: React.KeyboardEvent<HTMLButtonElement>) => void;
   variant?: 'primary' | 'secondary' | 'outline' | 'danger';
   className?: string;
 }
@@ -10,6 +11,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export default function Button({
   children,
   onClick,
+  onKeyDown,
   variant = 'primary',
   className = '',
   disabled = false,
@@ -32,11 +34,22 @@ export default function Button({
 
   const combinedClassName = `${baseStyles} ${variantStyles[variant]} ${className}`;
 
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLButtonElement>) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        onClick?.();
+      }
+    },
+    [onClick]
+  );
+
   return (
     <button
       type={type}
       className={combinedClassName}
       onClick={onClick}
+      onKeyDown={onKeyDown || handleKeyDown}
       disabled={disabled}
       {...props}
     >
