@@ -6,7 +6,6 @@ describe('Icon Component', () => {
   let consoleWarnSpy: jest.SpyInstance;
 
   beforeEach(() => {
-    // `console.warn`がテストログを汚さないようにモック化します。
     consoleWarnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
   });
 
@@ -20,11 +19,20 @@ describe('Icon Component', () => {
   });
 
   it('ケース3: `size`, `color`, `className`などのプロパティが適用される', () => {
-    render(<Icon name="Save" size={48} color="blue" className="extra-class" />);
-    // lucide-reactはデフォルトでrole="img"とaria-hidden="true"を設定します
-    const iconElement = screen.getByRole('img', { hidden: true });
-    expect(iconElement).toHaveClass('lucide-save', 'extra-class');
+    render(
+      <Icon
+        name="Save"
+        size={48}
+        color="blue"
+        className="extra-class"
+        data-testid="icon"
+      />
+    );
+    const iconElement = screen.getByTestId('icon');
+
+    expect(iconElement).toHaveClass('lucide', 'lucide-save', 'extra-class');
     expect(iconElement).toHaveAttribute('width', '48');
+    expect(iconElement).toHaveAttribute('height', '48');
     expect(iconElement).toHaveAttribute('stroke', 'blue');
   });
 
