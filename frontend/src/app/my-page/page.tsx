@@ -286,7 +286,7 @@ export default function ProfilePage() {
               )}
 
               <div className="w-full text-center">
-                <div className="group flex items-center justify-center gap-2">
+                <div className="group flex items-center justify-center gap-2 -mr-5">
                   {isEditingName ? (
                     <input
                       type="text"
@@ -345,7 +345,7 @@ export default function ProfilePage() {
 
           {/* Right Content */}
           <main className="md:col-span-3">
-            <div className="rounded-xl bg-white p-6 shadow-md">
+            <div className="rounded-xl bg-white p-6 border-2 border-gray-200">
               <h2 className="mb-4 text-lg font-semibold text-gray-700">
                 Contributions
               </h2>
