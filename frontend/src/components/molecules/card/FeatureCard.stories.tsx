@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import { icons } from 'lucide-react';
 import { type IconName } from '@/types/icon';
 import FeatureCard from './FeatureCard';

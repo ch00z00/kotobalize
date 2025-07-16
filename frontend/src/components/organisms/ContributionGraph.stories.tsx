@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/nextjs';
 import ContributionGraph from './ContributionGraph';
 import { type Activity } from 'react-activity-calendar';
 
