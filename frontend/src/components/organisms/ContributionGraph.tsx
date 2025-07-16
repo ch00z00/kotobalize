@@ -6,21 +6,25 @@ import ActivityCalendar, {
   type Color,
 } from 'react-activity-calendar';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
+import LinkButton from '../atoms/LinkButton';
 
 interface ContributionGraphProps {
   data: Activity[];
 }
 
 const explicitTheme = {
-  light: ['#f0f0f0', '#b1b1e9', '#6969d7', '#2a2ac5', '#0606b0'] as Color[],
-  dark: ['#f0f0f0', '#b1b1e9', '#6969d7', '#2a2ac5', '#0606b0'] as Color[],
+  light: ['#F0F0F0', '#DDF5FF', '#4A90E2', '#9B59B6', '#F73859'] as Color[],
+  dark: ['#F0F0F0', '#DDF5FF', '#4A90E2', '#9B59B6', '#F73859'] as Color[],
 };
 
 export default function ContributionGraph({ data }: ContributionGraphProps) {
   if (data.length === 0) {
     return (
-      <div className="flex h-full min-h-[160px] items-center justify-center rounded-md border-2 border-dashed border-gray-200 text-sm text-gray-500">
+      <div className="flex flex-col gap-y-4 h-full min-h-[160px] items-center justify-center rounded-md border-2 border-dashed border-gray-200 text-sm text-gray-500">
         <p>アクティビティがありません。</p>
+        <LinkButton href="/themes" variant="primary">
+          言語化にチャレンジする
+        </LinkButton>
       </div>
     );
   }
@@ -59,7 +63,7 @@ export default function ContributionGraph({ data }: ContributionGraphProps) {
 
           return React.cloneElement(block, tooltipProps);
         }}
-        blockSize={14}
+        blockSize={16}
         blockRadius={2}
         blockMargin={4}
         fontSize={16}
