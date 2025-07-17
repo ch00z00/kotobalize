@@ -30,12 +30,12 @@ export default function ContributionGraph({ data }: ContributionGraphProps) {
   }
 
   // Get today's date in 'YYYY-MM-DD' format, respecting the local timezone.
-  const today = new Date();
-  const todayString = new Date(
-    today.getTime() - today.getTimezoneOffset() * 60000
-  )
-    .toISOString()
-    .slice(0, 10);
+  const today = new Date().toLocaleDateString('en-CA', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    timeZone: 'Asia/Tokyo',
+  });
 
   return (
     <div className="contribution-calendar-wrapper">
@@ -53,7 +53,7 @@ export default function ContributionGraph({ data }: ContributionGraphProps) {
           };
 
           // For future dates, add a border to indicate they are upcoming.
-          if (activity.date > todayString) {
+          if (activity.date > today) {
             return React.cloneElement(block, {
               ...tooltipProps,
               stroke: 'rgba(27, 31, 35, 0.12)',
