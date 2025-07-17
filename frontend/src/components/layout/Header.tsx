@@ -14,6 +14,7 @@ const monumentExtended = localFont({
 });
 
 export default function Header() {
+  /** isClient is used to wait for the client side to be ready */
   const [isClient, setIsClient] = useState(false);
   const { isLoggedIn } = useAuthStore();
 
