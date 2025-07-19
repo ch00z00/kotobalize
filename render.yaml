@@ -1,0 +1,58 @@
+# Render Blueprint: https://render.com/docs/blueprint-spec
+
+services:
+ # 1. フロントエンド (Next.js)
+ # Next.jsのSSR（サーバーサイドレンダリング）などの機能を活かすため、Webサービスとしてデプロイします。
+ - type: web
+   name: kotobalize-frontend
+   runtime: node
+   plan: free
+   rootDir: frontend
+   buildCommand: npm install && npm run build
+   startCommand: npm start
+   envVars:
+    - key: NODE_ENV
+      value: production
+    - key: NEXT_PUBLIC_API_URL
+      # バックエンドサービスの公開URLを自動で環境変数に設定します。
+      fromService:
+       type: web
+       name: kotobalize-backend # 下で定義するバックエンドサービス名と一致させる
+       property: url
+
+ # 2. バックエンド (Go)
+ # CIでビルドしたDockerイメージをデプロイします。
+ - type: web
+   name: kotobalize-backend
+   runtime: docker
+   plan: free
+   rootDir: backend
+   dockerfilePath: ./Dockerfile
+   healthCheckPath: /health
+   envVars:
+    - key: DATABASE_URL
+      # MySQLデータベースの内部接続用URLを自動で環境変数に設定します。
+      fromService:
+       type: pserv
+       name: kotobalize-mysql # 下で定義するDBサービス名と一致させる
+       property: connectionString
+    - key: GIN_MODE # GoのフレームワークがGinの場合の例
+      value: release
+    # --- シークレット情報 ---
+    # JWT_SECRETのような秘密情報は、Renderのダッシュボードで設定します。
+    # 'sync: false' を指定すると、このyamlファイルでダッシュボードの値を上書きしなくなります。
+    - key: JWT_SECRET
+      sync: false
+
+ # 3. データベース (MySQL)
+ # 外部から直接アクセスできないプライベートサービスとしてデプロイします。
+#  - type: pserv # pserv = Private Service
+#    name: kotobalize-mysql # サービス名（任意）
+#    runtime: mysql
+#    plan: free # 無料プラン。
+# 注意: 無料プランのDBは一定期間でスリープし、データが永続化されません。
+# 本番運用では有料プランに切り替え、ディスク設定を有効にしてください。
+# disk:
+#   name: mysql-data
+#   sizeGB: 10
+#   mountPath: /var/lib/mysql

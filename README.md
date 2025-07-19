@@ -9,13 +9,6 @@
 - 技術面接で必要な説明力・構造化力・具体抽象変換力・語彙力をトレーニング
 - 書いて → AI に添削してもらって → 自分の弱点を自覚して鍛えるサイクルを支援
 
-## 📚 機能構成（MVP）
-
-1. 言語化テーマ選択（出題テーマから選択/自分で入力して設定）
-2. テキストエディタ（Markdown エディタ）
-3. AI レビュー（スコアと観点ごとのフィードバック）
-4. レビュー履歴
-
 ## 技術スタック
 
 - フロントエンド: Next.js, TypeScript, Tailwind CSS
@@ -23,9 +16,9 @@
 - スキーマ定義: OpenAPI
 - DB: MySQL
 - インフラ: Docker（Docker Compose）, openapi-generator
-- テスト: Go 標準テスト機能 (バックエンド), Jest (フロントエンド)
+- テスト: Go 標準テスト機能 (バックエンド), Jest/React Testing Library (フロントエンド)
 - AI レビュー: OpenAI API（GPT-4）
-- 認証（任意）: email ＋ password ベースのシンプルな認証で OK
+- 認証（任意）: email ＋ password ＋ JWT ベースのシンプルな認証で OK
 
 ## 実装概要
 
