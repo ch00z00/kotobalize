@@ -14,9 +14,12 @@
     "test:watch": "jest --watch",
     "gen:types": "openapi-generator generate -i ../openapi.yaml -g typescript -o src/types/generated --additional-properties=modelPropertyNaming=original,enumPropertyNaming=original",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "prepare": "husky"
   },
   "dependencies": {
+    "husky": "^9.0.0",
+    "lint-staged": "^15.0.0",
     "@storybook/nextjs": "^9.0.17",
     "framer-motion": "^12.23.3",
     "js-cookie": "^3.0.5",
@@ -63,5 +66,11 @@
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^3.2.4"
+  },
+  "lint-staged": {
+    "frontend/**/*.{js,jsx,ts,tsx}": [
+      "prettier --write",
+      "eslint --fix --max-warnings=0"
+    ]
   }
 }
