@@ -17,7 +17,7 @@ export default async function ThemesPage() {
   const themes = await getThemes(token);
 
   return (
-    <div className="container min-h-[calc(100vh-168px)] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-12 lg:py-14">
+    <div>
       {/* Pass the server-fetched themes to the client component for interactive browsing */}
       <ThemeBrowser initialThemes={themes} />
     </div>

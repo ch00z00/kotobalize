@@ -29,31 +29,35 @@ export default function ContributionGraph({ data }: ContributionGraphProps) {
     );
   }
 
-  // Get today's date in 'YYYY-MM-DD' format, respecting the local timezone.
-  const today = new Date().toLocaleDateString('en-CA', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    timeZone: 'Asia/Tokyo',
-  });
-
   return (
     <div className="contribution-calendar-wrapper">
       <ActivityCalendar
         data={data}
         theme={explicitTheme}
         renderBlock={(block, activity) => {
-          // Tooltip content changes based on activity count
+          const utcDate = new Date(activity.date + 'T00:00:00Z');
+          const jstDate = new Date(utcDate.getTime() + 9 * 60 * 60 * 1000);
+
+          const formattedJST = jstDate.toLocaleDateString('ja-JP', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            weekday: 'short',
+          });
+
           const tooltipProps = {
             'data-tooltip-id': 'react-tooltip',
             'data-tooltip-html':
               activity.count > 0
-                ? `${activity.count} contributions on ${activity.date}`
-                : `No contributions on ${activity.date}`,
+                ? `${activity.count} contributions on ${formattedJST}`
+                : `No contributions on ${formattedJST}`,
           };
 
-          // For future dates, add a border to indicate they are upcoming.
-          if (activity.date > today) {
+          // todayも JSTで比較する必要がある
+          const todayJST = new Date();
+          const todayDateStr = todayJST.toISOString().split('T')[0];
+
+          if (activity.date > todayDateStr) {
             return React.cloneElement(block, {
               ...tooltipProps,
               stroke: 'rgba(27, 31, 35, 0.12)',

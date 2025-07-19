@@ -32,7 +32,9 @@ export default function RootLayout({
           speed={200}
         />
         <Header />
-        <main>{children}</main>
+        <main className="container min-h-[calc(100vh-168px)] mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-12 lg:py-14">
+          {children}
+        </main>
         <Footer />
       </body>
     </html>

@@ -224,7 +224,7 @@ export default function ProfilePage() {
           onClose={() => setNotification(null)}
         />
       )}
-      <div className="container mx-auto min-h-[calc(100vh-168px)] max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+      <div>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           {/* Left Sidebar */}
           <aside className="md:col-span-1">
