@@ -1,219 +1,44 @@
 'use client';
 
-import { useState, ChangeEvent, useEffect } from 'react';
 import { User, Mail, Edit3, Save } from 'lucide-react';
 import Image from 'next/image';
-import { useAuthStore } from '@/store/auth';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
 import Button from '@/components/atoms/Button';
-import {
-  getAvatarUploadUrl,
-  updateUserAvatar,
-  updateUserProfile,
-  updateUserPassword,
-  deleteUserAvatar,
-  getUserActivity,
-} from '@/lib/api/users.client';
 import DeleteModal from '@/components/organisms/DeleteModal';
 import Banner from '@/components/molecules/Banner';
 import Modal from '@/components/common/Modal';
 import ContributionGraph from '@/components/organisms/ContributionGraph';
-import { type Activity } from 'react-activity-calendar';
-
+import { useProfilePage } from '@/hooks/useProfile';
 export default function ProfilePage() {
-  const { user, token, updateAvatar, updateUser } = useAuthStore();
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-  // State for profile editing
-  const [isEditingName, setIsEditingName] = useState(false);
-  const [name, setName] = useState(user?.name || '');
-
-  // State for password change
-  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [isPasswordLoading, setIsPasswordLoading] = useState(false);
-
-  // State for contribution graph
-  const [activityData, setActivityData] = useState<Activity[]>([]);
-  const [isActivityLoading, setIsActivityLoading] = useState(true);
-
-  const [notification, setNotification] = useState<{
-    message: string;
-    type: 'success' | 'error';
-  } | null>(null);
-
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-      setPreview(URL.createObjectURL(selectedFile));
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (!file || !token) return;
-
-    setIsLoading(true);
-    setNotification(null);
-
-    try {
-      // 1. Get presigned URL from our backend
-      const { uploadUrl } = await getAvatarUploadUrl(
-        file.name,
-        file.type,
-        token
-      );
-
-      // 2. Upload file directly to S3
-      const s3Response = await fetch(uploadUrl, {
-        method: 'PUT',
-        body: file,
-        headers: { 'Content-Type': file.type },
-      });
-
-      if (!s3Response.ok) {
-        // S3からのエラーレスポンス(XML)をテキストとして取得し、より詳細なエラーを表示
-        const errorText = await s3Response.text();
-        throw new Error(
-          `S3へのアップロードに失敗しました: ${s3Response.status}. ${errorText}`
-        );
-      }
-
-      // 3. Notify our backend with the new avatar URL
-      const avatarUrl = uploadUrl.split('?')[0]; // The base URL is the final URL
-      await updateUserAvatar(avatarUrl, token);
-
-      // 4. Update local state
-      updateAvatar(avatarUrl);
-      setNotification({ message: 'アバターを更新しました。', type: 'success' });
-      setFile(null);
-      setPreview(null);
-    } catch (err) {
-      setNotification({
-        message: err instanceof Error ? err.message : 'Upload failed',
-        type: 'error',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDeleteAvatar = async () => {
-    if (!token || !user?.avatarUrl) return;
-
-    setIsLoading(true);
-    setNotification(null);
-    try {
-      const updatedUser = await deleteUserAvatar(token);
-      updateAvatar(updatedUser.avatarUrl || '');
-      setNotification({ message: 'アバターを削除しました。', type: 'success' });
-    } catch (err) {
-      setNotification({
-        message:
-          err instanceof Error ? err.message : 'アバターの削除に失敗しました。',
-        type: 'error',
-      });
-    } finally {
-      setIsLoading(false);
-      setIsDeleteModalOpen(false);
-    }
-  };
-
-  const handleNameSave = async () => {
-    if (!token || !name.trim()) {
-      setNotification({
-        message: 'ユーザー名は必須です。',
-        type: 'error',
-      });
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const updatedUser = await updateUserProfile({ name }, token);
-      updateUser(updatedUser); // Update user in the store
-      setNotification({
-        message: 'ユーザー名を更新しました。',
-        type: 'success',
-      });
-      setIsEditingName(false);
-    } catch (err) {
-      setNotification({
-        message: err instanceof Error ? err.message : '更新に失敗しました。',
-        type: 'error',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handlePasswordChange = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!token) return;
-    if (newPassword.length < 8) {
-      setNotification({
-        message: '新しいパスワードは8文字以上で入力してください。',
-        type: 'error',
-      });
-      return;
-    }
-
-    setIsPasswordLoading(true);
-    setNotification(null);
-
-    try {
-      await updateUserPassword({ currentPassword, newPassword }, token);
-      setNotification({
-        message: 'パスワードを更新しました。',
-        type: 'success',
-      });
-      setCurrentPassword('');
-      setNewPassword('');
-      setIsPasswordModalOpen(false);
-    } catch (err) {
-      setNotification({
-        message:
-          err instanceof Error
-            ? err.message
-            : 'パスワードの変更に失敗しました。',
-        type: 'error',
-      });
-    } finally {
-      setIsPasswordLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const fetchActivity = async () => {
-      if (token) {
-        try {
-          const data = await getUserActivity(token);
-          setActivityData(data);
-        } catch (err) {
-          console.error('Failed to fetch activity data:', err);
-          setNotification({
-            message: '活動履歴の取得に失敗しました。',
-            type: 'error',
-          });
-        } finally {
-          setIsActivityLoading(false);
-        }
-      }
-    };
-    fetchActivity();
-  }, [token]);
-
-  useEffect(() => {
-    if (notification) {
-      const timer = setTimeout(() => {
-        setNotification(null);
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [notification]);
+  const {
+    user,
+    file,
+    preview,
+    isLoading,
+    isPasswordLoading,
+    isActivityLoading,
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
+    isPasswordModalOpen,
+    setIsPasswordModalOpen,
+    isEditingName,
+    setIsEditingName,
+    name,
+    setName,
+    currentPassword,
+    setCurrentPassword,
+    newPassword,
+    setNewPassword,
+    activityData,
+    notification,
+    setNotification,
+    handleAvatarChange,
+    handleUploadAvatar,
+    handleCancelAvatarChange,
+    handleDeleteAvatar,
+    handleNameSave,
+    handlePasswordChange,
+  } = useProfilePage();
 
   return (
     <ProtectedRoute>
@@ -263,23 +88,17 @@ export default function ProfilePage() {
                   id="avatar-upload"
                   type="file"
                   accept="image/png, image/jpeg, image/gif"
-                  onChange={handleFileChange}
+                  onChange={handleAvatarChange}
                   className="hidden"
                 />
               </div>
 
               {file && (
                 <div className="flex w-full items-center justify-center space-x-4">
-                  <Button onClick={handleSubmit} disabled={isLoading}>
+                  <Button onClick={handleUploadAvatar} disabled={isLoading}>
                     {isLoading ? '保存中...' : '保存'}
                   </Button>
-                  <Button
-                    onClick={() => {
-                      setFile(null);
-                      setPreview(null);
-                    }}
-                    variant="outline"
-                  >
+                  <Button onClick={handleCancelAvatarChange} variant="outline">
                     キャンセル
                   </Button>
                 </div>
