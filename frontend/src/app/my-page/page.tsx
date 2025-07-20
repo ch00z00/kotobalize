@@ -1,6 +1,6 @@
 'use client';
 
-import { User, Mail, Edit3, Save } from 'lucide-react';
+import { User, Mail, PenLine as Edit3, Save } from 'lucide-react';
 import Image from 'next/image';
 import ProtectedRoute from '@/components/common/ProtectedRoute';
 import Button from '@/components/atoms/Button';
@@ -32,6 +32,8 @@ export default function ProfilePage() {
     activityData,
     notification,
     setNotification,
+    avatarNotification,
+    setAvatarNotification,
     handleAvatarChange,
     handleUploadAvatar,
     handleCancelAvatarChange,
@@ -47,6 +49,13 @@ export default function ProfilePage() {
           message={notification.message}
           type={notification.type}
           onClose={() => setNotification(null)}
+        />
+      )}
+      {avatarNotification && (
+        <Banner
+          message={avatarNotification.message}
+          type={avatarNotification.type}
+          onClose={() => setAvatarNotification(null)}
         />
       )}
       <div>

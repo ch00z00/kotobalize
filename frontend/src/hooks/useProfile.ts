@@ -1,29 +1,24 @@
 'use client';
 
-import { useState, ChangeEvent, useEffect, FormEvent } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { useAuthStore } from '@/store/auth';
 import {
-  getAvatarUploadUrl,
-  updateUserAvatar,
   updateUserProfile,
   updateUserPassword,
-  deleteUserAvatar,
   getUserActivity,
 } from '@/lib/api/users.client';
 import { type Activity } from 'react-activity-calendar';
+import { useAvatar } from './useAvatar';
 
 /**
  * Custom hook to encapsulate all logic for the user profile page.
  * It handles state management, API calls, and event handlers.
  */
 export const useProfilePage = () => {
-  const { user, token, updateAvatar, updateUser } = useAuthStore();
-
-  // State for file handling
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
+  const { user, token, updateUser } = useAuthStore();
 
   // General and specific loading states
+  // Note: isAvatarLoading is managed within the useAvatar hook.
   const [isLoading, setIsLoading] = useState(false);
   const [isPasswordLoading, setIsPasswordLoading] = useState(false);
   const [isActivityLoading, setIsActivityLoading] = useState(true);
@@ -48,6 +43,21 @@ export const useProfilePage = () => {
     message: string;
     type: 'success' | 'error';
   } | null>(null);
+
+  // Encapsulated avatar logic from the custom useAvatar hook
+  const {
+    file,
+    preview,
+    isAvatarLoading,
+    avatarNotification,
+    setAvatarNotification,
+    handleAvatarChange,
+    handleCancelAvatarChange,
+    handleUploadAvatar,
+    handleDeleteAvatar,
+  } = useAvatar({
+    onDeleteSuccess: () => setIsDeleteModalOpen(false),
+  });
 
   // Effect to sync local name state with the user from the auth store
   useEffect(() => {
@@ -125,71 +135,6 @@ export const useProfilePage = () => {
     }
   }, [notification]);
 
-  const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      setFile(selectedFile);
-      setPreview(URL.createObjectURL(selectedFile));
-    }
-  };
-  const handleCancelAvatarChange = () => {
-    setFile(null);
-    setPreview(null);
-  };
-
-  const handleUploadAvatar = async () => {
-    if (!file || !token) return;
-
-    await handleApiCall(
-      async () => {
-        const { uploadUrl } = await getAvatarUploadUrl(
-          file.name,
-          file.type,
-          token
-        );
-        const s3Response = await fetch(uploadUrl, {
-          method: 'PUT',
-          body: file,
-          headers: { 'Content-Type': file.type },
-        });
-
-        if (!s3Response.ok) {
-          const errorText = await s3Response.text();
-          throw new Error(
-            `S3へのアップロードに失敗しました: ${s3Response.status}. ${errorText}`
-          );
-        }
-
-        const avatarUrl = uploadUrl.split('?')[0];
-        await updateUserAvatar(avatarUrl, token);
-        return avatarUrl;
-      },
-      {
-        loadingSetter: setIsLoading,
-        successMessage: 'アバターを更新しました。',
-        genericErrorMessage: 'アバターのアップロードに失敗しました。',
-        onSuccess: (avatarUrl) => {
-          updateAvatar(avatarUrl);
-          handleCancelAvatarChange();
-        },
-      }
-    );
-  };
-
-  const handleDeleteAvatar = async () => {
-    if (!token || !user?.avatarUrl) return;
-
-    await handleApiCall(() => deleteUserAvatar(token), {
-      loadingSetter: setIsLoading,
-      successMessage: 'アバターを削除しました。',
-      genericErrorMessage: 'アバターの削除に失敗しました。',
-      onSuccess: (updatedUser) => {
-        updateAvatar(updatedUser.avatarUrl || '');
-        setIsDeleteModalOpen(false);
-      },
-    });
-  };
-
   const handleNameSave = async () => {
     if (!token || !name.trim()) {
       setNotification({ message: 'ユーザー名は必須です。', type: 'error' });
@@ -234,11 +179,11 @@ export const useProfilePage = () => {
 
   return {
     user,
+    // Avatar related state and handlers from useAvatar
     file,
-    setFile,
     preview,
-    setPreview,
-    isLoading,
+    // Combine loading states for a single loading indicator in the UI
+    isLoading: isLoading || isAvatarLoading,
     isPasswordLoading,
     isActivityLoading,
     isDeleteModalOpen,
@@ -254,8 +199,10 @@ export const useProfilePage = () => {
     newPassword,
     setNewPassword,
     activityData,
-    notification,
+    notification, // For profile updates
     setNotification,
+    avatarNotification, // For avatar updates
+    setAvatarNotification,
     handleAvatarChange,
     handleCancelAvatarChange,
     handleUploadAvatar,
