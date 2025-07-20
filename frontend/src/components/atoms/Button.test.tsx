@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
-import Button from './Button';
+import Button, { type ButtonProps } from './Button';
 
 describe('Button Component', () => {
   const user = userEvent.setup();
@@ -56,7 +56,9 @@ describe('Button Component', () => {
     ])(
       'ケース6: variantが"%s"の時、正しいスタイルが適用される',
       (variant, expectedClass) => {
-        render(<Button variant={variant as any}>{variant}</Button>);
+        render(
+          <Button variant={variant as ButtonProps['variant']}>{variant}</Button>
+        );
         expect(screen.getByRole('button')).toHaveClass(expectedClass);
       }
     );
