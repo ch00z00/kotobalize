@@ -7,6 +7,7 @@ import {
   updateUserAvatar,
   deleteUserAvatar,
 } from '@/lib/api/users.client';
+import { handleApiCall } from '@/lib/utils/apiHandler';
 
 /**
  * Notification message type definition
@@ -72,46 +73,41 @@ export const useAvatar = ({ onDeleteSuccess }: UseAvatarProps = {}) => {
   const handleUploadAvatar = async () => {
     if (!file || !token) return;
 
-    setIsAvatarLoading(true);
-    setAvatarNotification(null);
-    try {
-      const { uploadUrl } = await getAvatarUploadUrl(
-        file.name,
-        file.type,
-        token
-      );
-      const s3Response = await fetch(uploadUrl, {
-        method: 'PUT',
-        body: file,
-        headers: { 'Content-Type': file.type },
-      });
-
-      if (!s3Response.ok) {
-        const errorText = await s3Response.text();
-        throw new Error(
-          `S3へのアップロードに失敗しました: ${s3Response.status}. ${errorText}`
+    await handleApiCall(
+      async () => {
+        const { uploadUrl } = await getAvatarUploadUrl(
+          file.name,
+          file.type,
+          token
         );
-      }
+        const s3Response = await fetch(uploadUrl, {
+          method: 'PUT',
+          body: file,
+          headers: { 'Content-Type': file.type },
+        });
 
-      const avatarUrl = uploadUrl.split('?')[0];
-      await updateUserAvatar(avatarUrl, token);
-      updateAvatar(avatarUrl); // Zustandストアを更新
-      handleCancelAvatarChange(); // ファイルとプレビューをリセット
-      setAvatarNotification({
-        message: 'アバターを更新しました。',
-        type: 'success',
-      });
-    } catch (err) {
-      setAvatarNotification({
-        message:
-          err instanceof Error
-            ? err.message
-            : 'アバターのアップロードに失敗しました。',
-        type: 'error',
-      });
-    } finally {
-      setIsAvatarLoading(false);
-    }
+        if (!s3Response.ok) {
+          const errorText = await s3Response.text();
+          throw new Error(
+            `S3へのアップロードに失敗しました: ${s3Response.status}. ${errorText}`
+          );
+        }
+
+        const avatarUrl = uploadUrl.split('?')[0];
+        await updateUserAvatar(avatarUrl, token);
+        return avatarUrl;
+      },
+      {
+        loadingSetter: setIsAvatarLoading,
+        notificationSetter: setAvatarNotification,
+        successMessage: 'アバターを更新しました。',
+        genericErrorMessage: 'アバターのアップロードに失敗しました。',
+        onSuccess: (avatarUrl) => {
+          updateAvatar(avatarUrl); // Zustandストアを更新
+          handleCancelAvatarChange(); // ファイルとプレビューをリセット
+        },
+      }
+    );
   };
 
   /**
@@ -120,25 +116,16 @@ export const useAvatar = ({ onDeleteSuccess }: UseAvatarProps = {}) => {
   const handleDeleteAvatar = async () => {
     if (!token || !user?.avatarUrl) return;
 
-    setIsAvatarLoading(true);
-    setAvatarNotification(null);
-    try {
-      const updatedUser = await deleteUserAvatar(token);
-      updateAvatar(updatedUser.avatarUrl || ''); // Zustandストアを更新
-      setAvatarNotification({
-        message: 'アバターを削除しました。',
-        type: 'success',
-      });
-      onDeleteSuccess?.(); // 親コンポーネントに成功を通知（例：モーダルを閉じる）
-    } catch (err) {
-      setAvatarNotification({
-        message:
-          err instanceof Error ? err.message : 'アバターの削除に失敗しました。',
-        type: 'error',
-      });
-    } finally {
-      setIsAvatarLoading(false);
-    }
+    await handleApiCall(() => deleteUserAvatar(token), {
+      loadingSetter: setIsAvatarLoading,
+      notificationSetter: setAvatarNotification,
+      successMessage: 'アバターを削除しました。',
+      genericErrorMessage: 'アバターの削除に失敗しました。',
+      onSuccess: (updatedUser) => {
+        updateAvatar(updatedUser.avatarUrl || ''); // Zustandストアを更新
+        onDeleteSuccess?.(); // 親コンポーネントに成功を通知（例：モーダルを閉じる）
+      },
+    });
   };
 
   return {

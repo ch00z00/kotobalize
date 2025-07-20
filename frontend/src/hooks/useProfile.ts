@@ -9,6 +9,7 @@ import {
 } from '@/lib/api/users.client';
 import { type Activity } from 'react-activity-calendar';
 import { useAvatar } from './useAvatar';
+import { handleApiCall } from '@/lib/utils/apiHandler';
 
 /**
  * Custom hook to encapsulate all logic for the user profile page.
@@ -66,41 +67,6 @@ export const useProfilePage = () => {
     }
   }, [user]);
 
-  /* Helper function to wrap API calls with common logic and error handling.
-   *
-   * @param apiCall - The API call to wrap.
-   * @param options - Options for the API call.
-   * @param options.loadingSetter - Function to set the loading state.
-   * @param options.successMessage - Success message to display.
-   * @param options.onSuccess - Optional function to run on success.
-   * @param options.genericErrorMessage - Generic error message to display.
-   */
-  const handleApiCall = async <T>(
-    apiCall: () => Promise<T>,
-    options: {
-      loadingSetter: (isLoading: boolean) => void;
-      successMessage: string;
-      onSuccess?: (result: T) => void;
-      genericErrorMessage: string;
-    }
-  ) => {
-    options.loadingSetter(true);
-    setNotification(null);
-    try {
-      const result = await apiCall();
-      setNotification({ message: options.successMessage, type: 'success' });
-      options.onSuccess?.(result);
-    } catch (err) {
-      setNotification({
-        message:
-          err instanceof Error ? err.message : options.genericErrorMessage,
-        type: 'error',
-      });
-    } finally {
-      options.loadingSetter(false);
-    }
-  };
-
   // Effect to fetch user activity data for the contribution graph
   useEffect(() => {
     const fetchActivity = async () => {
@@ -142,6 +108,7 @@ export const useProfilePage = () => {
     }
     await handleApiCall(() => updateUserProfile({ name }, token), {
       loadingSetter: setIsLoading,
+      notificationSetter: setNotification,
       successMessage: 'ユーザー名を更新しました。',
       genericErrorMessage: '更新に失敗しました。',
       onSuccess: (updatedUser) => {
@@ -166,6 +133,7 @@ export const useProfilePage = () => {
       () => updateUserPassword({ currentPassword, newPassword }, token),
       {
         loadingSetter: setIsPasswordLoading,
+        notificationSetter: setNotification,
         successMessage: 'パスワードを更新しました。',
         genericErrorMessage: 'パスワードの変更に失敗しました。',
         onSuccess: () => {
