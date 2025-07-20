@@ -50,14 +50,13 @@ export const useProfilePage = () => {
     file,
     preview,
     isAvatarLoading,
-    avatarNotification,
-    setAvatarNotification,
     handleAvatarChange,
     handleCancelAvatarChange,
     handleUploadAvatar,
     handleDeleteAvatar,
   } = useAvatar({
     onDeleteSuccess: () => setIsDeleteModalOpen(false),
+    notificationSetter: setNotification,
   });
 
   // Effect to sync local name state with the user from the auth store
@@ -169,8 +168,6 @@ export const useProfilePage = () => {
     activityData,
     notification, // For profile updates
     setNotification,
-    avatarNotification, // For avatar updates
-    setAvatarNotification,
     handleAvatarChange,
     handleCancelAvatarChange,
     handleUploadAvatar,

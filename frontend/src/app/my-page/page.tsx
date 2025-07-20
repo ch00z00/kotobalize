@@ -9,6 +9,7 @@ import Banner from '@/components/molecules/Banner';
 import Modal from '@/components/common/Modal';
 import ContributionGraph from '@/components/organisms/ContributionGraph';
 import { useProfilePage } from '@/hooks/useProfile';
+
 export default function ProfilePage() {
   const {
     user,
@@ -32,8 +33,6 @@ export default function ProfilePage() {
     activityData,
     notification,
     setNotification,
-    avatarNotification,
-    setAvatarNotification,
     handleAvatarChange,
     handleUploadAvatar,
     handleCancelAvatarChange,
@@ -49,13 +48,6 @@ export default function ProfilePage() {
           message={notification.message}
           type={notification.type}
           onClose={() => setNotification(null)}
-        />
-      )}
-      {avatarNotification && (
-        <Banner
-          message={avatarNotification.message}
-          type={avatarNotification.type}
-          onClose={() => setAvatarNotification(null)}
         />
       )}
       <div>

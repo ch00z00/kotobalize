@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, ChangeEvent, useEffect } from 'react';
+import { useState, ChangeEvent } from 'react';
 import { useAuthStore } from '@/store/auth';
 import {
   getAvatarUploadUrl,
@@ -21,31 +21,25 @@ type NotificationType = {
  * Props for the useAvatar hook
  */
 interface UseAvatarProps {
-  onDeleteSuccess?: () => void; // Callback to run on avatar deletion success
+  onDeleteSuccess?: () => void;
+  notificationSetter: React.Dispatch<
+    React.SetStateAction<NotificationType | null>
+  >;
 }
 
 /**
  * Custom hook to encapsulate user avatar-related logic
- * @param {UseAvatarProps} props - Hook properties
  */
-export const useAvatar = ({ onDeleteSuccess }: UseAvatarProps = {}) => {
+export const useAvatar = ({
+  onDeleteSuccess,
+  notificationSetter,
+}: UseAvatarProps) => {
   const { user, token, updateAvatar } = useAuthStore();
 
   const [file, setFile] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
 
   const [isAvatarLoading, setIsAvatarLoading] = useState(false);
-  const [avatarNotification, setAvatarNotification] =
-    useState<NotificationType | null>(null);
-
-  useEffect(() => {
-    if (avatarNotification) {
-      const timer = setTimeout(() => {
-        setAvatarNotification(null);
-      }, 5000);
-      return () => clearTimeout(timer);
-    }
-  }, [avatarNotification]);
 
   /**
    * Handle file input changes and set file and preview
@@ -99,7 +93,7 @@ export const useAvatar = ({ onDeleteSuccess }: UseAvatarProps = {}) => {
       },
       {
         loadingSetter: setIsAvatarLoading,
-        notificationSetter: setAvatarNotification,
+        notificationSetter,
         successMessage: 'アバターを更新しました。',
         genericErrorMessage: 'アバターのアップロードに失敗しました。',
         onSuccess: (avatarUrl) => {
@@ -118,7 +112,7 @@ export const useAvatar = ({ onDeleteSuccess }: UseAvatarProps = {}) => {
 
     await handleApiCall(() => deleteUserAvatar(token), {
       loadingSetter: setIsAvatarLoading,
-      notificationSetter: setAvatarNotification,
+      notificationSetter,
       successMessage: 'アバターを削除しました。',
       genericErrorMessage: 'アバターの削除に失敗しました。',
       onSuccess: (updatedUser) => {
@@ -132,8 +126,6 @@ export const useAvatar = ({ onDeleteSuccess }: UseAvatarProps = {}) => {
     file,
     preview,
     isAvatarLoading,
-    avatarNotification,
-    setAvatarNotification,
     handleAvatarChange,
     handleCancelAvatarChange,
     handleUploadAvatar,
