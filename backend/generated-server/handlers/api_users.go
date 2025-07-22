@@ -298,5 +298,8 @@ func (c *Container) DeleteUserAvatar(ctx *gin.Context) {
 	if user.AvatarURL != nil {
 		apiUser.AvatarURL = *user.AvatarURL
 	}
+	if user.Name != nil {
+		apiUser.Name = user.Name
+	}
 	ctx.JSON(http.StatusOK, apiUser)
 }

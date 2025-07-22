@@ -38,6 +38,9 @@ func (c *Container) GetCurrentUser(ctx *gin.Context) {
 	if user.AvatarURL != nil {
 		apiUser.AvatarURL = *user.AvatarURL
 	}
+	if user.Name != nil {
+		apiUser.Name = user.Name
+	}
 
 	ctx.JSON(http.StatusOK, apiUser)
 }
@@ -88,6 +91,9 @@ func (c *Container) LoginUser(ctx *gin.Context) {
 	}
 	if user.AvatarURL != nil {
 		apiUser.AvatarURL = *user.AvatarURL
+	}
+	if user.Name != nil {
+		apiUser.Name = user.Name
 	}
 
 	// Return the token and user info
@@ -155,6 +161,9 @@ func (c *Container) SignupUser(ctx *gin.Context) {
 	}
 	if newUser.AvatarURL != nil {
 		apiUser.AvatarURL = *newUser.AvatarURL
+	}
+	if newUser.Name != nil {
+		apiUser.Name = newUser.Name
 	}
 
 	ctx.JSON(http.StatusCreated, models.AuthResponse{
