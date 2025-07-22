@@ -69,6 +69,8 @@ func main() {
 	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
 	// Allow all standard HTTP methods
 	config.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}
+	// Allow credentials (cookies, authorization headers, etc.)
+	config.AllowCredentials = true
 	router.Use(cors.New(config))
 
 	// Create auth middleware instance
