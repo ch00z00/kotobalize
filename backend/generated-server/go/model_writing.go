@@ -14,7 +14,6 @@ import (
 )
 
 type Writing struct {
-
 	Id int64 `json:"id"`
 
 	UserId int64 `json:"userId"`

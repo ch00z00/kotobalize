@@ -6,7 +6,6 @@ import (
 
 // Writing model based on openapi.yml
 type Writing struct {
-
 	ID int64 `json:"id"`
 
 	UserID int64 `json:"userId"`

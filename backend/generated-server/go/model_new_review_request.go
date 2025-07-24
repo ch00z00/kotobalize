@@ -10,6 +10,5 @@
 package openapi
 
 type NewReviewRequest struct {
-
 	WritingId int64 `json:"writingId"`
 }

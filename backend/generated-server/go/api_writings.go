@@ -17,30 +17,29 @@ type WritingsAPI struct {
 }
 
 // Post /api/v1/writings
-// Create a new writing record and trigger AI review 
+// Create a new writing record and trigger AI review
 func (api *WritingsAPI) CreateWriting(c *gin.Context) {
 	// Your handler implementation
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
 // Get /api/v1/writings/:writingId
-// Get details of a specific writing record by ID 
+// Get details of a specific writing record by ID
 func (api *WritingsAPI) GetWritingById(c *gin.Context) {
 	// Your handler implementation
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
 // Get /api/v1/writings
-// Get a list of all writings for the authenticated user 
+// Get a list of all writings for the authenticated user
 func (api *WritingsAPI) ListUserWritings(c *gin.Context) {
 	// Your handler implementation
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
 // Post /api/v1/review
-// Trigger AI review for a writing 
+// Trigger AI review for a writing
 func (api *WritingsAPI) ReviewWriting(c *gin.Context) {
 	// Your handler implementation
 	c.JSON(200, gin.H{"status": "OK"})
 }
-

@@ -10,7 +10,6 @@
 package openapi
 
 type ThemeBase struct {
-
 	Title string `json:"title,omitempty"`
 
 	Description string `json:"description,omitempty"`

@@ -10,7 +10,6 @@
 package openapi
 
 type NewThemeRequest struct {
-
 	Title string `json:"title"`
 
 	Description string `json:"description"`

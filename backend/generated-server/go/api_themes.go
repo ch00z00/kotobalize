@@ -17,51 +17,50 @@ type ThemesAPI struct {
 }
 
 // Post /api/v1/themes
-// Create a new theme 
+// Create a new theme
 func (api *ThemesAPI) CreateTheme(c *gin.Context) {
 	// Your handler implementation
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
 // Delete /api/v1/themes/:themeId
-// Delete a theme 
+// Delete a theme
 func (api *ThemesAPI) DeleteTheme(c *gin.Context) {
 	// Your handler implementation
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
 // Post /api/v1/themes/:themeId/favorite
-// Favorite a theme 
+// Favorite a theme
 func (api *ThemesAPI) FavoriteTheme(c *gin.Context) {
 	// Your handler implementation
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
 // Get /api/v1/themes/:themeId
-// Get details of a specific theme by ID 
+// Get details of a specific theme by ID
 func (api *ThemesAPI) GetThemeById(c *gin.Context) {
 	// Your handler implementation
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
 // Get /api/v1/themes
-// Get a list of all available themes 
+// Get a list of all available themes
 func (api *ThemesAPI) ListThemes(c *gin.Context) {
 	// Your handler implementation
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
 // Delete /api/v1/themes/:themeId/favorite
-// Unfavorite a theme 
+// Unfavorite a theme
 func (api *ThemesAPI) UnfavoriteTheme(c *gin.Context) {
 	// Your handler implementation
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
 // Put /api/v1/themes/:themeId
-// Update an existing theme 
+// Update an existing theme
 func (api *ThemesAPI) UpdateTheme(c *gin.Context) {
 	// Your handler implementation
 	c.JSON(200, gin.H{"status": "OK"})
 }
-

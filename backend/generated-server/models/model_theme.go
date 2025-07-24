@@ -6,7 +6,6 @@ import (
 
 // Theme model based on openapi.yml
 type Theme struct {
-
 	ID int64 `json:"id"`
 
 	Title string `json:"title"`

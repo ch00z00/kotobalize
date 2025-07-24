@@ -46,10 +46,12 @@ services:
  - type: pserv
    name: kotobalize-db
    runtime: image
+   image:
+    url: mysql:8.0
    plan: free
    autoDeploy: false
    disk:
-    name: mysql
+    name: mysql-data
     mountPath: /var/lib/mysql
     sizeGB: 10
    envVars:

@@ -17,44 +17,43 @@ type UsersAPI struct {
 }
 
 // Delete /api/v1/users/me/avatar
-// Delete user's avatar 
+// Delete user's avatar
 func (api *UsersAPI) DeleteUserAvatar(c *gin.Context) {
 	// Your handler implementation
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
 // Post /api/v1/users/me/avatar/upload-url
-// Get a presigned URL for avatar upload 
+// Get a presigned URL for avatar upload
 func (api *UsersAPI) GetAvatarUploadURL(c *gin.Context) {
 	// Your handler implementation
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
 // Get /api/v1/users/me/activity
-// Get user's activity data for contribution graph 
+// Get user's activity data for contribution graph
 func (api *UsersAPI) GetUserActivity(c *gin.Context) {
 	// Your handler implementation
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
 // Put /api/v1/users/me/avatar
-// Update user's avatar URL 
+// Update user's avatar URL
 func (api *UsersAPI) UpdateUserAvatar(c *gin.Context) {
 	// Your handler implementation
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
 // Put /api/v1/users/me/password
-// Update current user's password 
+// Update current user's password
 func (api *UsersAPI) UpdateUserPassword(c *gin.Context) {
 	// Your handler implementation
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
 // Put /api/v1/users/me
-// Update current user's profile 
+// Update current user's profile
 func (api *UsersAPI) UpdateUserProfile(c *gin.Context) {
 	// Your handler implementation
 	c.JSON(200, gin.H{"status": "OK"})
 }
-

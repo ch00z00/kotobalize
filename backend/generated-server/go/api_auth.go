@@ -17,23 +17,22 @@ type AuthAPI struct {
 }
 
 // Get /api/v1/auth/me
-// Get current authenticated user's information 
+// Get current authenticated user's information
 func (api *AuthAPI) GetCurrentUser(c *gin.Context) {
 	// Your handler implementation
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
 // Post /api/v1/auth/login
-// Authenticate user and get a token 
+// Authenticate user and get a token
 func (api *AuthAPI) LoginUser(c *gin.Context) {
 	// Your handler implementation
 	c.JSON(200, gin.H{"status": "OK"})
 }
 
 // Post /api/v1/auth/signup
-// Sign up a new user 
+// Sign up a new user
 func (api *AuthAPI) SignupUser(c *gin.Context) {
 	// Your handler implementation
 	c.JSON(200, gin.H{"status": "OK"})
 }
-
