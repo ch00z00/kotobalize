@@ -13,12 +13,9 @@ services:
    envVars:
     - key: NODE_ENV
       value: production
-    - key: NEXT_PUBLIC_API_URL
-      # バックエンドサービスの公開URLを自動で環境変数に設定します。
-      fromService:
-       type: web
-       name: kotobalize-backend # 下で定義するバックエンドサービス名と一致させる
-       property: url
+    - key: NEXT_PUBLIC_API_URL # バックエンドサービスの公開URLを直接指定します。
+      # fromServiceの'url'はビルド時には利用できないためです。
+      value: https://kotobalize-backend.onrender.com
 
  # 2. バックエンド (Go)
  # CIでビルドしたDockerイメージをデプロイします。
@@ -34,7 +31,7 @@ services:
       # MySQLデータベースの内部接続用URLを自動で環境変数に設定します。
       fromService:
        type: pserv
-       name: kotobalize-mysql # 下で定義するDBサービス名と一致させる
+       name: kotobalize-db # 下で定義するDBサービス名と一致させる
        property: connectionString
     - key: GIN_MODE # GoのフレームワークがGinの場合の例
       value: release
@@ -46,13 +43,28 @@ services:
 
  # 3. データベース (MySQL)
  # 外部から直接アクセスできないプライベートサービスとしてデプロイします。
-#  - type: pserv # pserv = Private Service
-#    name: kotobalize-mysql # サービス名（任意）
-#    runtime: mysql
-#    plan: free # 無料プラン。
-# 注意: 無料プランのDBは一定期間でスリープし、データが永続化されません。
-# 本番運用では有料プランに切り替え、ディスク設定を有効にしてください。
-# disk:
-#   name: mysql-data
-#   sizeGB: 10
-#   mountPath: /var/lib/mysql
+ - type: pserv
+   name: kotobalize-db
+   runtime: image
+   plan: free
+   autoDeploy: false
+   disk:
+    name: mysql
+    mountPath: /var/lib/mysql
+    sizeGB: 10
+   envVars:
+    - fromGroup: mysql
+
+envVarGroups:
+ - name: mysql
+   envVars:
+    - key: DB_USER
+      value: kotobalize_user
+    - key: DB_PASSWORD
+      generateValue: true
+    - key: DB_HOST
+      value: db
+    - key: DB_PORT
+      value: 3306
+    - key: DB_NAME
+      value: kotobalize_db
