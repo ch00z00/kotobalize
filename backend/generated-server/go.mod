@@ -1,6 +1,8 @@
 module github.com/ch00z00/kotobalize
 
-go 1.22
+go 1.23.0
+
+toolchain go1.24.2
 
 require (
 	github.com/aws/aws-sdk-go-v2 v1.36.5
