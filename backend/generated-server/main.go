@@ -4,6 +4,7 @@ import (
 	"flag"
 	"log"
 	"os"
+	"time"
 
 	"github.com/ch00z00/kotobalize/handlers"
 	"github.com/ch00z00/kotobalize/middleware"
@@ -23,9 +24,17 @@ import (
  */
 
 func main() {
+	log.Println("Kotobalize backend server starting...")
+	
 	// --reset-db フラグを定義します。このフラグが指定されると、DBがリセットされます。
 	resetDB := flag.Bool("reset-db", false, "Reset the database by dropping all tables before migrating.")
 	flag.Parse()
+
+	// Add a small delay to ensure Cloud SQL proxy is ready
+	if os.Getenv("GIN_MODE") == "release" {
+		log.Println("Running in production mode, waiting for services to be ready...")
+		time.Sleep(2 * time.Second)
+	}
 
 	// Initialize container with DB connection
 	c, err := handlers.NewContainer()
