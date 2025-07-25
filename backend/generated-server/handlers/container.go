@@ -24,19 +24,28 @@ type Container struct {
 
 // NewContainer returns an empty or an initialized container for your handlers.
 func NewContainer() (Container, error) {
-	// Load environment variables from docker-compose.yml
-	user := os.Getenv("DB_USER")
-	password := os.Getenv("DB_PASSWORD")
-	host := os.Getenv("DB_HOST")
-	port := os.Getenv("DB_PORT")
-	dbname := os.Getenv("DB_NAME")
+	// Load environment variables
 	jwtSecret := os.Getenv("JWT_SECRET")
 	openaiAPIKey := os.Getenv("OPENAI_API_KEY")
 	awsRegion := os.Getenv("AWS_REGION")
 	s3BucketName := os.Getenv("S3_BUCKET_NAME")
 
-	// Build DSN (Data Source Name)
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", user, password, host, port, dbname)
+	var dsn string
+
+	// Check for DATABASE_URL first (used in Cloud Run)
+	if databaseURL := os.Getenv("DATABASE_URL"); databaseURL != "" {
+		dsn = databaseURL
+	} else {
+		// Fall back to individual environment variables (used in local development)
+		user := os.Getenv("DB_USER")
+		password := os.Getenv("DB_PASSWORD")
+		host := os.Getenv("DB_HOST")
+		port := os.Getenv("DB_PORT")
+		dbname := os.Getenv("DB_NAME")
+
+		// Build DSN (Data Source Name)
+		dsn = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", user, password, host, port, dbname)
+	}
 
 	// Connect to MySQL with GORM
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
