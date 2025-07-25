@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
 
 	"github.com/ch00z00/kotobalize/handlers"
 	"github.com/ch00z00/kotobalize/middleware"
@@ -61,10 +62,32 @@ func main() {
 	// Initialize Gin router
 	router := gin.Default()
 
+	// Add health check endpoint
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status": "healthy",
+			"message": "Server is running",
+		})
+	})
+
 	// Configure and use CORS middleware
 	config := cors.DefaultConfig()
-	// Allow requests from the frontend development server
-	config.AllowOrigins = []string{"http://localhost:3000"}
+	// Allow requests from the frontend development server and production
+	allowedOrigins := []string{"http://localhost:3000"}
+	
+	// Add production frontend URL if available
+	frontendURL := os.Getenv("FRONTEND_URL")
+	if frontendURL != "" {
+		allowedOrigins = append(allowedOrigins, frontendURL)
+	}
+	
+	// Allow all origins in production for now (to be restricted later)
+	if os.Getenv("GIN_MODE") == "release" {
+		config.AllowAllOrigins = true
+	} else {
+		config.AllowOrigins = allowedOrigins
+	}
+	
 	// Allow necessary headers for authentication and content type
 	config.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
 	// Allow all standard HTTP methods
@@ -112,8 +135,15 @@ func main() {
 		}
 	}
 
+	// Get port from environment variable or use default
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	
 	// Start server
-	if err := router.Run(":8080"); err != nil {
+	log.Printf("Starting server on port %s...", port)
+	if err := router.Run(":" + port); err != nil {
 		log.Fatalf("failed to run server: %v", err)
 	}
 }
