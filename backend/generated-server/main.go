@@ -150,9 +150,19 @@ func main() {
 		port = "8080"
 	}
 	
+	// Bind to 0.0.0.0 to accept connections from outside the container
+	addr := "0.0.0.0:" + port
+	
+	// Log when server is ready
+	go func() {
+		time.Sleep(100 * time.Millisecond)
+		log.Printf("Server should now be listening on %s", addr)
+		log.Printf("Health check available at: http://%s/health", addr)
+	}()
+	
 	// Start server
-	log.Printf("Starting server on port %s...", port)
-	if err := router.Run(":" + port); err != nil {
+	log.Printf("Starting server on %s...", addr)
+	if err := router.Run(addr); err != nil {
 		log.Fatalf("failed to run server: %v", err)
 	}
 }

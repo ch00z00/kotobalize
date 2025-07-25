@@ -15,8 +15,12 @@ RUN go build -o /app/main .
 
 # Runtime stage
 FROM alpine:3.18
+
+# Install ca-certificates for HTTPS connections and other runtime dependencies
+RUN apk --no-cache add ca-certificates tzdata
+
 ENV GIN_MODE=release
 WORKDIR /app
 COPY --from=build /app/main .
-EXPOSE 8080/tcp
+EXPOSE 8080
 CMD ["./main"]
