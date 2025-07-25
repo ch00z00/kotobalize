@@ -30,21 +30,71 @@ func main() {
 	resetDB := flag.Bool("reset-db", false, "Reset the database by dropping all tables before migrating.")
 	flag.Parse()
 
-	// Add a small delay to ensure Cloud SQL proxy is ready
-	if os.Getenv("GIN_MODE") == "release" {
-		log.Println("Running in production mode, waiting for services to be ready...")
-		time.Sleep(2 * time.Second)
+	// Get port from environment variable or use default
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
 	}
+	
+	// Initialize Gin router immediately
+	router := gin.Default()
+	
+	// Bind to 0.0.0.0 to accept connections from outside the container
+	addr := "0.0.0.0:" + port
+	
+	// Add basic health check that works immediately
+	router.GET("/health", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"status": "server_running",
+			"message": "HTTP server is running",
+			"timestamp": time.Now().UTC().Format(time.RFC3339),
+		})
+	})
+	
+	// Container to hold our dependencies (will be initialized asynchronously)
+	var container *handlers.Container
+	var containerReady bool
+	
+	// Initialize container asynchronously
+	go func() {
+		log.Println("Initializing application dependencies...")
+		
+		// Add a small delay to ensure Cloud SQL proxy is ready
+		if os.Getenv("GIN_MODE") == "release" {
+			log.Println("Running in production mode, waiting for services to be ready...")
+			time.Sleep(2 * time.Second)
+		}
 
-	// Initialize container with DB connection
-	c, err := handlers.NewContainer()
-	if err != nil {
-		log.Fatalf("failed to create container: %v", err)
+		// Initialize container with DB connection
+		c, err := handlers.NewContainer()
+		if err != nil {
+			log.Printf("failed to create container: %v", err)
+			return
+		}
+		
+		container = &c
+		containerReady = true
+		log.Println("Application dependencies initialized successfully")
+		
+		// Set up application routes now that container is ready
+		setupRoutes(router, container, *resetDB)
+	}()
+	
+	// Start server immediately
+	log.Printf("Starting HTTP server on %s...", addr)
+	log.Printf("Basic health check available at: http://%s/health", addr)
+	
+	if err := router.Run(addr); err != nil {
+		log.Fatalf("failed to run server: %v", err)
 	}
+}
+
+func setupRoutes(router *gin.Engine, c *handlers.Container, resetDB bool) {
+	log.Println("Setting up application routes...")
 
 	// --reset-db フラグが true の場合、既存のテーブルをすべて削除します。
 	// 注意: この操作は元に戻せません。
-	if *resetDB {
+	if resetDB {
 		log.Println("WARNING: --reset-db flag is set. Dropping all tables...")
 		err := c.DB.Migrator().DropTable(
 			&models.GormUser{},
@@ -53,7 +103,8 @@ func main() {
 			&models.UserFavoriteTheme{}, // 新しいお気に入りモデルも対象に含めます
 		)
 		if err != nil {
-			log.Fatalf("failed to drop tables: %v", err)
+			log.Printf("failed to drop tables: %v", err)
+			return
 		}
 		log.Println("All tables dropped successfully.")
 	}
@@ -62,20 +113,20 @@ func main() {
 	// 必要なテーブルやカラムが自動で作成されます。
 	log.Println("Running database migrations...")
 	if err := c.DB.AutoMigrate(&models.GormUser{}, &models.GormTheme{}, &models.GormWriting{}, &models.UserFavoriteTheme{}); err != nil {
-		log.Fatalf("failed to migrate database: %v", err)
+		log.Printf("failed to migrate database: %v", err)
+		return
 	}
 
 	// Seed the database with initial data
 	seeder.SeedThemes(c.DB)
 
-	// Initialize Gin router
-	router := gin.Default()
-
-	// Add health check endpoint
-	router.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"status": "healthy",
-			"message": "Server is running",
+	// Update health check to show full readiness
+	router.GET("/ready", func(ctx *gin.Context) {
+		ctx.JSON(200, gin.H{
+			"status": "ready",
+			"message": "Application is fully initialized and ready",
+			"database": "connected",
+			"timestamp": time.Now().UTC().Format(time.RFC3339),
 		})
 	})
 
@@ -144,25 +195,5 @@ func main() {
 		}
 	}
 
-	// Get port from environment variable or use default
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-	
-	// Bind to 0.0.0.0 to accept connections from outside the container
-	addr := "0.0.0.0:" + port
-	
-	// Log when server is ready
-	go func() {
-		time.Sleep(100 * time.Millisecond)
-		log.Printf("Server should now be listening on %s", addr)
-		log.Printf("Health check available at: http://%s/health", addr)
-	}()
-	
-	// Start server
-	log.Printf("Starting server on %s...", addr)
-	if err := router.Run(addr); err != nil {
-		log.Fatalf("failed to run server: %v", err)
-	}
+	log.Println("Application routes configured successfully")
 }
