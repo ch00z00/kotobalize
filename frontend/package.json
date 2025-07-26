@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "@storybook/nextjs": "^9.0.17",
+    "@tailwindcss/postcss": "^4.1.11",
     "autoprefixer": "^10.4.21",
     "framer-motion": "^12.23.3",
     "husky": "^9.0.0",
