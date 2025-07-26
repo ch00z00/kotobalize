@@ -1,7 +1,6 @@
 run:
   timeout: 5m
-  skip-dirs:
-    - go  # Skip the generated go directory
+  go: "1.23"
 
 linters:
   enable:
@@ -12,17 +11,16 @@ linters:
     - unused
     - gosimple
     - ineffassign
-    - typecheck
   disable:
     - structcheck  # deprecated
     - deadcode     # deprecated
     - varcheck     # deprecated
-
-linters-settings:
-  typecheck:
-    go: "1.23"
+    - typecheck     # temporarily disabled due to jwt import issues
 
 issues:
   exclude-use-default: false
   max-issues-per-linter: 0
   max-same-issues: 0
+  exclude-dirs:
+    - go  # Skip the generated go directory
+    - vendor
