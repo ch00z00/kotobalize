@@ -3,7 +3,8 @@ version: "3.8"
 services:
  backend:
   build:
-   context: ./backend/generated-server
+   context: ./backend
+   dockerfile: Dockerfile
   ports:
    - "8080:8080"
   depends_on:
@@ -17,20 +18,23 @@ services:
  frontend:
   build:
    context: ./frontend
+   dockerfile: Dockerfile.dev # Use development Dockerfile
   ports:
    - "3000:3000"
   volumes:
-   # ホストのソースコードをコンテナにマウントして、ホットリロードを有効にします
-   # :delegated はmacOSでのパフォーマンスを向上させます
+   # Mount host source code to container and enable hot reload
+   # :delegated improves performance on macOS
    - ./frontend:/app:delegated
-   # コンテナ内のnode_modulesがホストのもので上書きされるのを防ぎます
+   # Prevent container's node_modules from being overwritten by host's one
    - /app/node_modules
-  # DockerfileのCMDを上書きし、開発サーバーを起動します
-  command: npm run dev
+  # Dockerfile.dev sets CMD so command is not needed
+  # command: npm run dev  # <- This line is deleted
   depends_on:
    - backend
   env_file:
    - .env.local
+  environment:
+   - NODE_ENV=development # Indicates this is development environment
   networks:
    - kotobalize-net
 
@@ -57,10 +61,8 @@ services:
    retries: 5
    start_period: 10s
   ports:
-   # MySQL port mapping
    - "3306:3306"
   volumes:
-   # MySQL data persistence
    - mysql-data:/var/lib/mysql
   networks:
    - kotobalize-net

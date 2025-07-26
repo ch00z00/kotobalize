@@ -1,19 +1,32 @@
-# Use a Node.js base image suitable for development
-FROM node:20-alpine
+# Build stage
+FROM node:20-alpine AS builder
 
-# Set the working directory inside the container
 WORKDIR /app
 
-# Copy package.json and lock file to leverage Docker cache
 COPY package.json ./
 COPY package-lock.json ./
+RUN npm ci --only=production
 
-# Install dependencies
-RUN npm install
+COPY . .
+RUN npm run build
 
-# Expose the port the app runs on
+# Production stage
+FROM node:20-alpine AS runner
+
+WORKDIR /app
+
+COPY package.json ./
+COPY package-lock.json ./
+RUN npm ci --only=production && npm cache clean --force
+
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+USER nextjs
+
 EXPOSE 3000
+ENV PORT 3000
 
-# The command to run the development server will be provided by docker-compose.
-# This CMD is a fallback for running the container directly.
-CMD ["npm", "run", "dev"]
+CMD ["npm", "start"]
