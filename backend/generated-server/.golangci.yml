@@ -1,26 +1,20 @@
+version: "2"
+
 run:
-  timeout: 5m
-  go: "1.23"
+ timeout: 5m
+ go: "1.23"
 
 linters:
-  enable:
-    - gofmt
-    - govet
-    - errcheck
-    - staticcheck
-    - unused
-    - gosimple
-    - ineffassign
-  disable:
-    - structcheck  # deprecated
-    - deadcode     # deprecated
-    - varcheck     # deprecated
-    - typecheck     # temporarily disabled due to jwt import issues
+ enable:
+  - govet
+  - errcheck
+  - staticcheck
+  - unused
+  - ineffassign
+  - gocyclo
+  - misspell
+  - nolintlint
 
 issues:
-  exclude-use-default: false
-  max-issues-per-linter: 0
-  max-same-issues: 0
-  exclude-dirs:
-    - go  # Skip the generated go directory
-    - vendor
+ max-issues-per-linter: 0
+ max-same-issues: 0
