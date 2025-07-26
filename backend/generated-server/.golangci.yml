@@ -1,0 +1,28 @@
+run:
+  timeout: 5m
+  skip-dirs:
+    - go  # Skip the generated go directory
+
+linters:
+  enable:
+    - gofmt
+    - govet
+    - errcheck
+    - staticcheck
+    - unused
+    - gosimple
+    - ineffassign
+    - typecheck
+  disable:
+    - structcheck  # deprecated
+    - deadcode     # deprecated
+    - varcheck     # deprecated
+
+linters-settings:
+  typecheck:
+    go: "1.23"
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0

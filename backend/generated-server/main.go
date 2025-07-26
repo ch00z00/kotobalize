@@ -25,7 +25,7 @@ import (
 
 func main() {
 	log.Println("Kotobalize backend server starting...")
-	
+
 	// --reset-db フラグを定義します。このフラグが指定されると、DBがリセットされます。
 	resetDB := flag.Bool("reset-db", false, "Reset the database by dropping all tables before migrating.")
 	flag.Parse()
@@ -35,13 +35,13 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
-	
+
 	// Initialize Gin router immediately
 	router := gin.Default()
-	
+
 	// Bind to 0.0.0.0 to accept connections from outside the container
 	addr := "0.0.0.0:" + port
-	
+
 	// Add basic health check that works immediately
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{
@@ -50,14 +50,14 @@ func main() {
 			"timestamp": time.Now().UTC().Format(time.RFC3339),
 		})
 	})
-	
+
 	// Container to hold our dependencies (will be initialized asynchronously)
 	var container *handlers.Container
-	
+
 	// Initialize container asynchronously
 	go func() {
 		log.Println("Initializing application dependencies...")
-		
+
 		// Add a small delay to ensure Cloud SQL proxy is ready
 		if os.Getenv("GIN_MODE") == "release" {
 			log.Println("Running in production mode, waiting for services to be ready...")
@@ -70,18 +70,18 @@ func main() {
 			log.Printf("failed to create container: %v", err)
 			return
 		}
-		
+
 		container = &c
 		log.Println("Application dependencies initialized successfully")
-		
+
 		// Set up application routes now that container is ready
 		setupRoutes(router, container, *resetDB)
 	}()
-	
+
 	// Start server immediately
 	log.Printf("Starting HTTP server on %s...", addr)
 	log.Printf("Basic health check available at: http://%s/health", addr)
-	
+
 	if err := router.Run(addr); err != nil {
 		log.Fatalf("failed to run server: %v", err)
 	}
