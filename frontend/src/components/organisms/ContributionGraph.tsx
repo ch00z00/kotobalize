@@ -1,14 +1,14 @@
 'use client';
 
 import React from 'react';
-import GitHubCalendar from 'react-github-calendar';
+import GitHubCalendar, { type Activity as GitHubActivity } from 'react-github-calendar';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import LinkButton from '../atoms/LinkButton';
 
 interface Activity {
   date: string;
   count: number;
-  level: number;
+  level: 0 | 1 | 2 | 3 | 4;
 }
 
 interface ContributionGraphProps {
@@ -32,28 +32,17 @@ export default function ContributionGraph({ data }: ContributionGraphProps) {
     );
   }
 
-  // Transform data to the format expected by react-github-calendar
-  const transformedData = data.reduce(
-    (acc, activity) => {
-      acc[activity.date] = {
-        level: activity.level,
-        count: activity.count,
-      };
-      return acc;
-    },
-    {} as Record<string, { level: number; count: number }>
-  );
-
   return (
     <div className="contribution-calendar-wrapper">
       <GitHubCalendar
-        data={transformedData}
+        username="example" // required prop but we'll override with transformData
+        transformData={() => data}
         theme={customTheme}
         blockSize={16}
         blockMargin={4}
         fontSize={16}
         showWeekdayLabels={true}
-        renderBlock={(block: React.ReactElement, activity: { date: string; count: number; level: number }) => {
+        renderBlock={(block: React.ReactElement, activity: GitHubActivity) => {
           const utcDate = new Date(activity.date + 'T00:00:00Z');
           const jstDate = new Date(utcDate.getTime() + 9 * 60 * 60 * 1000);
 
