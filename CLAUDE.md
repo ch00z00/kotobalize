@@ -126,3 +126,32 @@ The project uses OpenAPI specification (`openapi.yaml`) as the single source of 
 - Backend connects to Cloud SQL (MySQL)
 - Frontend served as static site
 - Secrets managed via Google Secret Manager
+
+## Important Instructions for Claude Code
+
+### Bash Command Execution
+
+When executing commands that require changing directories:
+- **ALWAYS** run the `cd` command separately from the subsequent command
+- **DO NOT** use `&&` or `;` to chain `cd` with other commands
+- **DO NOT** combine directory changes with command execution
+
+**Correct approach:**
+```bash
+# First command: change directory
+cd /path/to/directory
+
+# Second command: execute the actual command
+npm install
+```
+
+**Incorrect approach (DO NOT USE):**
+```bash
+# DO NOT do this
+cd /path/to/directory && npm install
+
+# DO NOT do this either
+cd /path/to/directory; npm install
+```
+
+This ensures proper command execution and avoids potential errors in the environment.
