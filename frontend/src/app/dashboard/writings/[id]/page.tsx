@@ -3,19 +3,16 @@ import { redirect } from 'next/navigation';
 import { notFound } from 'next/navigation';
 import { getWritingById } from '@/lib/api/writings.server';
 import WritingDetailClient from '@/components/write/WritingDetailClient';
-import { ReadonlyRequestCookies } from 'next/dist/server/web/spec-extension/adapters/request-cookies';
 
 interface WritingDetailPageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
 export default async function WritingDetailPage({
   params,
 }: WritingDetailPageProps) {
-  const { id } = params;
-  const cookieStore: ReadonlyRequestCookies = await cookies();
+  const { id } = await params;
+  const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
 
   if (!token) {
