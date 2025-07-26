@@ -53,7 +53,6 @@ func main() {
 	
 	// Container to hold our dependencies (will be initialized asynchronously)
 	var container *handlers.Container
-	var containerReady bool
 	
 	// Initialize container asynchronously
 	go func() {
@@ -73,7 +72,6 @@ func main() {
 		}
 		
 		container = &c
-		containerReady = true
 		log.Println("Application dependencies initialized successfully")
 		
 		// Set up application routes now that container is ready
