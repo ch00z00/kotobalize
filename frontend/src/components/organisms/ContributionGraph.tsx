@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import GitHubCalendar, { type Activity as GitHubActivity } from 'react-github-calendar';
-import { Tooltip as ReactTooltip } from 'react-tooltip';
+import GitHubCalendar from 'react-github-calendar';
 import LinkButton from '../atoms/LinkButton';
+import { Tooltip as ReactTooltip } from 'react-tooltip';
 
 interface Activity {
   date: string;
@@ -42,27 +42,8 @@ export default function ContributionGraph({ data }: ContributionGraphProps) {
         blockMargin={4}
         fontSize={16}
         showWeekdayLabels={true}
-        renderBlock={(block: React.ReactElement, activity: GitHubActivity) => {
-          const utcDate = new Date(activity.date + 'T00:00:00Z');
-          const jstDate = new Date(utcDate.getTime() + 9 * 60 * 60 * 1000);
-
-          const formattedJST = jstDate.toLocaleDateString('ja-JP', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            weekday: 'short',
-          });
-
-          const tooltipProps = {
-            'data-tooltip-id': 'react-tooltip',
-            'data-tooltip-html':
-              activity.count > 0
-                ? `${activity.count} contributions on ${formattedJST}`
-                : `No contributions on ${formattedJST}`,
-          };
-
-          return React.cloneElement(block, tooltipProps);
-        }}
+        hideColorLegend={false}
+        hideTotalCount={false}
       />
       <ReactTooltip id="react-tooltip" place="top" />
     </div>
