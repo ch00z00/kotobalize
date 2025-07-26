@@ -12,10 +12,21 @@ linters:
   - gocyclo
   - misspell
   - nolintlint
+ exclusions:
+  paths:
+   - go
+   - vendor
+
+formatters:
+ enable:
+  - goimports
+  - golines
+  - swaggo
+ exclusions:
+  paths:
+   - go
+   - vendor
 
 issues:
  max-issues-per-linter: 0
  max-same-issues: 0
- exclude-dirs:
-  - go # Skip the generated go directory
-  - vendor
