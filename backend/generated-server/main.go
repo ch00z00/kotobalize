@@ -42,6 +42,22 @@ func main() {
 	// Bind to 0.0.0.0 to accept connections from outside the container
 	addr := "0.0.0.0:" + port
 
+	// Add root endpoint with API information
+	router.GET("/", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"service": "Kotobalize Backend API",
+			"version": "1.0.0",
+			"status": "running",
+			"endpoints": gin.H{
+				"health": "/health",
+				"ready": "/ready",
+				"api": "/api/v1",
+				"docs": "API endpoints are under /api/v1/*",
+			},
+			"timestamp": time.Now().UTC().Format(time.RFC3339),
+		})
+	})
+	
 	// Add basic health check that works immediately
 	router.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{
