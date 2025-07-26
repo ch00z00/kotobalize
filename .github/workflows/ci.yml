@@ -52,9 +52,6 @@ jobs:
    - name: Run backend linter (golangci-lint)
      run: |
       golangci-lint run --disable=typecheck --out-format=github-actions --path-prefix=backend/generated-server
-     with:
-      version: v1.57
-      working-directory: backend/generated-server
 
    - name: Run backend tests
      run: go test -v ./...
