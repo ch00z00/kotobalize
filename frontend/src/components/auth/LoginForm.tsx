@@ -1,4 +1,3 @@
-// components/auth/LoginForm.tsx
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
