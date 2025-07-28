@@ -36,7 +36,10 @@ export default async function WritePage({ params }: WritePageProps) {
         <p className="text-gray-600">{theme.description}</p>
       </div>
       {/* The Editor component handles the client-side state and interactions */}
-      <Editor themeId={theme.id} />
+      <Editor
+        themeId={theme.id}
+        timeLimitInSeconds={theme.timeLimitInSeconds}
+      />
     </div>
   );
 }

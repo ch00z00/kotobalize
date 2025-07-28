@@ -1,4 +1,4 @@
-import { Theme } from '@/types/generated/models';
+import { Theme } from '@/types/generated/api';
 import { INTERNAL_API_BASE_URL } from '@/lib/api/config';
 
 /**
