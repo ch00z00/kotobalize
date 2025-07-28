@@ -5,13 +5,11 @@ import { cookies } from 'next/headers';
 import Tag from '@/components/atoms/Tag';
 
 interface WritePageProps {
-  params: {
-    id: string;
-  };
+  params: Promise<{ id: string }>;
 }
 
 export default async function WritePage({ params }: WritePageProps) {
-  const { id } = params;
+  const { id } = await params;
   const cookieStore = await cookies();
   const token = cookieStore.get('token')?.value;
 
