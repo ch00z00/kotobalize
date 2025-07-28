@@ -47,10 +47,15 @@ export async function getThemeById(
   token: string
 ): Promise<Theme | null> {
   try {
+    console.log('=== getThemeById Debug ===');
+    console.log('API URL:', INTERNAL_API_BASE_URL);
+    console.log('Theme ID:', id);
+    console.log('Token first 20 chars:', token?.substring(0, 20));
     if (!token) {
       throw new Error('Authorization token is required to fetch a theme.');
     }
 
+    console.log('Making fetch request...');
     const res = await fetch(`${INTERNAL_API_BASE_URL}/themes/${id}`, {
       cache: 'no-store', // Always fetch the latest data
       headers: {
@@ -58,13 +63,26 @@ export async function getThemeById(
       },
     });
 
+    console.log('Response status:', res.status);
+    console.log('Response ok:', res.ok);
+
     if (!res.ok) {
+      console.log(
+        'Response not ok. Status:',
+        res.status,
+        'StatusText:',
+        res.statusText
+      );
       // Return null for 404 to be handled by the page component
-      if (res.status === 404) return null;
+      if (res.status === 404) {
+        console.log('Returning null for 404');
+        return null;
+      }
 
       // For other errors, throw to be caught by the catch block
       throw new Error(`Failed to fetch theme: ${res.statusText}`);
     }
+    console.log('Successfully fetched theme:', res.json());
     return res.json();
   } catch (error) {
     console.error(`API call failed for theme ${id}:`, error);
