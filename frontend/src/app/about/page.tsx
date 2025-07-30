@@ -1,7 +1,19 @@
+'use client';
+
 import { Book, Brain, Target, TrendingUp, Users, Zap } from 'lucide-react';
-import Link from 'next/link';
+import { useAuthStore } from '@/store/auth';
+import LinkButton from '@/components/atoms/LinkButton';
+import { useEffect, useState } from 'react';
+import FeatureCard from '@/components/about/FeatureCard';
+import StepCard from '@/components/about/StepCard';
 
 export default function AboutPage() {
+  const [mounted, setMounted] = useState(false);
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn());
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
@@ -117,54 +129,15 @@ export default function AboutPage() {
           <p className="mb-8 text-xl">
             無料で始められます。クレジットカード不要。
           </p>
-          <Link
-            href="/signup"
-            className="inline-block rounded-lg bg-blue-600 px-8 py-3 text-lg font-semibold transition hover:bg-blue-700"
+          <LinkButton
+            href={mounted && isLoggedIn ? '/themes' : '/signup'}
+            variant="primary"
+            className="px-8 py-3 text-lg"
           >
-            無料で始める
-          </Link>
+            {mounted && isLoggedIn ? 'テーマ一覧へ' : '無料で始める'}
+          </LinkButton>
         </div>
       </section>
-    </div>
-  );
-}
-
-function FeatureCard({
-  icon,
-  title,
-  description,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="rounded-lg border border-gray-200 p-6 transition hover:shadow-lg">
-      <div className="mb-4 text-blue-600">{icon}</div>
-      <h3 className="mb-2 text-xl font-semibold text-gray-900">{title}</h3>
-      <p className="text-gray-600">{description}</p>
-    </div>
-  );
-}
-
-function StepCard({
-  number,
-  title,
-  description,
-}: {
-  number: string;
-  title: string;
-  description: string;
-}) {
-  return (
-    <div className="flex gap-6">
-      <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-xl font-bold text-white">
-        {number}
-      </div>
-      <div>
-        <h3 className="mb-2 text-xl font-semibold text-gray-900">{title}</h3>
-        <p className="text-gray-600">{description}</p>
-      </div>
     </div>
   );
 }
