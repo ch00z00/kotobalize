@@ -29,7 +29,7 @@ export default function ContributionGraph({ data }: ContributionGraphProps) {
   }
 
   // Convert our Activity type to CalendarActivity type
-  const calendarData: CalendarActivity[] = data.map(item => ({
+  const calendarData: CalendarActivity[] = data.map((item) => ({
     date: item.date,
     count: item.count,
     level: item.level as 0 | 1 | 2 | 3 | 4,

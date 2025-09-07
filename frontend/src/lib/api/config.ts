@@ -8,6 +8,9 @@ export const PUBLIC_API_BASE_URL =
 /**
  * Next.jsサーバー(サーバーサイド)からAPIにアクセスするための内部URL。
  * サーバーサイドでのみ使用される。
+ * INTERNAL_API_BASE_URLを優先し、なければINTERNAL_API_URL、最後にPUBLIC_API_BASE_URLを使用
  */
 export const INTERNAL_API_BASE_URL =
-  process.env.INTERNAL_API_URL || PUBLIC_API_BASE_URL;
+  process.env.INTERNAL_API_BASE_URL ||
+  process.env.INTERNAL_API_URL ||
+  PUBLIC_API_BASE_URL;
