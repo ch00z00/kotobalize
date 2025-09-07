@@ -4,11 +4,15 @@ import Editor from '@/components/edit/Editor';
 import { cookies } from 'next/headers';
 import Tag from '@/components/atoms/Tag';
 
-interface WritePageProps {
-  params: Promise<{ id: string }>;
+export async function generateStaticParams() {
+  return [];
 }
 
-export default async function WritePage({ params }: WritePageProps) {
+export default async function WritePage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const { id } = await params;
   console.log('=== WritePage Debug ===');
   console.log('Theme ID:', id);

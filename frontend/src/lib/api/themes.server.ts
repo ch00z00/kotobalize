@@ -82,8 +82,9 @@ export async function getThemeById(
       // For other errors, throw to be caught by the catch block
       throw new Error(`Failed to fetch theme: ${res.statusText}`);
     }
-    console.log('Successfully fetched theme:', res.json());
-    return res.json();
+    const data = await res.json();
+    console.log('Successfully fetched theme:', data);
+    return data;
   } catch (error) {
     console.error(`API call failed for theme ${id}:`, error);
     return null;

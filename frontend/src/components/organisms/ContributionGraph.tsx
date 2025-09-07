@@ -4,12 +4,8 @@ import React from 'react';
 import GitHubCalendar from 'react-github-calendar';
 import LinkButton from '../atoms/LinkButton';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
-
-interface Activity {
-  date: string;
-  count: number;
-  level: 0 | 1 | 2 | 3 | 4;
-}
+import { Activity } from '@/types/generated/api';
+import type { Activity as CalendarActivity } from 'react-github-calendar';
 
 interface ContributionGraphProps {
   data: Activity[];
@@ -32,11 +28,18 @@ export default function ContributionGraph({ data }: ContributionGraphProps) {
     );
   }
 
+  // Convert our Activity type to CalendarActivity type
+  const calendarData: CalendarActivity[] = data.map(item => ({
+    date: item.date,
+    count: item.count,
+    level: item.level as 0 | 1 | 2 | 3 | 4,
+  }));
+
   return (
     <div className="contribution-calendar-wrapper">
       <GitHubCalendar
         username="example" // required prop but we'll override with transformData
-        transformData={() => data}
+        transformData={() => calendarData}
         theme={customTheme}
         blockSize={16}
         blockMargin={4}

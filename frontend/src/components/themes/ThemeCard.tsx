@@ -26,7 +26,7 @@ export default function ThemeCard({
       <div className="absolute top-4 right-4 flex items-center space-x-3">
         <button
           onClick={onToggleFavorite}
-          className="text-yellow-400 transition-colors hover:text-yellow-500"
+          className="text-yellow-400 transition-colors hover:text-yellow-500 hover:cursor-pointer"
           aria-label={theme.isFavorited ? 'お気に入り解除' : 'お気に入り登録'}
         >
           <Star
@@ -39,14 +39,14 @@ export default function ThemeCard({
           <>
             <button
               onClick={onEdit}
-              className="text-gray-400 transition-colors hover:text-gray-600"
+              className="text-gray-400 transition-colors hover:text-gray-600 hover:cursor-pointer"
               aria-label="編集"
             >
               <Pencil className="h-5 w-5" />
             </button>
             <button
               onClick={onDelete}
-              className="text-gray-400 transition-colors hover:text-red-500"
+              className="text-gray-400 transition-colors hover:text-red-500 hover:cursor-pointer"
               aria-label="削除"
             >
               <Trash2 className="h-5 w-5" />
@@ -55,10 +55,10 @@ export default function ThemeCard({
         )}
       </div>
       <Tag className="mb-2 self-start">{theme.category}</Tag>
-      <h2 className="mb-2 flex-grow pr-20 text-xl font-semibold text-gray-900">
+      <h2 className="mb-2 flex-grow text-xl font-semibold text-gray-900 line-clamp-2">
         {theme.title}
       </h2>
-      <p className="mb-4 text-gray-600">{theme.description}</p>
+      <p className="mb-4 text-gray-600 line-clamp-3">{theme.description}</p>
       <LinkButton
         href={`/themes/${theme.id.toString()}/write`}
         className="mt-auto"

@@ -7,7 +7,7 @@ import {
   updateUserPassword,
   getUserActivity,
 } from '@/lib/api/users.client';
-import { type Activity } from 'react-activity-calendar';
+import { type Activity } from '@/types/generated/api';
 import { useAvatar } from './useAvatar';
 import { handleApiCall } from '@/lib/utils/apiHandler';
 
@@ -166,7 +166,7 @@ export const useProfilePage = () => {
     newPassword,
     setNewPassword,
     activityData,
-    notification, // For profile updates
+    notification,
     setNotification,
     handleAvatarChange,
     handleCancelAvatarChange,
