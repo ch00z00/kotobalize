@@ -23,39 +23,41 @@ export default function ThemeCard({
       id={theme.id.toString()}
       className="relative flex flex-col overflow-hidden rounded-lg bg-white p-6 shadow-md transition-shadow duration-300 hover:shadow-lg"
     >
-      <div className="absolute top-4 right-4 flex items-center space-x-3">
-        <button
-          onClick={onToggleFavorite}
-          className="text-yellow-400 transition-colors hover:text-yellow-500 hover:cursor-pointer"
-          aria-label={theme.isFavorited ? 'お気に入り解除' : 'お気に入り登録'}
-        >
-          <Star
-            className={`h-5 w-5 transition-all ${
-              theme.isFavorited ? 'fill-yellow-400' : 'fill-none'
-            }`}
-          />
-        </button>
-        {isMyTheme && (
-          <>
-            <button
-              onClick={onEdit}
-              className="text-gray-400 transition-colors hover:text-gray-600 hover:cursor-pointer"
-              aria-label="編集"
-            >
-              <Pencil className="h-5 w-5" />
-            </button>
-            <button
-              onClick={onDelete}
-              className="text-gray-400 transition-colors hover:text-red-500 hover:cursor-pointer"
-              aria-label="削除"
-            >
-              <Trash2 className="h-5 w-5" />
-            </button>
-          </>
-        )}
+      <div className="flex items-center justify-between mb-4">
+        <Tag>{theme.category}</Tag>
+        <div className="flex items-center space-x-3">
+          <button
+            onClick={onToggleFavorite}
+            className="text-yellow-400 transition-colors hover:text-yellow-500 hover:cursor-pointer"
+            aria-label={theme.isFavorited ? 'お気に入り解除' : 'お気に入り登録'}
+          >
+            <Star
+              className={`h-5 w-5 transition-all ${
+                theme.isFavorited ? 'fill-yellow-400' : 'fill-none'
+              }`}
+            />
+          </button>
+          {isMyTheme && (
+            <>
+              <button
+                onClick={onEdit}
+                className="text-gray-400 transition-colors hover:text-gray-600 hover:cursor-pointer"
+                aria-label="編集"
+              >
+                <Pencil className="h-5 w-5" />
+              </button>
+              <button
+                onClick={onDelete}
+                className="text-gray-400 transition-colors hover:text-red-500 hover:cursor-pointer"
+                aria-label="削除"
+              >
+                <Trash2 className="h-5 w-5" />
+              </button>
+            </>
+          )}
+        </div>
       </div>
-      <Tag className="mb-2 self-start">{theme.category}</Tag>
-      <h2 className="mb-2 flex-grow text-xl font-semibold text-gray-900 line-clamp-2">
+      <h2 className="mb-2 text-xl font-semibold text-gray-900 line-clamp-2">
         {theme.title}
       </h2>
       <p className="mb-4 text-gray-600 line-clamp-3">{theme.description}</p>
