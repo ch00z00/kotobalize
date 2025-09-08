@@ -13,48 +13,57 @@ export default async function WritePage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
-  console.log('=== WritePage Debug ===');
-  console.log('Theme ID:', id);
-  console.log('INTERNAL_API_BASE_URL:', process.env.INTERNAL_API_BASE_URL);
+  try {
+    const resolvedParams = await params;
+    const id = resolvedParams.id;
 
-  const cookieStore = await cookies();
-  const token = cookieStore.get('token')?.value;
-  console.log('Token present:', !!token);
-  console.log('Token length:', token?.length);
+    console.log('=== WritePage Debug ===');
+    console.log('Theme ID:', id);
+    console.log('INTERNAL_API_BASE_URL:', process.env.INTERNAL_API_BASE_URL);
+    console.log('INTERNAL_API_URL:', process.env.INTERNAL_API_URL);
 
-  if (!token) {
-    console.log('No token, redirecting to login');
-    // Redirect to login page if not authenticated, preserving the intended destination
-    const callbackUrl = encodeURIComponent(`/themes/${id}/write`);
-    redirect(`/login?callbackUrl=${callbackUrl}`);
-  }
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    console.log('Token present:', !!token);
+    console.log('Token length:', token?.length);
 
-  console.log('Fetching theme with ID:', id);
-  // Fetch the theme data on the server
-  const theme = await getThemeById(id, token);
-  console.log('Theme fetched:', !!theme);
-  console.log('Theme data:', theme);
+    if (!token) {
+      console.log('No token, redirecting to login');
+      // Redirect to login page if not authenticated, preserving the intended destination
+      const callbackUrl = encodeURIComponent(`/themes/${id}/write`);
+      redirect(`/login?callbackUrl=${callbackUrl}`);
+    }
 
-  if (!theme) {
-    console.log('Theme not found, calling notFound()');
-    notFound();
-  }
+    console.log('Fetching theme with ID:', id);
+    // Fetch the theme data on the server
+    const theme = await getThemeById(id, token);
+    console.log('Theme fetched:', !!theme);
+    console.log('Theme data:', theme);
 
-  console.log('Rendering page with theme:', theme.title);
+    if (!theme) {
+      console.log('Theme not found, calling notFound()');
+      notFound();
+    }
 
-  return (
-    <div className="container mx-auto p-4 sm:p-6 lg:p-8">
-      <div className="mb-8 rounded-lg bg-white p-6 shadow-md">
-        <Tag className="mb-2">{theme.category}</Tag>
-        <h1 className="mb-2 text-3xl font-bold text-gray-900">{theme.title}</h1>
-        <p className="text-gray-600">{theme.description}</p>
+    console.log('Rendering page with theme:', theme.title);
+
+    return (
+      <div className="container mx-auto p-4 sm:p-6 lg:p-8">
+        <div className="mb-8 rounded-lg bg-white p-6 shadow-md">
+          <Tag className="mb-2">{theme.category}</Tag>
+          <h1 className="mb-2 text-3xl font-bold text-gray-900">{theme.title}</h1>
+          <p className="text-gray-600">{theme.description}</p>
+        </div>
+        {/* The Editor component handles the client-side state and interactions */}
+        <Editor
+          themeId={theme.id}
+          timeLimitInSeconds={theme.timeLimitInSeconds}
+        />
       </div>
-      {/* The Editor component handles the client-side state and interactions */}
-      <Editor
-        themeId={theme.id}
-        timeLimitInSeconds={theme.timeLimitInSeconds}
-      />
-    </div>
-  );
+    );
+  } catch (error) {
+    console.error('Error in WritePage:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack');
+    throw error; // Re-throw to show error page
+  }
 }
