@@ -57,7 +57,7 @@ jobs:
       push: true
       tags: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/kotobalize-frontend:${{ github.sha }}
       build-args: |
-       NEXT_PUBLIC_API_URL=${{ steps.deploy_backend.outputs.url }}
+       NEXT_PUBLIC_API_URL=${{ steps.deploy_backend.outputs.url }}/api/v1
 
    - name: Deploy Frontend to Cloud Run
      uses: google-github-actions/deploy-cloudrun@v2
@@ -66,4 +66,5 @@ jobs:
       region: ${{ env.GAR_LOCATION }}
       image: ${{ env.GAR_LOCATION }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/${{ env.REPOSITORY }}/kotobalize-frontend:${{ github.sha }}
       flags: >-
+       --set-env-vars=INTERNAL_API_BASE_URL=${{ steps.deploy_backend.outputs.url }}/api/v1
        --allow-unauthenticated

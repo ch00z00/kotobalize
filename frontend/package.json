@@ -12,7 +12,7 @@
     "format:check": "prettier --check .",
     "test": "jest",
     "test:watch": "jest --watch",
-    "gen:types": "openapi-generator generate -i ../openapi.yaml -g typescript -o src/types/generated --additional-properties=modelPropertyNaming=original,enumPropertyNaming=original",
+    "gen:types": "openapi-generator generate -i ../openapi.yaml -g typescript-axios -o src/types/generated --additional-properties=modelPropertyNaming=original,enumPropertyNaming=original",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "prepare": "husky"
@@ -55,6 +55,7 @@
     "@types/react-dom": "^19",
     "@vitest/browser": "^3.2.4",
     "@vitest/coverage-v8": "^3.2.4",
+    "axios": "^1.7.9",
     "eslint": "^9",
     "eslint-config-next": "15.3.4",
     "eslint-config-prettier": "^10.1.5",

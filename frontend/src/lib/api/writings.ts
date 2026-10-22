@@ -2,7 +2,7 @@ import {
   NewReviewRequest,
   NewWritingRequest,
   Writing,
-} from '@/types/generated/models';
+} from '@/types/generated/api';
 import { PUBLIC_API_BASE_URL } from '@/lib/api/config';
 
 /**

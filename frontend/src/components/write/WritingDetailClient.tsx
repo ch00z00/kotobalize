@@ -4,7 +4,7 @@ import { useState } from 'react';
 import LinkButton from '@/components/atoms/LinkButton';
 // import { useAuthStore } from '@/store/auth';
 // import { requestAiReview } from '@/lib/api/writings.client';
-import { Writing } from '@/types/generated/models';
+import { Writing } from '@/types/generated/api';
 // import Button from '@/components/atoms/Button';
 // import ScoreCircle from '@/components/molecules/ScoreCircle';
 
